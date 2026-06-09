@@ -13,6 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.dicoding.tugas_akhir.ui.theme.Error
 import com.dicoding.tugas_akhir.ui.theme.Neutral200
@@ -20,6 +21,10 @@ import com.dicoding.tugas_akhir.ui.theme.Neutral500
 import com.dicoding.tugas_akhir.ui.theme.Primary1
 import com.dicoding.tugas_akhir.ui.theme.Primary2
 import com.dicoding.tugas_akhir.ui.theme.White
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.padding
+import com.dicoding.tugas_akhir.ui.theme.Neutral300
 
 enum class PrimaryButtonVariant {
     Blue,
@@ -57,7 +62,7 @@ fun PrimaryButton(
             containerColor = containerColor,
             contentColor = White,
             disabledContainerColor = Neutral200,
-            disabledContentColor = Neutral500
+            disabledContentColor = Neutral300
         )
     ) {
         if (leadingIcon != null) {
@@ -71,6 +76,41 @@ fun PrimaryButton(
         Text(
             text = text,
             style = MaterialTheme.typography.labelLarge
+        )
+    }
+}
+
+@Preview(
+    showBackground = true,
+    widthDp = 360
+)
+@Composable
+fun PrimaryButtonPreview() {
+    Column(
+        modifier = Modifier.padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        PrimaryButton(
+            text = "Cari Jadwal",
+            onClick = {}
+        )
+
+        PrimaryButton(
+            text = "Lanjut Pembayaran",
+            onClick = {},
+            variant = PrimaryButtonVariant.Dark
+        )
+
+        PrimaryButton(
+            text = "Batalkan Pesanan",
+            onClick = {},
+            variant = PrimaryButtonVariant.Danger
+        )
+
+        PrimaryButton(
+            text = "Button Disabled",
+            onClick = {},
+            enabled = false
         )
     }
 }
