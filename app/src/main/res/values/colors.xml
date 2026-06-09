@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="White">#FFFFFFFF</color>
+    <color name="Black">#FF111827</color>
+    <color name="Background">#FFF6F8FB</color>
+
+    <color name="Primary_1">#FF0B1F3A</color>
+    <color name="Primary_2">#FF1976D2</color>
+    <color name="Primary_3">#FFE8F2FD</color>
+
+    <color name="Secondary_1">#FF20C7B5</color>
+    <color name="Secondary_2">#FF139B8C</color>
+    <color name="Secondary_3">#FFE6FAF7</color>
+
+    <color name="Neutral_100">#FFF3F4F6</color>
+    <color name="Neutral_200">#FFE5E7EB</color>
+    <color name="Neutral_300">#FFD1D5DB</color>
+    <color name="Neutral_500">#FF6B7280</color>
+    <color name="Neutral_700">#FF374151</color>
+
+    <color name="Success">#FF16A34A</color>
+    <color name="Success_Light">#FFDCFCE7</color>
+
+    <color name="Info">#FF2563EB</color>
+    <color name="Info_Light">#FFDBEAFE</color>
+
+    <color name="Warning">#FFF59E0B</color>
+    <color name="Warning_Light">#FFFEF3C7</color>
+
+    <color name="Error">#FFDC2626</color>
+    <color name="Error_Light">#FFFEE2E2</color>
+</resources>
