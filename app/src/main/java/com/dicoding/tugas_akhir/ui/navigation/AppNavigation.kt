@@ -7,7 +7,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -47,12 +46,41 @@ import com.dicoding.tugas_akhir.ui.screens.onboarding.OnboardingScreen
 import com.dicoding.tugas_akhir.ui.screens.splash.SplashScreen
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.UserProfileChangeRequest
+import kotlinx.coroutines.launch
+import androidx.credentials.ClearCredentialStateRequest
+import androidx.credentials.CredentialManager
 
 @Composable
 fun AppNavigation() {
     val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
-    val currentRoute = navBackStackEntry?.destination?.route ?: Screens.Home
+    val currentRoute = navBackStackEntry?.destination?.route
+
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+
+    val auth = remember {
+        FirebaseAuth.getInstance()
+    }
+
+    val prefs = remember {
+        context.getSharedPreferences(
+            "app_preferences",
+            android.content.Context.MODE_PRIVATE
+        )
+    }
+
+    var hasSeenOnboarding by remember {
+        mutableStateOf(prefs.getBoolean("has_seen_onboarding", false))
+    }
+
+    var isLoggedIn by remember {
+        mutableStateOf(auth.currentUser != null)
+    }
+
+    var pendingProtectedRoute by remember {
+        mutableStateOf<String?>(null)
+    }
 
     val bottomBarRoutes = listOf(
         Screens.Home,
@@ -77,38 +105,40 @@ fun AppNavigation() {
         Screens.Profile
     )
 
-    val context = LocalContext.current
-    val scope = rememberCoroutineScope()
+    val showBottomBar = currentRoute != null &&
+            currentRoute in bottomBarRoutes
 
-    val auth = remember {
-        FirebaseAuth.getInstance()
-    }
+    val showTopBar = currentRoute != null &&
+            currentRoute !in hideTopBarRoutes
 
-    val prefs = remember {
-        context.getSharedPreferences("app_preferences", android.content.Context.MODE_PRIVATE)
-    }
-
-    var hasSeenOnboarding by remember {
-        mutableStateOf(prefs.getBoolean("has_seen_onboarding", false))
-    }
-
-    var isLoggedIn by remember {
-        mutableStateOf(auth.currentUser != null)
-    }
-
-    var pendingProtectedRoute by remember {
-        mutableStateOf<String?>(null)
-    }
-
-    val showBottomBar = currentRoute in bottomBarRoutes
-    val showTopBar = currentRoute !in hideTopBarRoutes
-
-    val showBackTopBar = currentRoute !in bottomBarRoutes
-            && currentRoute != Screens.Home
+    val showBackTopBar = currentRoute != null &&
+            currentRoute !in bottomBarRoutes &&
+            currentRoute !in hideTopBarRoutes
 
     var originPort by remember { mutableStateOf<Port?>(null) }
     var destinationPort by remember { mutableStateOf<Port?>(null) }
     var selectedDate by remember { mutableStateOf("") }
+
+    fun navigateAfterAuthSuccess() {
+        val targetRoute = pendingProtectedRoute ?: Screens.Home
+        val fromProtectedRoute = pendingProtectedRoute != null
+
+        pendingProtectedRoute = null
+
+        navController.navigate(targetRoute) {
+            popUpTo(
+                if (fromProtectedRoute) {
+                    Screens.AuthRequired
+                } else {
+                    Screens.Login
+                }
+            ) {
+                inclusive = true
+            }
+
+            launchSingleTop = true
+        }
+    }
 
     Scaffold(
         containerColor = Background,
@@ -116,14 +146,14 @@ fun AppNavigation() {
             if (showTopBar) {
                 if (showBackTopBar) {
                     AppBackTopBar(
-                        title = getTopBarTitle(currentRoute),
+                        title = getTopBarTitle(currentRoute.orEmpty()),
                         onBackClick = {
                             navController.popBackStack()
                         }
                     )
                 } else {
                     AppTopBar(
-                        title = getTopBarTitle(currentRoute)
+                        title = getTopBarTitle(currentRoute.orEmpty())
                     )
                 }
             }
@@ -131,7 +161,7 @@ fun AppNavigation() {
         bottomBar = {
             if (showBottomBar) {
                 AppBottomNavigationBar(
-                    currentRoute = currentRoute,
+                    currentRoute = currentRoute.orEmpty(),
                     onItemClick = { item ->
                         if (!isLoggedIn && item.route in protectedRoutes) {
                             pendingProtectedRoute = item.route
@@ -142,10 +172,9 @@ fun AppNavigation() {
                         } else {
                             navController.navigate(item.route) {
                                 popUpTo(Screens.Home) {
-                                    saveState = true
+                                    inclusive = false
                                 }
                                 launchSingleTop = true
-                                restoreState = true
                             }
                         }
                     }
@@ -200,16 +229,7 @@ fun AppNavigation() {
                         auth.signInWithEmailAndPassword(email, password)
                             .addOnSuccessListener {
                                 isLoggedIn = true
-
-                                val targetRoute = pendingProtectedRoute ?: Screens.Home
-                                pendingProtectedRoute = null
-
-                                navController.navigate(targetRoute) {
-                                    popUpTo(Screens.Login) {
-                                        inclusive = true
-                                    }
-                                    launchSingleTop = true
-                                }
+                                navigateAfterAuthSuccess()
                             }
                             .addOnFailureListener { exception ->
                                 onError(exception.message ?: "Login gagal")
@@ -222,16 +242,7 @@ fun AppNavigation() {
                             scope = scope,
                             onSuccess = {
                                 isLoggedIn = true
-
-                                val targetRoute = pendingProtectedRoute ?: Screens.Home
-                                pendingProtectedRoute = null
-
-                                navController.navigate(targetRoute) {
-                                    popUpTo(Screens.Login) {
-                                        inclusive = true
-                                    }
-                                    launchSingleTop = true
-                                }
+                                navigateAfterAuthSuccess()
                             },
                             onError = onError
                         )
@@ -240,10 +251,17 @@ fun AppNavigation() {
                         navController.navigate(Screens.Register)
                     },
                     onContinueAsGuestClick = {
+                        val fromProtectedRoute = pendingProtectedRoute != null
                         pendingProtectedRoute = null
 
                         navController.navigate(Screens.Home) {
-                            popUpTo(Screens.Login) {
+                            popUpTo(
+                                if (fromProtectedRoute) {
+                                    Screens.AuthRequired
+                                } else {
+                                    Screens.Login
+                                }
+                            ) {
                                 inclusive = true
                             }
                             launchSingleTop = true
@@ -264,16 +282,7 @@ fun AppNavigation() {
                                 auth.currentUser?.updateProfile(profileUpdates)
 
                                 isLoggedIn = true
-
-                                val targetRoute = pendingProtectedRoute ?: Screens.Home
-                                pendingProtectedRoute = null
-
-                                navController.navigate(targetRoute) {
-                                    popUpTo(Screens.Register) {
-                                        inclusive = true
-                                    }
-                                    launchSingleTop = true
-                                }
+                                navigateAfterAuthSuccess()
                             }
                             .addOnFailureListener { exception ->
                                 onError(exception.message ?: "Daftar akun gagal")
@@ -287,18 +296,9 @@ fun AppNavigation() {
             composable(Screens.AuthRequired) {
                 AuthRequiredScreen(
                     onLoginClick = {
-                        isLoggedIn = true
-
-                        val targetRoute = pendingProtectedRoute ?: Screens.Home
-
-                        navController.navigate(targetRoute) {
-                            popUpTo(Screens.AuthRequired) {
-                                inclusive = true
-                            }
+                        navController.navigate(Screens.Login) {
                             launchSingleTop = true
                         }
-
-                        pendingProtectedRoute = null
                     },
                     onBackHomeClick = {
                         pendingProtectedRoute = null
@@ -502,7 +502,30 @@ fun AppNavigation() {
             }
 
             composable(Screens.Profile) {
-                ProfileScreen()
+                val user = auth.currentUser
+
+                ProfileScreen(
+                    name = user?.displayName ?: "Vira Sare",
+                    email = user?.email ?: "virasare@gmail.com",
+                    onLogoutClick = {
+                        scope.launch {
+                            val credentialManager = CredentialManager.create(context)
+
+                            auth.signOut()
+                            credentialManager.clearCredentialState(ClearCredentialStateRequest())
+
+                            isLoggedIn = false
+                            pendingProtectedRoute = null
+
+                            navController.navigate(Screens.Home) {
+                                popUpTo(Screens.Home) {
+                                    inclusive = false
+                                }
+                                launchSingleTop = true
+                            }
+                        }
+                    }
+                )
             }
         }
     }
