@@ -15,6 +15,7 @@ import com.dicoding.tugas_akhir.ui.theme.Primary2
 import com.dicoding.tugas_akhir.ui.theme.Primary3
 import com.dicoding.tugas_akhir.ui.theme.White
 import androidx.compose.ui.tooling.preview.Preview
+import com.dicoding.tugas_akhir.ui.navigation.Screens
 
 data class BottomNavItem(
     val route: String,
@@ -24,27 +25,27 @@ data class BottomNavItem(
 
 val bottomNavItems = listOf(
     BottomNavItem(
-        route = "home",
+        route = Screens.Home,
         label = "Beranda",
         icon = R.drawable.ic_beranda
     ),
     BottomNavItem(
-        route = "schedule",
+        route = Screens.Schedule,
         label = "Jadwal",
         icon = R.drawable.ic_tiket
     ),
     BottomNavItem(
-        route = "orders",
+        route = Screens.MyTicket,
         label = "Pesanan",
         icon = R.drawable.ic_riwayat
     ),
     BottomNavItem(
-        route = "notifications",
+        route = Screens.Notification,
         label = "Notifikasi",
         icon = R.drawable.ic_notifikasi
     ),
     BottomNavItem(
-        route = "profile",
+        route = Screens.Profile,
         label = "Profil",
         icon = R.drawable.ic_person
     )
