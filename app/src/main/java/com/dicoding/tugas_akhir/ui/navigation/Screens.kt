@@ -12,4 +12,12 @@ object Screens {
     const val ETicket = "e_ticket"
     const val Notification = "notification"
     const val Profile = "profile"
+
+    const val SearchResult = "search_result"
+
+    const val PortSearchRoute = "port_search/{type}"
+
+    fun portSearch(type: String): String {
+        return "port_search/$type"
+    }
 }

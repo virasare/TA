@@ -6,17 +6,26 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
+import com.dicoding.tugas_akhir.data.dummy.Port
+import com.dicoding.tugas_akhir.data.dummy.dummyPorts
 import com.dicoding.tugas_akhir.ui.components.navigation.AppBackTopBar
 import com.dicoding.tugas_akhir.ui.components.navigation.AppBottomNavigationBar
 import com.dicoding.tugas_akhir.ui.components.navigation.AppTopBar
-import com.dicoding.tugas_akhir.ui.screens.HomeScreen
+import com.dicoding.tugas_akhir.ui.screens.SearchResultScreen
+import com.dicoding.tugas_akhir.ui.screens.home.HomeScreen
 import com.dicoding.tugas_akhir.ui.screens.booking.BookingSummaryScreen
 import com.dicoding.tugas_akhir.ui.screens.booking.PassengerFormScreen
+import com.dicoding.tugas_akhir.ui.screens.home.PortSearchScreen
 import com.dicoding.tugas_akhir.ui.screens.myticket.MyTicketScreen
 import com.dicoding.tugas_akhir.ui.screens.notification.NotificationScreen
 import com.dicoding.tugas_akhir.ui.screens.payment.PaymentScreen
@@ -43,21 +52,31 @@ fun AppNavigation() {
     )
 
     val showBottomBar = currentRoute in bottomBarRoutes
+    val showTopBar = currentRoute != Screens.Home
+
+    val showBackTopBar = currentRoute !in bottomBarRoutes
+            && currentRoute != Screens.Home
+
+    var originPort by remember { mutableStateOf<Port?>(null) }
+    var destinationPort by remember { mutableStateOf<Port?>(null) }
+    var selectedDate by remember { mutableStateOf("") }
 
     Scaffold(
         containerColor = Background,
         topBar = {
-            if (currentRoute in bottomBarRoutes) {
-                AppTopBar(
-                    title = getTopBarTitle(currentRoute)
-                )
-            } else {
-                AppBackTopBar(
-                    title = getTopBarTitle(currentRoute),
-                    onBackClick = {
-                        navController.popBackStack()
-                    }
-                )
+            if (showTopBar) {
+                if (showBackTopBar) {
+                    AppBackTopBar(
+                        title = getTopBarTitle(currentRoute),
+                        onBackClick = {
+                            navController.popBackStack()
+                        }
+                    )
+                } else {
+                    AppTopBar(
+                        title = getTopBarTitle(currentRoute)
+                    )
+                }
             }
         },
         bottomBar = {
@@ -87,14 +106,61 @@ fun AppNavigation() {
         ) {
             composable(Screens.Home) {
                 HomeScreen(
+                    originPort = originPort,
+                    destinationPort = destinationPort,
+                    selectedDate = selectedDate,
+                    onOriginClick = {
+                        navController.navigate(Screens.portSearch("origin"))
+                    },
+                    onDestinationClick = {
+                        navController.navigate(Screens.portSearch("destination"))
+                    },
+                    onDateSelected = { date ->
+                        selectedDate = date
+                    },
                     onSearchScheduleClick = {
+                        navController.navigate(Screens.SearchResult)
+                    }
+                )
+            }
+
+            composable(
+                route = Screens.PortSearchRoute,
+                arguments = listOf(
+                    navArgument("type") {
+                        type = NavType.StringType
+                    }
+                )
+            ) { backStackEntry ->
+                val type = backStackEntry.arguments?.getString("type") ?: "origin"
+
+                PortSearchScreen(
+                    ports = dummyPorts,
+                    onPortSelected = { port ->
+                        if (type == "origin") {
+                            originPort = port
+                        } else {
+                            destinationPort = port
+                        }
+
+                        navController.popBackStack()
+                    }
+                )
+            }
+
+            composable(Screens.SearchResult) {
+                SearchResultScreen(
+                    originPort = originPort,
+                    destinationPort = destinationPort,
+                    selectedDate = selectedDate,
+                    onScheduleClick = {
+                        navController.navigate(Screens.ScheduleDetail)
+                    },
+                    onBackToHomeClick = {
+                        navController.popBackStack()
+                    },
+                    onSeeAllSchedulesClick = {
                         navController.navigate(Screens.Schedule)
-                    },
-                    onMyTicketClick = {
-                        navController.navigate(Screens.MyTicket)
-                    },
-                    onNotificationClick = {
-                        navController.navigate(Screens.Notification)
                     }
                 )
             }
@@ -206,6 +272,8 @@ private fun getTopBarTitle(route: String): String {
         Screens.ETicket -> "E-Ticket"
         Screens.Notification -> "Notifikasi"
         Screens.Profile -> "Profil"
+        Screens.PortSearchRoute -> "Pilih Pelabuhan"
+        Screens.SearchResult -> "Hasil Pencarian"
         else -> ""
     }
 }
