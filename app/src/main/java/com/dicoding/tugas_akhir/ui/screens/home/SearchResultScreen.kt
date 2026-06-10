@@ -1,4 +1,4 @@
-package com.dicoding.tugas_akhir.ui.screens
+package com.dicoding.tugas_akhir.ui.screens.home
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement

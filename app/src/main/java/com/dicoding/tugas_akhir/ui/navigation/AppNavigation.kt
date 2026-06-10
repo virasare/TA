@@ -22,7 +22,7 @@ import com.dicoding.tugas_akhir.data.dummy.popularRoutes
 import com.dicoding.tugas_akhir.ui.components.navigation.AppBackTopBar
 import com.dicoding.tugas_akhir.ui.components.navigation.AppBottomNavigationBar
 import com.dicoding.tugas_akhir.ui.components.navigation.AppTopBar
-import com.dicoding.tugas_akhir.ui.screens.SearchResultScreen
+import com.dicoding.tugas_akhir.ui.screens.home.SearchResultScreen
 import com.dicoding.tugas_akhir.ui.screens.home.HomeScreen
 import com.dicoding.tugas_akhir.ui.screens.booking.BookingSummaryScreen
 import com.dicoding.tugas_akhir.ui.screens.booking.PassengerFormScreen
@@ -53,8 +53,13 @@ fun AppNavigation() {
         Screens.Profile
     )
 
+    val hideTopBarRoutes = listOf(
+        Screens.Home,
+        Screens.Schedule
+    )
+
     val showBottomBar = currentRoute in bottomBarRoutes
-    val showTopBar = currentRoute != Screens.Home
+    val showTopBar = currentRoute !in hideTopBarRoutes
 
     val showBackTopBar = currentRoute !in bottomBarRoutes
             && currentRoute != Screens.Home
