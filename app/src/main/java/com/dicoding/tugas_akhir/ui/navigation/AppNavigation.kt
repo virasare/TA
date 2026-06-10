@@ -1,15 +1,16 @@
 package com.dicoding.tugas_akhir.ui.navigation
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -39,6 +40,13 @@ import com.dicoding.tugas_akhir.ui.screens.ticket.ETicketScreen
 import com.dicoding.tugas_akhir.ui.theme.Background
 import com.dicoding.tugas_akhir.data.dummy.dummyShipSchedules
 import com.dicoding.tugas_akhir.ui.screens.auth.AuthRequiredScreen
+import com.dicoding.tugas_akhir.ui.screens.auth.LoginScreen
+import com.dicoding.tugas_akhir.ui.screens.auth.RegisterScreen
+import com.dicoding.tugas_akhir.ui.screens.auth.signInWithGoogle
+import com.dicoding.tugas_akhir.ui.screens.onboarding.OnboardingScreen
+import com.dicoding.tugas_akhir.ui.screens.splash.SplashScreen
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.UserProfileChangeRequest
 
 @Composable
 fun AppNavigation() {
@@ -55,6 +63,10 @@ fun AppNavigation() {
     )
 
     val hideTopBarRoutes = listOf(
+        Screens.Splash,
+        Screens.Onboarding,
+        Screens.Login,
+        Screens.Register,
         Screens.Home,
         Screens.Schedule
     )
@@ -65,8 +77,28 @@ fun AppNavigation() {
         Screens.Profile
     )
 
-    var isLoggedIn by remember { mutableStateOf(false) }
-    var pendingProtectedRoute by remember { mutableStateOf<String?>(null) }
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+
+    val auth = remember {
+        FirebaseAuth.getInstance()
+    }
+
+    val prefs = remember {
+        context.getSharedPreferences("app_preferences", android.content.Context.MODE_PRIVATE)
+    }
+
+    var hasSeenOnboarding by remember {
+        mutableStateOf(prefs.getBoolean("has_seen_onboarding", false))
+    }
+
+    var isLoggedIn by remember {
+        mutableStateOf(auth.currentUser != null)
+    }
+
+    var pendingProtectedRoute by remember {
+        mutableStateOf<String?>(null)
+    }
 
     val showBottomBar = currentRoute in bottomBarRoutes
     val showTopBar = currentRoute !in hideTopBarRoutes
@@ -123,12 +155,135 @@ fun AppNavigation() {
     ) { innerPadding ->
         NavHost(
             navController = navController,
-            startDestination = Screens.Home,
-            modifier = Modifier
-                .fillMaxSize()
-                .background(Background)
-                .padding(innerPadding)
+            startDestination = Screens.Splash,
+            modifier = Modifier.padding(innerPadding)
         ) {
+            composable(Screens.Splash) {
+                SplashScreen(
+                    onSplashFinished = {
+                        val nextRoute = if (hasSeenOnboarding) {
+                            Screens.Home
+                        } else {
+                            Screens.Onboarding
+                        }
+
+                        navController.navigate(nextRoute) {
+                            popUpTo(Screens.Splash) {
+                                inclusive = true
+                            }
+                        }
+                    }
+                )
+            }
+
+            composable(Screens.Onboarding) {
+                OnboardingScreen(
+                    onFinishClick = {
+                        hasSeenOnboarding = true
+
+                        prefs.edit()
+                            .putBoolean("has_seen_onboarding", true)
+                            .apply()
+
+                        navController.navigate(Screens.Login) {
+                            popUpTo(Screens.Onboarding) {
+                                inclusive = true
+                            }
+                        }
+                    }
+                )
+            }
+
+            composable(Screens.Login) {
+                LoginScreen(
+                    onLoginClick = { email, password, onError ->
+                        auth.signInWithEmailAndPassword(email, password)
+                            .addOnSuccessListener {
+                                isLoggedIn = true
+
+                                val targetRoute = pendingProtectedRoute ?: Screens.Home
+                                pendingProtectedRoute = null
+
+                                navController.navigate(targetRoute) {
+                                    popUpTo(Screens.Login) {
+                                        inclusive = true
+                                    }
+                                    launchSingleTop = true
+                                }
+                            }
+                            .addOnFailureListener { exception ->
+                                onError(exception.message ?: "Login gagal")
+                            }
+                    },
+                    onGoogleLoginClick = { onError ->
+                        signInWithGoogle(
+                            context = context,
+                            auth = auth,
+                            scope = scope,
+                            onSuccess = {
+                                isLoggedIn = true
+
+                                val targetRoute = pendingProtectedRoute ?: Screens.Home
+                                pendingProtectedRoute = null
+
+                                navController.navigate(targetRoute) {
+                                    popUpTo(Screens.Login) {
+                                        inclusive = true
+                                    }
+                                    launchSingleTop = true
+                                }
+                            },
+                            onError = onError
+                        )
+                    },
+                    onRegisterClick = {
+                        navController.navigate(Screens.Register)
+                    },
+                    onContinueAsGuestClick = {
+                        pendingProtectedRoute = null
+
+                        navController.navigate(Screens.Home) {
+                            popUpTo(Screens.Login) {
+                                inclusive = true
+                            }
+                            launchSingleTop = true
+                        }
+                    }
+                )
+            }
+
+            composable(Screens.Register) {
+                RegisterScreen(
+                    onRegisterClick = { name, email, password, onError ->
+                        auth.createUserWithEmailAndPassword(email, password)
+                            .addOnSuccessListener {
+                                val profileUpdates = UserProfileChangeRequest.Builder()
+                                    .setDisplayName(name)
+                                    .build()
+
+                                auth.currentUser?.updateProfile(profileUpdates)
+
+                                isLoggedIn = true
+
+                                val targetRoute = pendingProtectedRoute ?: Screens.Home
+                                pendingProtectedRoute = null
+
+                                navController.navigate(targetRoute) {
+                                    popUpTo(Screens.Register) {
+                                        inclusive = true
+                                    }
+                                    launchSingleTop = true
+                                }
+                            }
+                            .addOnFailureListener { exception ->
+                                onError(exception.message ?: "Daftar akun gagal")
+                            }
+                    },
+                    onLoginClick = {
+                        navController.popBackStack()
+                    }
+                )
+            }
             composable(Screens.AuthRequired) {
                 AuthRequiredScreen(
                     onLoginClick = {

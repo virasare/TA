@@ -8,10 +8,10 @@
             <InsightsFilterSettings>
               <option name="connection">
                 <ConnectionSetting>
-                  <option name="appId" value="PLACEHOLDER" />
-                  <option name="mobileSdkAppId" value="" />
-                  <option name="projectId" value="" />
-                  <option name="projectNumber" value="" />
+                  <option name="appId" value="com.dicoding.tugas_akhir" />
+                  <option name="mobileSdkAppId" value="1:292026138311:android:65f472f3702a751430c8e2" />
+                  <option name="projectId" value="tugas-akhir-2208561062" />
+                  <option name="projectNumber" value="292026138311" />
                 </ConnectionSetting>
               </option>
               <option name="signal" value="SIGNAL_UNSPECIFIED" />

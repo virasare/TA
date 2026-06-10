@@ -2,6 +2,10 @@ package com.dicoding.tugas_akhir.ui.navigation
 
 object Screens {
     const val AuthRequired = "auth_required"
+    const val Splash = "splash"
+    const val Onboarding = "onboarding"
+    const val Login = "login"
+    const val Register = "register"
     const val Home = "home"
     const val Schedule = "schedule"
     const val ScheduleDetail = "schedule_detail/{scheduleId}"
@@ -13,7 +17,6 @@ object Screens {
     const val ETicket = "e_ticket"
     const val Notification = "notification"
     const val Profile = "profile"
-
     const val SearchResult = "search_result"
 
     const val PortSearchRoute = "port_search/{type}"
