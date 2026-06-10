@@ -1,5 +1,7 @@
 package com.dicoding.tugas_akhir.ui.navigation
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
@@ -9,7 +11,9 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.dicoding.tugas_akhir.ui.components.navigation.AppBackTopBar
 import com.dicoding.tugas_akhir.ui.components.navigation.AppBottomNavigationBar
+import com.dicoding.tugas_akhir.ui.components.navigation.AppTopBar
 import com.dicoding.tugas_akhir.ui.screens.HomeScreen
 import com.dicoding.tugas_akhir.ui.screens.booking.BookingSummaryScreen
 import com.dicoding.tugas_akhir.ui.screens.booking.PassengerFormScreen
@@ -21,6 +25,7 @@ import com.dicoding.tugas_akhir.ui.screens.profile.ProfileScreen
 import com.dicoding.tugas_akhir.ui.screens.schedule.ScheduleDetailScreen
 import com.dicoding.tugas_akhir.ui.screens.schedule.ScheduleScreen
 import com.dicoding.tugas_akhir.ui.screens.ticket.ETicketScreen
+import com.dicoding.tugas_akhir.ui.theme.Background
 
 @Composable
 fun AppNavigation() {
@@ -40,6 +45,21 @@ fun AppNavigation() {
     val showBottomBar = currentRoute in bottomBarRoutes
 
     Scaffold(
+        containerColor = Background,
+        topBar = {
+            if (currentRoute in bottomBarRoutes) {
+                AppTopBar(
+                    title = getTopBarTitle(currentRoute)
+                )
+            } else {
+                AppBackTopBar(
+                    title = getTopBarTitle(currentRoute),
+                    onBackClick = {
+                        navController.popBackStack()
+                    }
+                )
+            }
+        },
         bottomBar = {
             if (showBottomBar) {
                 AppBottomNavigationBar(
@@ -60,7 +80,10 @@ fun AppNavigation() {
         NavHost(
             navController = navController,
             startDestination = Screens.Home,
-            modifier = Modifier.padding(innerPadding)
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Background)
+                .padding(innerPadding)
         ) {
             composable(Screens.Home) {
                 HomeScreen(
@@ -131,9 +154,7 @@ fun AppNavigation() {
             composable(Screens.PaymentSuccess) {
                 PaymentSuccessScreen(
                     onSeeTicketClick = {
-                        navController.navigate(Screens.ETicket) {
-                            popUpTo(Screens.Home)
-                        }
+                        navController.navigate(Screens.ETicket)
                     },
                     onBackHomeClick = {
                         navController.navigate(Screens.Home) {
@@ -169,5 +190,22 @@ fun AppNavigation() {
                 ProfileScreen()
             }
         }
+    }
+}
+
+private fun getTopBarTitle(route: String): String {
+    return when (route) {
+        Screens.Home -> "Beranda"
+        Screens.Schedule -> "Jadwal Kapal"
+        Screens.ScheduleDetail -> "Detail Jadwal"
+        Screens.PassengerForm -> "Data Penumpang"
+        Screens.BookingSummary -> "Ringkasan Pesanan"
+        Screens.Payment -> "Pembayaran"
+        Screens.PaymentSuccess -> "Pembayaran Berhasil"
+        Screens.MyTicket -> "Pesanan Saya"
+        Screens.ETicket -> "E-Ticket"
+        Screens.Notification -> "Notifikasi"
+        Screens.Profile -> "Profil"
+        else -> ""
     }
 }

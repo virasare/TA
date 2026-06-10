@@ -31,7 +31,6 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import com.dicoding.tugas_akhir.ui.theme.Background
 import com.dicoding.tugas_akhir.ui.theme.Neutral700
-import com.dicoding.tugas_akhir.ui.theme.Primary2
 import androidx.compose.ui.tooling.preview.Preview
 import com.dicoding.tugas_akhir.ui.theme.Neutral500
 import com.dicoding.tugas_akhir.ui.theme.White
@@ -46,7 +45,7 @@ fun AppTopBar(
     onActionClick: () -> Unit = {}
 ) {
     CenterAlignedTopAppBar(
-        modifier = modifier.height(64.dp),
+        modifier = modifier,
         title = {
             Text(
                 text = title,
@@ -83,7 +82,7 @@ fun AppBackTopBar(
     onBackClick: () -> Unit = {}
 ) {
     TopAppBar(
-        modifier = modifier.height(64.dp),
+        modifier = modifier,
         title = {
             Text(
                 text = title,
