@@ -1,6 +1,7 @@
 package com.dicoding.tugas_akhir.ui.navigation
 
 object Screens {
+    const val AuthRequired = "auth_required"
     const val Home = "home"
     const val Schedule = "schedule"
     const val ScheduleDetail = "schedule_detail/{scheduleId}"

@@ -38,11 +38,11 @@ import com.dicoding.tugas_akhir.ui.screens.schedule.ScheduleScreen
 import com.dicoding.tugas_akhir.ui.screens.ticket.ETicketScreen
 import com.dicoding.tugas_akhir.ui.theme.Background
 import com.dicoding.tugas_akhir.data.dummy.dummyShipSchedules
+import com.dicoding.tugas_akhir.ui.screens.auth.AuthRequiredScreen
 
 @Composable
 fun AppNavigation() {
     val navController = rememberNavController()
-
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route ?: Screens.Home
 
@@ -58,6 +58,15 @@ fun AppNavigation() {
         Screens.Home,
         Screens.Schedule
     )
+
+    val protectedRoutes = listOf(
+        Screens.MyTicket,
+        Screens.Notification,
+        Screens.Profile
+    )
+
+    var isLoggedIn by remember { mutableStateOf(false) }
+    var pendingProtectedRoute by remember { mutableStateOf<String?>(null) }
 
     val showBottomBar = currentRoute in bottomBarRoutes
     val showTopBar = currentRoute !in hideTopBarRoutes
@@ -92,12 +101,20 @@ fun AppNavigation() {
                 AppBottomNavigationBar(
                     currentRoute = currentRoute,
                     onItemClick = { item ->
-                        navController.navigate(item.route) {
-                            popUpTo(Screens.Home) {
-                                saveState = true
+                        if (!isLoggedIn && item.route in protectedRoutes) {
+                            pendingProtectedRoute = item.route
+
+                            navController.navigate(Screens.AuthRequired) {
+                                launchSingleTop = true
                             }
-                            launchSingleTop = true
-                            restoreState = true
+                        } else {
+                            navController.navigate(item.route) {
+                                popUpTo(Screens.Home) {
+                                    saveState = true
+                                }
+                                launchSingleTop = true
+                                restoreState = true
+                            }
                         }
                     }
                 )
@@ -112,6 +129,34 @@ fun AppNavigation() {
                 .background(Background)
                 .padding(innerPadding)
         ) {
+            composable(Screens.AuthRequired) {
+                AuthRequiredScreen(
+                    onLoginClick = {
+                        isLoggedIn = true
+
+                        val targetRoute = pendingProtectedRoute ?: Screens.Home
+
+                        navController.navigate(targetRoute) {
+                            popUpTo(Screens.AuthRequired) {
+                                inclusive = true
+                            }
+                            launchSingleTop = true
+                        }
+
+                        pendingProtectedRoute = null
+                    },
+                    onBackHomeClick = {
+                        pendingProtectedRoute = null
+
+                        navController.navigate(Screens.Home) {
+                            popUpTo(Screens.Home) {
+                                inclusive = false
+                            }
+                            launchSingleTop = true
+                        }
+                    }
+                )
+            }
             composable(Screens.Home) {
                 HomeScreen(
                     originPort = originPort,
@@ -220,7 +265,15 @@ fun AppNavigation() {
                         navController.popBackStack()
                     },
                     onBookTicketClick = {
-                        navController.navigate(Screens.PassengerForm)
+                        if (isLoggedIn) {
+                            navController.navigate(Screens.PassengerForm)
+                        } else {
+                            pendingProtectedRoute = Screens.PassengerForm
+
+                            navController.navigate(Screens.AuthRequired) {
+                                launchSingleTop = true
+                            }
+                        }
                     }
                 )
             }
@@ -302,6 +355,7 @@ fun AppNavigation() {
 
 private fun getTopBarTitle(route: String): String {
     return when (route) {
+        Screens.AuthRequired -> "Login Diperlukan"
         Screens.Home -> "Beranda"
         Screens.Schedule -> "Jadwal Kapal"
         Screens.ScheduleDetail -> "Detail Jadwal"
