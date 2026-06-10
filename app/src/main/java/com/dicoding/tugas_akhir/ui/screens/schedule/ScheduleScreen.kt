@@ -46,7 +46,7 @@ import com.dicoding.tugas_akhir.ui.components.filters.ScheduleFilterSection
 
 @Composable
 fun ScheduleScreen(
-    onScheduleClick: () -> Unit
+    onScheduleClick: (Int) -> Unit
 ) {
     var selectedFilter by remember {
         mutableStateOf(ScheduleFilter.All)
@@ -99,7 +99,9 @@ fun ScheduleScreen(
                         price = schedule.price,
                         quota = schedule.quota,
                         status = schedule.status,
-                        onClick = onScheduleClick
+                        onClick = {
+                            onScheduleClick(schedule.id)
+                        }
                     )
                 }
             }

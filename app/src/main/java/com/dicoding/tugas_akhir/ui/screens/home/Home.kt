@@ -109,14 +109,14 @@ private fun HomeGreeting() {
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         Text(
-            text = "Halo, Vira",
+            text = "Mau berangkat ke mana?",
             color = Neutral700,
             fontWeight = FontWeight.Bold,
             style = MaterialTheme.typography.titleLarge
         )
 
         Text(
-            text = "Mau berangkat ke mana?",
+            text = "Cari jadwal kapal dan lihat detail perjalanan dengan mudah.",
             color = Neutral500,
             style = MaterialTheme.typography.bodyMedium
         )

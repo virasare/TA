@@ -42,7 +42,7 @@ fun SearchResultScreen(
     originPort: Port?,
     destinationPort: Port?,
     selectedDate: String,
-    onScheduleClick: () -> Unit,
+    onScheduleClick: (Int) -> Unit,
     onBackToHomeClick: () -> Unit,
     onSeeAllSchedulesClick: () -> Unit
 ) {
@@ -134,7 +134,9 @@ fun SearchResultScreen(
                         price = schedule.price,
                         quota = schedule.quota,
                         status = schedule.status,
-                        onClick = onScheduleClick
+                        onClick = {
+                            onScheduleClick(schedule.id)
+                        }
                     )
                 }
             }
@@ -215,7 +217,7 @@ private fun SearchResultRecommendationContent(
     destinationPort: Port,
     selectedDate: String,
     recommendations: List<ShipSchedule>,
-    onScheduleClick: () -> Unit,
+    onScheduleClick: (Int) -> Unit,
     onBackToHomeClick: () -> Unit,
     onSeeAllSchedulesClick: () -> Unit
 ) {
@@ -282,7 +284,9 @@ private fun SearchResultRecommendationContent(
                     price = schedule.price,
                     quota = schedule.quota,
                     status = schedule.status,
-                    onClick = onScheduleClick
+                    onClick = {
+                        onScheduleClick(schedule.id)
+                    }
                 )
             }
         }

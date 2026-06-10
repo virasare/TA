@@ -37,6 +37,7 @@ import com.dicoding.tugas_akhir.ui.screens.schedule.ScheduleDetailScreen
 import com.dicoding.tugas_akhir.ui.screens.schedule.ScheduleScreen
 import com.dicoding.tugas_akhir.ui.screens.ticket.ETicketScreen
 import com.dicoding.tugas_akhir.ui.theme.Background
+import com.dicoding.tugas_akhir.data.dummy.dummyShipSchedules
 
 @Composable
 fun AppNavigation() {
@@ -163,8 +164,8 @@ fun AppNavigation() {
                     originPort = originPort,
                     destinationPort = destinationPort,
                     selectedDate = selectedDate,
-                    onScheduleClick = {
-                        navController.navigate(Screens.ScheduleDetail)
+                    onScheduleClick = { scheduleId ->
+                        navController.navigate(Screens.scheduleDetail(scheduleId))
                     },
                     onBackToHomeClick = {
                         navController.popBackStack()
@@ -188,22 +189,33 @@ fun AppNavigation() {
 
                 PopularRouteResultScreen(
                     popularRoute = selectedPopularRoute,
-                    onScheduleClick = {
-                        navController.navigate(Screens.ScheduleDetail)
+                    onScheduleClick = { scheduleId ->
+                        navController.navigate(Screens.scheduleDetail(scheduleId))
                     }
                 )
             }
 
             composable(Screens.Schedule) {
                 ScheduleScreen(
-                    onScheduleClick = {
-                        navController.navigate(Screens.ScheduleDetail)
+                    onScheduleClick = { scheduleId ->
+                        navController.navigate(Screens.scheduleDetail(scheduleId))
                     }
                 )
             }
 
-            composable(Screens.ScheduleDetail) {
+            composable(
+                route = Screens.ScheduleDetail,
+                arguments = listOf(
+                    navArgument("scheduleId") {
+                        type = NavType.IntType
+                    }
+                )
+            ) { backStackEntry ->
+                val scheduleId = backStackEntry.arguments?.getInt("scheduleId")
+                val schedule = dummyShipSchedules.find { it.id == scheduleId }
+
                 ScheduleDetailScreen(
+                    schedule = schedule,
                     onBackClick = {
                         navController.popBackStack()
                     },

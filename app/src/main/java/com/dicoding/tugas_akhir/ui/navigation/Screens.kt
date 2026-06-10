@@ -3,7 +3,7 @@ package com.dicoding.tugas_akhir.ui.navigation
 object Screens {
     const val Home = "home"
     const val Schedule = "schedule"
-    const val ScheduleDetail = "schedule_detail"
+    const val ScheduleDetail = "schedule_detail/{scheduleId}"
     const val PassengerForm = "passenger_form"
     const val BookingSummary = "booking_summary"
     const val Payment = "payment"
@@ -25,5 +25,9 @@ object Screens {
 
     fun popularRouteResult(routeId: Int): String {
         return "popular_route_result/$routeId"
+    }
+
+    fun scheduleDetail(scheduleId: Int): String {
+        return "schedule_detail/$scheduleId"
     }
 }

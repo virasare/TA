@@ -25,7 +25,7 @@ import com.dicoding.tugas_akhir.ui.theme.Neutral700
 @Composable
 fun PopularRouteResultScreen(
     popularRoute: PopularRoute?,
-    onScheduleClick: () -> Unit
+    onScheduleClick: (Int) -> Unit
 ) {
     if (popularRoute == null) {
         Column(
@@ -104,7 +104,9 @@ fun PopularRouteResultScreen(
                 price = schedule.price,
                 quota = schedule.quota,
                 status = schedule.status,
-                onClick = onScheduleClick
+                onClick = {
+                    onScheduleClick(schedule.id)
+                }
             )
         }
     }
