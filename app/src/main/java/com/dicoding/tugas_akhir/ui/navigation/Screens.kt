@@ -20,4 +20,10 @@ object Screens {
     fun portSearch(type: String): String {
         return "port_search/$type"
     }
+
+    const val PopularRouteResult = "popular_route_result/{routeId}"
+
+    fun popularRouteResult(routeId: Int): String {
+        return "popular_route_result/$routeId"
+    }
 }

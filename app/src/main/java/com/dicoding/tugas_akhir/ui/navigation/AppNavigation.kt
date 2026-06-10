@@ -18,6 +18,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.dicoding.tugas_akhir.data.dummy.Port
 import com.dicoding.tugas_akhir.data.dummy.dummyPorts
+import com.dicoding.tugas_akhir.data.dummy.popularRoutes
 import com.dicoding.tugas_akhir.ui.components.navigation.AppBackTopBar
 import com.dicoding.tugas_akhir.ui.components.navigation.AppBottomNavigationBar
 import com.dicoding.tugas_akhir.ui.components.navigation.AppTopBar
@@ -25,6 +26,7 @@ import com.dicoding.tugas_akhir.ui.screens.SearchResultScreen
 import com.dicoding.tugas_akhir.ui.screens.home.HomeScreen
 import com.dicoding.tugas_akhir.ui.screens.booking.BookingSummaryScreen
 import com.dicoding.tugas_akhir.ui.screens.booking.PassengerFormScreen
+import com.dicoding.tugas_akhir.ui.screens.home.PopularRouteResultScreen
 import com.dicoding.tugas_akhir.ui.screens.home.PortSearchScreen
 import com.dicoding.tugas_akhir.ui.screens.myticket.MyTicketScreen
 import com.dicoding.tugas_akhir.ui.screens.notification.NotificationScreen
@@ -120,6 +122,9 @@ fun AppNavigation() {
                     },
                     onSearchScheduleClick = {
                         navController.navigate(Screens.SearchResult)
+                    },
+                    onPopularRouteClick = { route ->
+                        navController.navigate(Screens.popularRouteResult(route.id))
                     }
                 )
             }
@@ -161,6 +166,25 @@ fun AppNavigation() {
                     },
                     onSeeAllSchedulesClick = {
                         navController.navigate(Screens.Schedule)
+                    }
+                )
+            }
+
+            composable(
+                route = Screens.PopularRouteResult,
+                arguments = listOf(
+                    navArgument("routeId") {
+                        type = NavType.IntType
+                    }
+                )
+            ) { backStackEntry ->
+                val routeId = backStackEntry.arguments?.getInt("routeId")
+                val selectedPopularRoute = popularRoutes.find { it.id == routeId }
+
+                PopularRouteResultScreen(
+                    popularRoute = selectedPopularRoute,
+                    onScheduleClick = {
+                        navController.navigate(Screens.ScheduleDetail)
                     }
                 )
             }
@@ -274,6 +298,7 @@ private fun getTopBarTitle(route: String): String {
         Screens.Profile -> "Profil"
         Screens.PortSearchRoute -> "Pilih Pelabuhan"
         Screens.SearchResult -> "Hasil Pencarian"
+        Screens.PopularRouteResult -> "Rute Populer"
         else -> ""
     }
 }

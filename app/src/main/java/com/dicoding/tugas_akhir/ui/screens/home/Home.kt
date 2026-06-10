@@ -23,6 +23,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.material3.rememberDatePickerState
+import com.dicoding.tugas_akhir.data.dummy.PopularRoute
 import com.dicoding.tugas_akhir.data.dummy.Port
 import com.dicoding.tugas_akhir.data.dummy.popularRoutes
 import com.dicoding.tugas_akhir.ui.components.PopularRouteSection
@@ -43,7 +44,8 @@ fun HomeScreen(
     onOriginClick: () -> Unit,
     onDestinationClick: () -> Unit,
     onDateSelected: (String) -> Unit,
-    onSearchScheduleClick: () -> Unit
+    onSearchScheduleClick: () -> Unit,
+    onPopularRouteClick: (PopularRoute) -> Unit
 ) {
     var showDatePicker by remember { mutableStateOf(false) }
 
@@ -81,8 +83,8 @@ fun HomeScreen(
 
             PopularRouteSection(
                 routes = popularRoutes,
-                onRouteClick = {
-                    onSearchScheduleClick()
+                onRouteClick = { route ->
+                    onPopularRouteClick(route)
                 }
             )
         }
