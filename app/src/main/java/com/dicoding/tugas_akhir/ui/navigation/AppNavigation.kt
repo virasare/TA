@@ -49,6 +49,8 @@ import com.google.firebase.auth.UserProfileChangeRequest
 import kotlinx.coroutines.launch
 import androidx.credentials.ClearCredentialStateRequest
 import androidx.credentials.CredentialManager
+import com.dicoding.tugas_akhir.data.dummy.dummyNotifications
+import com.dicoding.tugas_akhir.ui.screens.notification.NotificationDetailScreen
 
 @Composable
 fun AppNavigation() {
@@ -498,7 +500,30 @@ fun AppNavigation() {
             }
 
             composable(Screens.Notification) {
-                NotificationScreen()
+                NotificationScreen(
+                    onNotificationClick = { notificationId ->
+                        navController.navigate(Screens.notificationDetail(notificationId))
+                    }
+                )
+            }
+
+            composable(
+                route = Screens.NotificationDetail,
+                arguments = listOf(
+                    navArgument("notificationId") {
+                        type = NavType.IntType
+                    }
+                )
+            ) { backStackEntry ->
+                val notificationId = backStackEntry.arguments?.getInt("notificationId")
+                val notification = dummyNotifications.find { it.id == notificationId }
+
+                NotificationDetailScreen(
+                    notification = notification,
+                    onSeeTicketClick = {
+                        navController.navigate(Screens.ETicket)
+                    }
+                )
             }
 
             composable(Screens.Profile) {
@@ -544,6 +569,7 @@ private fun getTopBarTitle(route: String): String {
         Screens.MyTicket -> "Pesanan Saya"
         Screens.ETicket -> "E-Ticket"
         Screens.Notification -> "Notifikasi"
+        Screens.NotificationDetail -> "Detail Notifikasi"
         Screens.Profile -> "Profil"
         Screens.PortSearchRoute -> "Pilih Pelabuhan"
         Screens.SearchResult -> "Hasil Pencarian"
