@@ -1,12 +1,11 @@
 package com.dicoding.tugas_akhir.ui.screens.payment
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Check
+import androidx.compose.material.icons.outlined.Close
+import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -22,10 +21,9 @@ import com.dicoding.tugas_akhir.ui.components.buttons.SecondaryButton
 import com.dicoding.tugas_akhir.ui.theme.*
 
 @Composable
-fun PaymentSuccessScreen(
-    bookingCode: String = "NKP12345",
-    onSeeTicketClick: () -> Unit,
-    onBackHomeClick: () -> Unit
+fun PaymentFailedScreen(
+    onHelpClick: () -> Unit,
+    onCheckAgainClick: () -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -39,10 +37,10 @@ fun PaymentSuccessScreen(
 
         Surface(
             shape = CircleShape,
-            color = Primary2
+            color = androidx.compose.ui.graphics.Color(0xFFE53935)
         ) {
             Icon(
-                imageVector = Icons.Outlined.Check,
+                imageVector = Icons.Outlined.Close,
                 contentDescription = null,
                 tint = White,
                 modifier = Modifier
@@ -52,7 +50,7 @@ fun PaymentSuccessScreen(
         }
 
         Text(
-            text = "Pembayaran Berhasil",
+            text = "Pembayaran Belum Berhasil",
             color = Neutral700,
             fontWeight = FontWeight.Bold,
             style = MaterialTheme.typography.titleLarge,
@@ -60,7 +58,7 @@ fun PaymentSuccessScreen(
         )
 
         Text(
-            text = "Tiket berhasil diterbitkan dan dapat dilihat pada halaman Tiket Saya.",
+            text = "Pembayaran belum berhasil atau masih diproses. Silakan cek ulang status pembayaran.",
             color = Neutral500,
             style = MaterialTheme.typography.bodyMedium,
             textAlign = TextAlign.Center,
@@ -70,27 +68,25 @@ fun PaymentSuccessScreen(
         Surface(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = 28.dp),
-            color = White,
-            shape = RoundedCornerShape(16.dp),
-            border = BorderStroke(1.dp, Neutral200),
-            shadowElevation = 2.dp
+                .padding(top = 24.dp),
+            color = androidx.compose.ui.graphics.Color(0xFFFFF4D8),
+            shape = MaterialTheme.shapes.large
         ) {
-            Column(
-                modifier = Modifier.padding(18.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
+            Row(
+                modifier = Modifier.padding(14.dp),
+                verticalAlignment = Alignment.Top
             ) {
-                Text(
-                    text = "Kode Booking",
-                    color = Neutral500,
-                    style = MaterialTheme.typography.bodySmall
+                Icon(
+                    imageVector = Icons.Outlined.Info,
+                    contentDescription = null,
+                    tint = androidx.compose.ui.graphics.Color(0xFFD98A00)
                 )
 
                 Text(
-                    text = bookingCode,
-                    color = Primary2,
-                    fontWeight = FontWeight.Bold,
-                    style = MaterialTheme.typography.titleMedium
+                    text = "Jika pembayaran sudah dilakukan, sistem mungkin membutuhkan beberapa saat untuk memperbarui status.",
+                    color = Neutral700,
+                    style = MaterialTheme.typography.bodySmall,
+                    modifier = Modifier.padding(start = 10.dp)
                 )
             }
         }
@@ -101,14 +97,14 @@ fun PaymentSuccessScreen(
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             SecondaryButton(
-                text = "Kembali ke Beranda",
-                onClick = onBackHomeClick,
+                text = "Hubungi Bantuan",
+                onClick = onHelpClick,
                 modifier = Modifier.weight(1f)
             )
 
             PrimaryButton(
-                text = "Lihat E-Ticket",
-                onClick = onSeeTicketClick,
+                text = "Cek Ulang Status",
+                onClick = onCheckAgainClick,
                 modifier = Modifier.weight(1f)
             )
         }

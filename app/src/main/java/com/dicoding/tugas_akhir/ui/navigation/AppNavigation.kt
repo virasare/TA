@@ -1,5 +1,6 @@
 package com.dicoding.tugas_akhir.ui.navigation
 
+import android.content.Context
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
@@ -10,47 +11,56 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.credentials.ClearCredentialStateRequest
+import androidx.credentials.CredentialManager
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.dicoding.tugas_akhir.data.dummy.ETicketData
+import com.dicoding.tugas_akhir.data.dummy.PassengerData
 import com.dicoding.tugas_akhir.data.dummy.Port
+import com.dicoding.tugas_akhir.data.dummy.ShipSchedule
+import com.dicoding.tugas_akhir.data.dummy.TicketClassOption
+import com.dicoding.tugas_akhir.data.dummy.createETicketFromCurrentBooking
+import com.dicoding.tugas_akhir.data.dummy.dummyNotifications
 import com.dicoding.tugas_akhir.data.dummy.dummyPorts
+import com.dicoding.tugas_akhir.data.dummy.dummyShipSchedules
 import com.dicoding.tugas_akhir.data.dummy.popularRoutes
+import com.dicoding.tugas_akhir.data.dummy.toETicketData
 import com.dicoding.tugas_akhir.ui.components.navigation.AppBackTopBar
 import com.dicoding.tugas_akhir.ui.components.navigation.AppBottomNavigationBar
 import com.dicoding.tugas_akhir.ui.components.navigation.AppTopBar
-import com.dicoding.tugas_akhir.ui.screens.home.SearchResultScreen
-import com.dicoding.tugas_akhir.ui.screens.home.HomeScreen
-import com.dicoding.tugas_akhir.ui.screens.booking.BookingSummaryScreen
-import com.dicoding.tugas_akhir.ui.screens.booking.PassengerFormScreen
-import com.dicoding.tugas_akhir.ui.screens.home.PopularRouteResultScreen
-import com.dicoding.tugas_akhir.ui.screens.home.PortSearchScreen
-import com.dicoding.tugas_akhir.ui.screens.myticket.MyTicketScreen
-import com.dicoding.tugas_akhir.ui.screens.notification.NotificationScreen
-import com.dicoding.tugas_akhir.ui.screens.payment.PaymentScreen
-import com.dicoding.tugas_akhir.ui.screens.payment.PaymentSuccessScreen
-import com.dicoding.tugas_akhir.ui.screens.profile.ProfileScreen
-import com.dicoding.tugas_akhir.ui.screens.schedule.ScheduleDetailScreen
-import com.dicoding.tugas_akhir.ui.screens.schedule.ScheduleScreen
-import com.dicoding.tugas_akhir.ui.screens.ticket.ETicketScreen
-import com.dicoding.tugas_akhir.ui.theme.Background
-import com.dicoding.tugas_akhir.data.dummy.dummyShipSchedules
 import com.dicoding.tugas_akhir.ui.screens.auth.AuthRequiredScreen
 import com.dicoding.tugas_akhir.ui.screens.auth.LoginScreen
 import com.dicoding.tugas_akhir.ui.screens.auth.RegisterScreen
 import com.dicoding.tugas_akhir.ui.screens.auth.signInWithGoogle
+import com.dicoding.tugas_akhir.ui.screens.booking.BookingSummaryScreen
+import com.dicoding.tugas_akhir.ui.screens.booking.PassengerFormScreen
+import com.dicoding.tugas_akhir.ui.screens.booking.SelectTicketScreen
+import com.dicoding.tugas_akhir.ui.screens.home.HomeScreen
+import com.dicoding.tugas_akhir.ui.screens.home.PopularRouteResultScreen
+import com.dicoding.tugas_akhir.ui.screens.home.PortSearchScreen
+import com.dicoding.tugas_akhir.ui.screens.home.SearchResultScreen
+import com.dicoding.tugas_akhir.ui.screens.myticket.MyTicketScreen
+import com.dicoding.tugas_akhir.ui.screens.notification.NotificationDetailScreen
+import com.dicoding.tugas_akhir.ui.screens.notification.NotificationScreen
 import com.dicoding.tugas_akhir.ui.screens.onboarding.OnboardingScreen
+import com.dicoding.tugas_akhir.ui.screens.payment.PaymentFailedScreen
+import com.dicoding.tugas_akhir.ui.screens.payment.PaymentScreen
+import com.dicoding.tugas_akhir.ui.screens.payment.PaymentSuccessScreen
+import com.dicoding.tugas_akhir.ui.screens.payment.PaymentWaitingScreen
+import com.dicoding.tugas_akhir.ui.screens.profile.ProfileScreen
+import com.dicoding.tugas_akhir.ui.screens.schedule.ScheduleDetailScreen
+import com.dicoding.tugas_akhir.ui.screens.schedule.ScheduleScreen
 import com.dicoding.tugas_akhir.ui.screens.splash.SplashScreen
+import com.dicoding.tugas_akhir.ui.screens.ticket.ETicketScreen
+import com.dicoding.tugas_akhir.ui.theme.Background
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.UserProfileChangeRequest
 import kotlinx.coroutines.launch
-import androidx.credentials.ClearCredentialStateRequest
-import androidx.credentials.CredentialManager
-import com.dicoding.tugas_akhir.data.dummy.dummyNotifications
-import com.dicoding.tugas_akhir.ui.screens.notification.NotificationDetailScreen
 
 @Composable
 fun AppNavigation() {
@@ -68,7 +78,7 @@ fun AppNavigation() {
     val prefs = remember {
         context.getSharedPreferences(
             "app_preferences",
-            android.content.Context.MODE_PRIVATE
+            Context.MODE_PRIVATE
         )
     }
 
@@ -82,6 +92,34 @@ fun AppNavigation() {
 
     var pendingProtectedRoute by remember {
         mutableStateOf<String?>(null)
+    }
+
+    var originPort by remember {
+        mutableStateOf<Port?>(null)
+    }
+
+    var destinationPort by remember {
+        mutableStateOf<Port?>(null)
+    }
+
+    var selectedDate by remember {
+        mutableStateOf("")
+    }
+
+    var selectedBookingSchedule by remember {
+        mutableStateOf<ShipSchedule?>(null)
+    }
+
+    var selectedTicketClass by remember {
+        mutableStateOf<TicketClassOption?>(null)
+    }
+
+    var passengerData by remember {
+        mutableStateOf<PassengerData?>(null)
+    }
+
+    var passengerList by remember {
+        mutableStateOf<List<PassengerData>>(emptyList())
     }
 
     val bottomBarRoutes = listOf(
@@ -117,10 +155,6 @@ fun AppNavigation() {
             currentRoute !in bottomBarRoutes &&
             currentRoute !in hideTopBarRoutes
 
-    var originPort by remember { mutableStateOf<Port?>(null) }
-    var destinationPort by remember { mutableStateOf<Port?>(null) }
-    var selectedDate by remember { mutableStateOf("") }
-
     fun navigateAfterAuthSuccess() {
         val targetRoute = pendingProtectedRoute ?: Screens.Home
         val fromProtectedRoute = pendingProtectedRoute != null
@@ -140,6 +174,10 @@ fun AppNavigation() {
 
             launchSingleTop = true
         }
+    }
+
+    var selectedETicketData by remember {
+        mutableStateOf<ETicketData?>(null)
     }
 
     Scaffold(
@@ -295,6 +333,7 @@ fun AppNavigation() {
                     }
                 )
             }
+
             composable(Screens.AuthRequired) {
                 AuthRequiredScreen(
                     onLoginClick = {
@@ -314,6 +353,7 @@ fun AppNavigation() {
                     }
                 )
             }
+
             composable(Screens.Home) {
                 HomeScreen(
                     originPort = originPort,
@@ -387,7 +427,9 @@ fun AppNavigation() {
                 )
             ) { backStackEntry ->
                 val routeId = backStackEntry.arguments?.getInt("routeId")
-                val selectedPopularRoute = popularRoutes.find { it.id == routeId }
+                val selectedPopularRoute = popularRoutes.find {
+                    it.id == routeId
+                }
 
                 PopularRouteResultScreen(
                     popularRoute = selectedPopularRoute,
@@ -414,7 +456,9 @@ fun AppNavigation() {
                 )
             ) { backStackEntry ->
                 val scheduleId = backStackEntry.arguments?.getInt("scheduleId")
-                val schedule = dummyShipSchedules.find { it.id == scheduleId }
+                val schedule = dummyShipSchedules.find {
+                    it.id == scheduleId
+                }
 
                 ScheduleDetailScreen(
                     schedule = schedule,
@@ -422,10 +466,12 @@ fun AppNavigation() {
                         navController.popBackStack()
                     },
                     onBookTicketClick = {
+                        selectedBookingSchedule = schedule
+
                         if (isLoggedIn) {
-                            navController.navigate(Screens.PassengerForm)
+                            navController.navigate(Screens.SelectTicket)
                         } else {
-                            pendingProtectedRoute = Screens.PassengerForm
+                            pendingProtectedRoute = Screens.SelectTicket
 
                             navController.navigate(Screens.AuthRequired) {
                                 launchSingleTop = true
@@ -435,34 +481,71 @@ fun AppNavigation() {
                 )
             }
 
+            composable(Screens.SelectTicket) {
+                SelectTicketScreen(
+                    schedule = selectedBookingSchedule,
+                    onContinueClick = { ticket ->
+                        selectedTicketClass = ticket
+                        navController.navigate(Screens.PassengerForm)
+                    }
+                )
+            }
+
             composable(Screens.PassengerForm) {
                 PassengerFormScreen(
                     onBackClick = {
                         navController.popBackStack()
                     },
-                    onContinueClick = {
+                    onContinueClick = { passenger ->
+                        passengerData = passenger
+                        passengerList = listOf(passenger)
                         navController.navigate(Screens.BookingSummary)
                     }
                 )
             }
 
             composable(Screens.BookingSummary) {
-                BookingSummaryScreen(
-                    onBackClick = {
-                        navController.popBackStack()
-                    },
-                    onPaymentClick = {
-                        navController.navigate(Screens.Payment)
-                    }
-                )
+                val currentPassengerData = passengerData
+
+                if (currentPassengerData != null) {
+                    BookingSummaryScreen(
+                        schedule = selectedBookingSchedule,
+                        selectedTicket = selectedTicketClass,
+                        passengerData = currentPassengerData,
+                        onBackClick = {
+                            navController.popBackStack()
+                        },
+                        onPaymentClick = {
+                            navController.navigate(Screens.Payment)
+                        }
+                    )
+                }
             }
 
             composable(Screens.Payment) {
                 PaymentScreen(
+                    schedule = selectedBookingSchedule,
+                    selectedTicket = selectedTicketClass,
+                    passengerList = passengerList,
                     onBackClick = {
                         navController.popBackStack()
                     },
-                    onPaymentSuccessClick = {
+                    onPayNowClick = {
+                        navController.navigate(Screens.PaymentWaiting)
+                    }
+                )
+            }
+
+            composable(Screens.PaymentWaiting) {
+                PaymentWaitingScreen(
+                    schedule = selectedBookingSchedule,
+                    selectedTicket = selectedTicketClass,
+                    onCancelClick = {
+                        navController.navigate(Screens.MyTicket) {
+                            launchSingleTop = true
+                        }
+                    },
+                    onCheckStatusClick = {
                         navController.navigate(Screens.PaymentSuccess)
                     }
                 )
@@ -470,22 +553,45 @@ fun AppNavigation() {
 
             composable(Screens.PaymentSuccess) {
                 PaymentSuccessScreen(
+                    bookingCode = "NKP12345",
                     onSeeTicketClick = {
+                        selectedETicketData = createETicketFromCurrentBooking(
+                            schedule = selectedBookingSchedule,
+                            selectedTicket = selectedTicketClass,
+                            passengerList = passengerList,
+                            bookingCode = "NKP12345"
+                        )
+
                         navController.navigate(Screens.ETicket)
                     },
                     onBackHomeClick = {
                         navController.navigate(Screens.Home) {
                             popUpTo(Screens.Home) {
-                                inclusive = true
+                                inclusive = false
                             }
+                            launchSingleTop = true
                         }
+                    }
+                )
+            }
+
+            composable(Screens.PaymentFailed) {
+                PaymentFailedScreen(
+                    onHelpClick = {
+                        navController.navigate(Screens.Home) {
+                            launchSingleTop = true
+                        }
+                    },
+                    onCheckAgainClick = {
+                        navController.navigate(Screens.PaymentSuccess)
                     }
                 )
             }
 
             composable(Screens.MyTicket) {
                 MyTicketScreen(
-                    onTicketClick = {
+                    onTicketClick = { order ->
+                        selectedETicketData = order.toETicketData()
                         navController.navigate(Screens.ETicket)
                     }
                 )
@@ -493,8 +599,11 @@ fun AppNavigation() {
 
             composable(Screens.ETicket) {
                 ETicketScreen(
+                    ticketData = selectedETicketData,
                     onBackClick = {
-                        navController.popBackStack()
+                        navController.navigate(Screens.MyTicket) {
+                            launchSingleTop = true
+                        }
                     }
                 )
             }
@@ -516,7 +625,9 @@ fun AppNavigation() {
                 )
             ) { backStackEntry ->
                 val notificationId = backStackEntry.arguments?.getInt("notificationId")
-                val notification = dummyNotifications.find { it.id == notificationId }
+                val notification = dummyNotifications.find {
+                    it.id == notificationId
+                }
 
                 NotificationDetailScreen(
                     notification = notification,
@@ -537,7 +648,9 @@ fun AppNavigation() {
                             val credentialManager = CredentialManager.create(context)
 
                             auth.signOut()
-                            credentialManager.clearCredentialState(ClearCredentialStateRequest())
+                            credentialManager.clearCredentialState(
+                                ClearCredentialStateRequest()
+                            )
 
                             isLoggedIn = false
                             pendingProtectedRoute = null
@@ -562,10 +675,13 @@ private fun getTopBarTitle(route: String): String {
         Screens.Home -> "Beranda"
         Screens.Schedule -> "Jadwal Kapal"
         Screens.ScheduleDetail -> "Detail Jadwal"
+        Screens.SelectTicket -> "Pilih Tiket"
         Screens.PassengerForm -> "Data Penumpang"
         Screens.BookingSummary -> "Ringkasan Pesanan"
         Screens.Payment -> "Pembayaran"
-        Screens.PaymentSuccess -> "Pembayaran Berhasil"
+        Screens.PaymentWaiting -> "Menunggu Pembayaran"
+        Screens.PaymentFailed -> "Status Pembayaran"
+        Screens.PaymentSuccess -> "Status Pembayaran"
         Screens.MyTicket -> "Pesanan Saya"
         Screens.ETicket -> "E-Ticket"
         Screens.Notification -> "Notifikasi"
