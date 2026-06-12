@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
@@ -37,7 +36,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.dicoding.tugas_akhir.data.dummy.ETicketData
 import com.dicoding.tugas_akhir.data.dummy.PassengerData
-import com.dicoding.tugas_akhir.ui.components.buttons.PrimaryButton
+import com.dicoding.tugas_akhir.ui.components.dialog.buttons.PrimaryButton
 import com.dicoding.tugas_akhir.ui.theme.Background
 import com.dicoding.tugas_akhir.ui.theme.Neutral200
 import com.dicoding.tugas_akhir.ui.theme.Neutral500

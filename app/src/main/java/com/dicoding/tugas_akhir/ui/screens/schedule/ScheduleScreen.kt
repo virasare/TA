@@ -30,8 +30,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.dicoding.tugas_akhir.data.dummy.ShipSchedule
 import com.dicoding.tugas_akhir.data.dummy.dummyShipSchedules
-import com.dicoding.tugas_akhir.ui.components.cards.ShipScheduleCard
-import com.dicoding.tugas_akhir.ui.components.cards.ShipScheduleStatus
+import com.dicoding.tugas_akhir.ui.components.dialog.cards.ShipScheduleCard
+import com.dicoding.tugas_akhir.ui.components.dialog.cards.ShipScheduleStatus
 import com.dicoding.tugas_akhir.ui.theme.Background
 import com.dicoding.tugas_akhir.ui.theme.Neutral200
 import com.dicoding.tugas_akhir.ui.theme.Neutral500
@@ -41,8 +41,8 @@ import com.dicoding.tugas_akhir.ui.theme.Primary3
 import com.dicoding.tugas_akhir.ui.theme.White
 import java.text.SimpleDateFormat
 import java.util.Locale
-import com.dicoding.tugas_akhir.ui.components.filters.ScheduleFilter
-import com.dicoding.tugas_akhir.ui.components.filters.ScheduleFilterSection
+import com.dicoding.tugas_akhir.ui.components.dialog.filters.ScheduleFilter
+import com.dicoding.tugas_akhir.ui.components.dialog.filters.ScheduleFilterSection
 
 @Composable
 fun ScheduleScreen(

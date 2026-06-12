@@ -1,4 +1,4 @@
-package com.dicoding.tugas_akhir.ui.components.cards
+package com.dicoding.tugas_akhir.ui.components.dialog.cards
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
@@ -25,13 +25,14 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.dicoding.tugas_akhir.data.dummy.dummyShipSchedules
-import com.dicoding.tugas_akhir.ui.components.buttons.PrimaryButton
-import com.dicoding.tugas_akhir.ui.components.feedback.BadgeVariant
-import com.dicoding.tugas_akhir.ui.components.feedback.StatusBadge
+import com.dicoding.tugas_akhir.ui.components.dialog.buttons.PrimaryButton
+import com.dicoding.tugas_akhir.ui.components.dialog.feedback.BadgeVariant
+import com.dicoding.tugas_akhir.ui.components.dialog.feedback.StatusBadge
 import com.dicoding.tugas_akhir.ui.theme.Neutral200
 import com.dicoding.tugas_akhir.ui.theme.Neutral500
 import com.dicoding.tugas_akhir.ui.theme.Neutral700
@@ -218,7 +219,7 @@ fun ShipScheduleCard(
 
 @Composable
 private fun ScheduleInfoItem(
-    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    icon: ImageVector,
     title: String,
     value: String,
     modifier: Modifier = Modifier

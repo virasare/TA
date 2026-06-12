@@ -2,7 +2,7 @@ package com.dicoding.tugas_akhir.data.recomendation
 
 import com.dicoding.tugas_akhir.data.dummy.Port
 import com.dicoding.tugas_akhir.data.dummy.ShipSchedule
-import com.dicoding.tugas_akhir.ui.components.cards.ShipScheduleStatus
+import com.dicoding.tugas_akhir.ui.components.dialog.cards.ShipScheduleStatus
 import java.text.SimpleDateFormat
 import java.util.Locale
 import kotlin.math.abs

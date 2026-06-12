@@ -26,8 +26,8 @@ import androidx.compose.material3.rememberDatePickerState
 import com.dicoding.tugas_akhir.data.dummy.PopularRoute
 import com.dicoding.tugas_akhir.data.dummy.Port
 import com.dicoding.tugas_akhir.data.dummy.popularRoutes
-import com.dicoding.tugas_akhir.ui.components.PopularRouteSection
-import com.dicoding.tugas_akhir.ui.components.cards.SearchScheduleCard
+import com.dicoding.tugas_akhir.ui.components.dialog.PopularRouteSection
+import com.dicoding.tugas_akhir.ui.components.dialog.cards.SearchScheduleCard
 import com.dicoding.tugas_akhir.ui.theme.Background
 import com.dicoding.tugas_akhir.ui.theme.Neutral500
 import com.dicoding.tugas_akhir.ui.theme.Neutral700

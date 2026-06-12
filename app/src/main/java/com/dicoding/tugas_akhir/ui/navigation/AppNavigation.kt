@@ -30,9 +30,9 @@ import com.dicoding.tugas_akhir.data.dummy.dummyPorts
 import com.dicoding.tugas_akhir.data.dummy.dummyShipSchedules
 import com.dicoding.tugas_akhir.data.dummy.popularRoutes
 import com.dicoding.tugas_akhir.data.dummy.toETicketData
-import com.dicoding.tugas_akhir.ui.components.navigation.AppBackTopBar
-import com.dicoding.tugas_akhir.ui.components.navigation.AppBottomNavigationBar
-import com.dicoding.tugas_akhir.ui.components.navigation.AppTopBar
+import com.dicoding.tugas_akhir.ui.components.dialog.navigation.AppBackTopBar
+import com.dicoding.tugas_akhir.ui.components.dialog.navigation.AppBottomNavigationBar
+import com.dicoding.tugas_akhir.ui.components.dialog.navigation.AppTopBar
 import com.dicoding.tugas_akhir.ui.screens.auth.AuthRequiredScreen
 import com.dicoding.tugas_akhir.ui.screens.auth.LoginScreen
 import com.dicoding.tugas_akhir.ui.screens.auth.RegisterScreen

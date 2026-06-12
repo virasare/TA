@@ -40,19 +40,18 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.dicoding.tugas_akhir.data.dummy.ShipSchedule
-import com.dicoding.tugas_akhir.ui.components.buttons.PrimaryButton
-import com.dicoding.tugas_akhir.ui.components.feedback.BadgeVariant
-import com.dicoding.tugas_akhir.ui.components.feedback.InfoBox
-import com.dicoding.tugas_akhir.ui.components.feedback.InfoBoxVariant
-import com.dicoding.tugas_akhir.ui.components.feedback.StatusBadge
+import com.dicoding.tugas_akhir.ui.components.dialog.buttons.PrimaryButton
+import com.dicoding.tugas_akhir.ui.components.dialog.feedback.BadgeVariant
+import com.dicoding.tugas_akhir.ui.components.dialog.feedback.InfoBox
+import com.dicoding.tugas_akhir.ui.components.dialog.feedback.InfoBoxVariant
+import com.dicoding.tugas_akhir.ui.components.dialog.feedback.StatusBadge
 import com.dicoding.tugas_akhir.ui.theme.Background
 import com.dicoding.tugas_akhir.ui.theme.Neutral200
 import com.dicoding.tugas_akhir.ui.theme.Neutral500
 import com.dicoding.tugas_akhir.ui.theme.Neutral700
 import com.dicoding.tugas_akhir.ui.theme.Primary2
-import com.dicoding.tugas_akhir.ui.theme.Primary3
 import com.dicoding.tugas_akhir.ui.theme.White
-import com.dicoding.tugas_akhir.ui.components.cards.ShipScheduleStatus
+import com.dicoding.tugas_akhir.ui.components.dialog.cards.ShipScheduleStatus
 
 private data class TicketClass(
     val name: String,

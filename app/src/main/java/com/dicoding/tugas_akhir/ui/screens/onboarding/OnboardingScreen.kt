@@ -2,7 +2,6 @@ package com.dicoding.tugas_akhir.ui.screens.onboarding
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -12,7 +11,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Surface
 import androidx.compose.material3.MaterialTheme
@@ -29,14 +27,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.dicoding.tugas_akhir.R
-import com.dicoding.tugas_akhir.ui.components.buttons.PrimaryButton
-import com.dicoding.tugas_akhir.ui.components.buttons.SecondaryButton
+import com.dicoding.tugas_akhir.ui.components.dialog.buttons.PrimaryButton
+import com.dicoding.tugas_akhir.ui.components.dialog.buttons.SecondaryButton
 import com.dicoding.tugas_akhir.ui.theme.Background
 import com.dicoding.tugas_akhir.ui.theme.Neutral200
 import com.dicoding.tugas_akhir.ui.theme.Neutral500
 import com.dicoding.tugas_akhir.ui.theme.Neutral700
 import com.dicoding.tugas_akhir.ui.theme.Primary2
-import com.dicoding.tugas_akhir.ui.theme.White
 
 private data class OnboardingItem(
     val title: String,

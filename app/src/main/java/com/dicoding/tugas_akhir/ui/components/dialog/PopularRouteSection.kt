@@ -1,4 +1,4 @@
-package com.dicoding.tugas_akhir.ui.components
+package com.dicoding.tugas_akhir.ui.components.dialog
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable

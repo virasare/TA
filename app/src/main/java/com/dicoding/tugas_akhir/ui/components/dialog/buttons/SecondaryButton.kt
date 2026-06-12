@@ -1,66 +1,54 @@
-package com.dicoding.tugas_akhir.ui.components.buttons
+package com.dicoding.tugas_akhir.ui.components.dialog.buttons
 
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.dicoding.tugas_akhir.ui.theme.Error
 import com.dicoding.tugas_akhir.ui.theme.Neutral200
-import com.dicoding.tugas_akhir.ui.theme.Neutral500
-import com.dicoding.tugas_akhir.ui.theme.Primary1
+import com.dicoding.tugas_akhir.ui.theme.Neutral300
 import com.dicoding.tugas_akhir.ui.theme.Primary2
 import com.dicoding.tugas_akhir.ui.theme.White
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.padding
-import com.dicoding.tugas_akhir.ui.theme.Neutral300
-
-enum class PrimaryButtonVariant {
-    Blue,
-    Dark,
-    Danger
-}
 
 @Composable
-fun PrimaryButton(
+fun SecondaryButton(
     text: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
-    variant: PrimaryButtonVariant = PrimaryButtonVariant.Blue,
     leadingIcon: ImageVector? = null
 ) {
-    val containerColor = when (variant) {
-        PrimaryButtonVariant.Blue -> Primary2
-        PrimaryButtonVariant.Dark -> Primary1
-        PrimaryButtonVariant.Danger -> Error
-    }
-
-    Button(
+    OutlinedButton(
         onClick = onClick,
         enabled = enabled,
         modifier = modifier
             .fillMaxWidth()
             .height(48.dp),
         shape = RoundedCornerShape(10.dp),
+        border = BorderStroke(
+            width = 1.dp,
+            color = if (enabled) Primary2 else Neutral200
+        ),
         contentPadding = PaddingValues(
             horizontal = 24.dp,
             vertical = 12.dp
         ),
-        colors = ButtonDefaults.buttonColors(
-            containerColor = containerColor,
-            contentColor = White,
+        colors = ButtonDefaults.outlinedButtonColors(
+            containerColor = if (enabled) White else Neutral200,
+            contentColor = if (enabled) Primary2 else Neutral300,
             disabledContainerColor = Neutral200,
             disabledContentColor = Neutral300
         )
@@ -68,8 +56,7 @@ fun PrimaryButton(
         if (leadingIcon != null) {
             Icon(
                 imageVector = leadingIcon,
-                contentDescription = null,
-                tint = Color.Unspecified
+                contentDescription = null
             )
         }
 
@@ -85,29 +72,22 @@ fun PrimaryButton(
     widthDp = 360
 )
 @Composable
-fun PrimaryButtonPreview() {
+fun SecondaryButtonPreview() {
     Column(
         modifier = Modifier.padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        PrimaryButton(
-            text = "Cari Jadwal",
+        SecondaryButton(
+            text = "Batalkan Pesanan",
             onClick = {}
         )
 
-        PrimaryButton(
-            text = "Lanjut Pembayaran",
-            onClick = {},
-            variant = PrimaryButtonVariant.Dark
+        SecondaryButton(
+            text = "Ubah Jadwal",
+            onClick = {}
         )
 
-        PrimaryButton(
-            text = "Batalkan Pesanan",
-            onClick = {},
-            variant = PrimaryButtonVariant.Danger
-        )
-
-        PrimaryButton(
+        SecondaryButton(
             text = "Button Disabled",
             onClick = {},
             enabled = false

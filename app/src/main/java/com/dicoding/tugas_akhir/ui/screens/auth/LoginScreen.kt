@@ -34,8 +34,8 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.dicoding.tugas_akhir.R
-import com.dicoding.tugas_akhir.ui.components.buttons.PrimaryButton
-import com.dicoding.tugas_akhir.ui.components.buttons.SecondaryButton
+import com.dicoding.tugas_akhir.ui.components.dialog.buttons.PrimaryButton
+import com.dicoding.tugas_akhir.ui.components.dialog.buttons.SecondaryButton
 import com.dicoding.tugas_akhir.ui.theme.Background
 import com.dicoding.tugas_akhir.ui.theme.Error
 import com.dicoding.tugas_akhir.ui.theme.Neutral500

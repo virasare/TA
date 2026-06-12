@@ -1,4 +1,4 @@
-package com.dicoding.tugas_akhir.ui.components.feedback
+package com.dicoding.tugas_akhir.ui.components.dialog.feedback
 
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.BorderStroke

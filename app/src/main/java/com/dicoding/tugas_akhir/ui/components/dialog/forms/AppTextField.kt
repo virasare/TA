@@ -1,5 +1,6 @@
-package com.dicoding.tugas_akhir.ui.components.forms
+package com.dicoding.tugas_akhir.ui.components.dialog.forms
 
+import androidx.annotation.DrawableRes
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -8,14 +9,12 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Visibility
-import androidx.compose.material.icons.outlined.VisibilityOff
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -23,11 +22,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.dicoding.tugas_akhir.R
 import com.dicoding.tugas_akhir.ui.theme.Error
 import com.dicoding.tugas_akhir.ui.theme.Neutral300
 import com.dicoding.tugas_akhir.ui.theme.Neutral500
@@ -36,7 +35,7 @@ import com.dicoding.tugas_akhir.ui.theme.Primary2
 import com.dicoding.tugas_akhir.ui.theme.White
 
 @Composable
-fun AppPasswordField(
+fun AppTextField(
     value: String,
     onValueChange: (String) -> Unit,
     label: String,
@@ -44,10 +43,12 @@ fun AppPasswordField(
     placeholder: String = "",
     enabled: Boolean = true,
     isError: Boolean = false,
-    errorMessage: String? = null
+    errorMessage: String? = null,
+    singleLine: Boolean = true,
+    keyboardType: KeyboardType = KeyboardType.Text,
+    @DrawableRes trailingIcon: Int? = null,
+    onTrailingIconClick: (() -> Unit)? = null
 ) {
-    var passwordVisible by remember { mutableStateOf(false) }
-
     Column(
         modifier = modifier.fillMaxWidth()
     ) {
@@ -64,7 +65,7 @@ fun AppPasswordField(
             onValueChange = onValueChange,
             enabled = enabled,
             isError = isError,
-            singleLine = true,
+            singleLine = singleLine,
             placeholder = {
                 Text(
                     text = placeholder,
@@ -76,32 +77,27 @@ fun AppPasswordField(
                 color = Neutral700
             ),
             keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Password
+                keyboardType = keyboardType
             ),
-            visualTransformation = if (passwordVisible) {
-                VisualTransformation.None
-            } else {
-                PasswordVisualTransformation()
-            },
             trailingIcon = {
-                IconButton(
-                    onClick = {
-                        passwordVisible = !passwordVisible
+                if (trailingIcon != null) {
+                    if (onTrailingIconClick != null) {
+                        IconButton(
+                            onClick = onTrailingIconClick
+                        ) {
+                            Icon(
+                                painter = painterResource(id = trailingIcon),
+                                contentDescription = null,
+                                tint = Neutral500
+                            )
+                        }
+                    } else {
+                        Icon(
+                            painter = painterResource(id = trailingIcon),
+                            contentDescription = null,
+                            tint = Neutral500
+                        )
                     }
-                ) {
-                    Icon(
-                        imageVector = if (passwordVisible) {
-                            Icons.Outlined.Visibility
-                        } else {
-                            Icons.Outlined.VisibilityOff
-                        },
-                        contentDescription = if (passwordVisible) {
-                            "Sembunyikan password"
-                        } else {
-                            "Tampilkan password"
-                        },
-                        tint = Neutral500
-                    )
                 }
             },
             shape = RoundedCornerShape(16.dp),
@@ -143,47 +139,75 @@ fun AppPasswordField(
 }
 
 @Preview(
-    name = "Password Field Preview",
-    showBackground = true,
-    widthDp = 360
+    name = "AppTextField Preview",
+    showBackground = true
 )
 @Composable
-fun AppPasswordFieldPreview() {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
-    ) {
-        AppPasswordField(
-            value = "",
-            onValueChange = {},
-            label = "Password",
-            placeholder = "Masukkan password"
-        )
+private fun AppTextFieldPreview() {
+    MaterialTheme {
+        Surface {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                var name by remember { mutableStateOf("") }
+                var email by remember { mutableStateOf("vira@gmail.com") }
+                var phone by remember { mutableStateOf("") }
 
-        AppPasswordField(
-            value = "password123",
-            onValueChange = {},
-            label = "Password",
-            placeholder = "Masukkan password"
-        )
+                AppTextField(
+                    value = name,
+                    onValueChange = { name = it },
+                    label = "Nama Lengkap",
+                    placeholder = "Masukkan nama lengkap",
+                    trailingIcon = R.drawable.ic_person
+                )
 
-        AppPasswordField(
-            value = "123",
-            onValueChange = {},
-            label = "Password",
-            placeholder = "Masukkan password",
-            isError = true,
-            errorMessage = "Password minimal 8 karakter"
-        )
+                AppTextField(
+                    value = email,
+                    onValueChange = { email = it },
+                    label = "Email",
+                    placeholder = "Masukkan email",
+                    keyboardType = KeyboardType.Email,
+                    trailingIcon = R.drawable.ic_message,
+                )
 
-        AppPasswordField(
-            value = "password123",
-            onValueChange = {},
-            label = "Password",
-            placeholder = "Masukkan password",
-            enabled = false
-        )
+                AppTextField(
+                    value = phone,
+                    onValueChange = { phone = it },
+                    label = "Nomor HP",
+                    placeholder = "Contoh: 081234567890",
+                    keyboardType = KeyboardType.Phone,
+                    trailingIcon = R.drawable.ic_call,
+                )
+
+                AppTextField(
+                    value = "",
+                    onValueChange = {},
+                    label = "Pelabuhan Tujuan",
+                    placeholder = "Cari pelabuhan tujuan",
+                    trailingIcon = R.drawable.ic_search
+                )
+
+                AppTextField(
+                    value = "",
+                    onValueChange = {},
+                    label = "NIK",
+                    placeholder = "Masukkan NIK",
+                    keyboardType = KeyboardType.Number,
+                    isError = true,
+                    errorMessage = "NIK wajib diisi"
+                )
+
+                AppTextField(
+                    value = "Ende",
+                    onValueChange = {},
+                    label = "Pelabuhan Asal",
+                    placeholder = "Pilih pelabuhan asal",
+                    enabled = false
+                )
+            }
+        }
     }
 }

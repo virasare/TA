@@ -17,8 +17,8 @@ import androidx.compose.ui.unit.dp
 import com.dicoding.tugas_akhir.data.dummy.ShipSchedule
 import com.dicoding.tugas_akhir.data.dummy.TicketClassOption
 import com.dicoding.tugas_akhir.data.dummy.toRupiah
-import com.dicoding.tugas_akhir.ui.components.buttons.PrimaryButton
-import com.dicoding.tugas_akhir.ui.components.buttons.SecondaryButton
+import com.dicoding.tugas_akhir.ui.components.dialog.buttons.PrimaryButton
+import com.dicoding.tugas_akhir.ui.components.dialog.buttons.SecondaryButton
 import com.dicoding.tugas_akhir.ui.theme.*
 
 @Composable

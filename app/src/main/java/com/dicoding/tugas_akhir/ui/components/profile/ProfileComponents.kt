@@ -31,7 +31,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.dicoding.tugas_akhir.data.dummy.PassengerData
-import com.dicoding.tugas_akhir.ui.components.buttons.PrimaryButton
+import com.dicoding.tugas_akhir.ui.components.dialog.buttons.PrimaryButton
 import com.dicoding.tugas_akhir.ui.theme.Background
 import com.dicoding.tugas_akhir.ui.theme.Neutral200
 import com.dicoding.tugas_akhir.ui.theme.Neutral500

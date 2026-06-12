@@ -21,7 +21,7 @@ import com.dicoding.tugas_akhir.data.dummy.PassengerData
 import com.dicoding.tugas_akhir.data.dummy.ShipSchedule
 import com.dicoding.tugas_akhir.data.dummy.TicketClassOption
 import com.dicoding.tugas_akhir.data.dummy.toRupiah
-import com.dicoding.tugas_akhir.ui.components.buttons.PrimaryButton
+import com.dicoding.tugas_akhir.ui.components.dialog.buttons.PrimaryButton
 import com.dicoding.tugas_akhir.ui.theme.*
 
 private enum class PaymentMethod(

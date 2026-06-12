@@ -1,4 +1,4 @@
-package com.dicoding.tugas_akhir.ui.components.navigation
+package com.dicoding.tugas_akhir.ui.components.dialog.navigation
 
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.background

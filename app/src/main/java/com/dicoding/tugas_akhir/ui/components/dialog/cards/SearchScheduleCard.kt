@@ -1,4 +1,4 @@
-package com.dicoding.tugas_akhir.ui.components.cards
+package com.dicoding.tugas_akhir.ui.components.dialog.cards
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
@@ -29,7 +29,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.dicoding.tugas_akhir.ui.components.buttons.PrimaryButton
+import com.dicoding.tugas_akhir.ui.components.dialog.buttons.PrimaryButton
 import com.dicoding.tugas_akhir.ui.theme.Background
 import com.dicoding.tugas_akhir.ui.theme.Neutral200
 import com.dicoding.tugas_akhir.ui.theme.Neutral500

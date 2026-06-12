@@ -38,7 +38,7 @@ import com.dicoding.tugas_akhir.data.dummy.BookingOrder
 import com.dicoding.tugas_akhir.data.dummy.BookingStatus
 import com.dicoding.tugas_akhir.data.dummy.dummyOrders
 import com.dicoding.tugas_akhir.data.dummy.toRupiah
-import com.dicoding.tugas_akhir.ui.components.buttons.PrimaryButton
+import com.dicoding.tugas_akhir.ui.components.dialog.buttons.PrimaryButton
 import com.dicoding.tugas_akhir.ui.theme.Background
 import com.dicoding.tugas_akhir.ui.theme.Neutral200
 import com.dicoding.tugas_akhir.ui.theme.Neutral500
