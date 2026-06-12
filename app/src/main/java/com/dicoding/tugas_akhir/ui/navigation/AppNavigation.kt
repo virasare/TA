@@ -52,7 +52,16 @@ import com.dicoding.tugas_akhir.ui.screens.payment.PaymentFailedScreen
 import com.dicoding.tugas_akhir.ui.screens.payment.PaymentScreen
 import com.dicoding.tugas_akhir.ui.screens.payment.PaymentSuccessScreen
 import com.dicoding.tugas_akhir.ui.screens.payment.PaymentWaitingScreen
+import com.dicoding.tugas_akhir.ui.screens.profile.AboutAppScreen
+import com.dicoding.tugas_akhir.ui.screens.profile.EditProfileScreen
+import com.dicoding.tugas_akhir.ui.screens.profile.HelpDetailScreen
+import com.dicoding.tugas_akhir.ui.screens.profile.HelpScreen
+import com.dicoding.tugas_akhir.ui.screens.profile.LanguageSettingScreen
+import com.dicoding.tugas_akhir.ui.screens.profile.PassengerDataScreen
+import com.dicoding.tugas_akhir.ui.screens.profile.PassengerProfileFormScreen
 import com.dicoding.tugas_akhir.ui.screens.profile.ProfileScreen
+import com.dicoding.tugas_akhir.ui.screens.profile.SettingsScreen
+import com.dicoding.tugas_akhir.ui.screens.profile.ThemeSettingScreen
 import com.dicoding.tugas_akhir.ui.screens.schedule.ScheduleDetailScreen
 import com.dicoding.tugas_akhir.ui.screens.schedule.ScheduleScreen
 import com.dicoding.tugas_akhir.ui.screens.splash.SplashScreen
@@ -643,6 +652,21 @@ fun AppNavigation() {
                 ProfileScreen(
                     name = user?.displayName ?: "Vira Sare",
                     email = user?.email ?: "virasare@gmail.com",
+                    onEditProfileClick = {
+                        navController.navigate(Screens.ProfileEdit)
+                    },
+                    onPassengerDataClick = {
+                        navController.navigate(Screens.ProfilePassengerData)
+                    },
+                    onSettingsClick = {
+                        navController.navigate(Screens.ProfileSettings)
+                    },
+                    onHelpClick = {
+                        navController.navigate(Screens.ProfileHelp)
+                    },
+                    onAboutClick = {
+                        navController.navigate(Screens.ProfileAbout)
+                    },
                     onLogoutClick = {
                         scope.launch {
                             val credentialManager = CredentialManager.create(context)
@@ -664,6 +688,94 @@ fun AppNavigation() {
                         }
                     }
                 )
+            }
+
+            composable(Screens.ProfileEdit) {
+                val user = auth.currentUser
+
+                EditProfileScreen(
+                    initialName = user?.displayName ?: "Vira Sare",
+                    initialEmail = user?.email ?: "virasare@gmail.com",
+                    onSaveClick = {
+                        navController.popBackStack()
+                    }
+                )
+            }
+
+            composable(Screens.ProfilePassengerData) {
+                PassengerDataScreen(
+                    onAddPassengerClick = {
+                        navController.navigate(Screens.ProfilePassengerForm)
+                    }
+                )
+            }
+
+            composable(Screens.ProfilePassengerForm) {
+                PassengerProfileFormScreen(
+                    onSaveClick = {
+                        navController.popBackStack()
+                    }
+                )
+            }
+
+            composable(Screens.ProfileSettings) {
+                SettingsScreen(
+                    onLanguageClick = {
+                        navController.navigate(Screens.ProfileLanguage)
+                    },
+                    onThemeClick = {
+                        navController.navigate(Screens.ProfileTheme)
+                    },
+                    onAboutClick = {
+                        navController.navigate(Screens.ProfileAbout)
+                    },
+                    onHelpClick = {
+                        navController.navigate(Screens.ProfileHelp)
+                    }
+                )
+            }
+
+            composable(Screens.ProfileLanguage) {
+                LanguageSettingScreen(
+                    onSaveClick = {
+                        navController.popBackStack()
+                    }
+                )
+            }
+
+            composable(Screens.ProfileTheme) {
+                ThemeSettingScreen(
+                    onSaveClick = {
+                        navController.popBackStack()
+                    }
+                )
+            }
+
+            composable(Screens.ProfileHelp) {
+                HelpScreen(
+                    onHelpItemClick = { helpId ->
+                        navController.navigate(Screens.profileHelpDetail(helpId))
+                    }
+                )
+            }
+
+            composable(
+                route = Screens.ProfileHelpDetail,
+                arguments = listOf(
+                    navArgument("helpId") {
+                        type = NavType.IntType
+                    }
+                )
+            ) { backStackEntry ->
+                val helpId = backStackEntry.arguments?.getInt("helpId") ?: 0
+
+                HelpDetailScreen(
+                    helpId = helpId
+                )
+            }
+
+            composable(Screens.ProfileAbout) {
+                AboutAppScreen()
             }
         }
     }
@@ -690,6 +802,15 @@ private fun getTopBarTitle(route: String): String {
         Screens.PortSearchRoute -> "Pilih Pelabuhan"
         Screens.SearchResult -> "Hasil Pencarian"
         Screens.PopularRouteResult -> "Rute Populer"
+        Screens.ProfileEdit -> "Edit Profil"
+        Screens.ProfilePassengerData -> "Data Penumpang"
+        Screens.ProfilePassengerForm -> "Tambah Penumpang"
+        Screens.ProfileSettings -> "Pengaturan"
+        Screens.ProfileLanguage -> "Bahasa"
+        Screens.ProfileTheme -> "Tema"
+        Screens.ProfileHelp -> "Bantuan"
+        Screens.ProfileHelpDetail -> "Detail Bantuan"
+        Screens.ProfileAbout -> "Tentang Aplikasi"
         else -> ""
     }
 }

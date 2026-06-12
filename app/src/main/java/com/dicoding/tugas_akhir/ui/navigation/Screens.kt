@@ -43,4 +43,17 @@ object Screens {
     }
 
     const val Profile = "profile"
+    const val ProfileEdit = "profile_edit"
+    const val ProfilePassengerData = "profile_passenger_data"
+    const val ProfilePassengerForm = "profile_passenger_form"
+    const val ProfileSettings = "profile_settings"
+    const val ProfileLanguage = "profile_language"
+    const val ProfileTheme = "profile_theme"
+    const val ProfileHelp = "profile_help"
+    const val ProfileHelpDetail = "profile_help_detail/{helpId}"
+    const val ProfileAbout = "profile_about"
+
+    fun profileHelpDetail(helpId: Int): String {
+        return "profile_help_detail/$helpId"
+    }
 }

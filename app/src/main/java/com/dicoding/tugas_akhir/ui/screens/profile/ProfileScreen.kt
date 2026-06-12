@@ -48,6 +48,11 @@ import com.dicoding.tugas_akhir.ui.theme.White
 fun ProfileScreen(
     name: String,
     email: String,
+    onEditProfileClick: () -> Unit,
+    onPassengerDataClick: () -> Unit,
+    onSettingsClick: () -> Unit,
+    onHelpClick: () -> Unit,
+    onAboutClick: () -> Unit,
     onLogoutClick: () -> Unit
 ) {
     LazyColumn(
@@ -83,21 +88,21 @@ fun ProfileScreen(
                         icon = Icons.Outlined.Edit,
                         title = "Edit Profil",
                         description = "Ubah nama dan informasi akun",
-                        onClick = {}
+                        onClick = onEditProfileClick
                     )
 
                     ProfileMenuItem(
                         icon = Icons.Outlined.Person,
                         title = "Data Penumpang",
                         description = "Kelola data penumpang tersimpan",
-                        onClick = {}
+                        onClick = onPassengerDataClick
                     )
 
                     ProfileMenuItem(
                         icon = Icons.Outlined.Settings,
                         title = "Pengaturan",
                         description = "Bahasa, tema, dan preferensi aplikasi",
-                        onClick = {}
+                        onClick = onSettingsClick
                     )
                 }
             }
@@ -121,14 +126,14 @@ fun ProfileScreen(
                         icon = Icons.Outlined.Help,
                         title = "Bantuan",
                         description = "Panduan dan pusat bantuan",
-                        onClick = {}
+                        onClick = onHelpClick
                     )
 
                     ProfileMenuItem(
                         icon = Icons.Outlined.Info,
                         title = "Tentang Aplikasi",
                         description = "Informasi aplikasi",
-                        onClick = {}
+                        onClick = onAboutClick
                     )
 
                     ProfileMenuItem(
