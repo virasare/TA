@@ -35,7 +35,7 @@ import com.dicoding.tugas_akhir.data.dummy.TicketClassOption
 import com.dicoding.tugas_akhir.data.dummy.toPriceNumber
 import com.dicoding.tugas_akhir.data.dummy.toRupiah
 import com.dicoding.tugas_akhir.ui.components.dialog.buttons.PrimaryButton
-import com.dicoding.tugas_akhir.ui.components.dialog.cards.ShipScheduleStatus
+import com.dicoding.tugas_akhir.ui.components.cards.ShipScheduleStatus
 import com.dicoding.tugas_akhir.ui.components.dialog.feedback.BadgeVariant
 import com.dicoding.tugas_akhir.ui.components.dialog.feedback.StatusBadge
 import com.dicoding.tugas_akhir.ui.theme.Background

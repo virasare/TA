@@ -9,11 +9,11 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun ScheduleListPlaceholder(
     modifier: Modifier = Modifier,
-    itemCount: Int = 3
+    itemCount: Int = 4
 ) {
     Column(
         modifier = modifier,
-        verticalArrangement = Arrangement.spacedBy(12.dp)
+        verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         repeat(itemCount) {
             ScheduleCardPlaceholder()

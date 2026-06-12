@@ -14,24 +14,32 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.EventBusy
+import androidx.compose.material.icons.outlined.WarningAmber
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.dicoding.tugas_akhir.data.dummy.ShipSchedule
-import com.dicoding.tugas_akhir.data.dummy.dummyShipSchedules
-import com.dicoding.tugas_akhir.ui.components.dialog.cards.ShipScheduleCard
-import com.dicoding.tugas_akhir.ui.components.dialog.cards.ShipScheduleStatus
+import com.dicoding.tugas_akhir.ui.components.cards.ShipScheduleCard
+import com.dicoding.tugas_akhir.ui.components.cards.ShipScheduleStatus
+import com.dicoding.tugas_akhir.ui.components.dialog.filters.ScheduleFilter
+import com.dicoding.tugas_akhir.ui.components.dialog.filters.ScheduleFilterSection
+import com.dicoding.tugas_akhir.ui.components.loading.ScheduleListPlaceholder
+import com.dicoding.tugas_akhir.ui.state.ScheduleUiState
 import com.dicoding.tugas_akhir.ui.theme.Background
 import com.dicoding.tugas_akhir.ui.theme.Neutral200
 import com.dicoding.tugas_akhir.ui.theme.Neutral500
@@ -39,30 +47,60 @@ import com.dicoding.tugas_akhir.ui.theme.Neutral700
 import com.dicoding.tugas_akhir.ui.theme.Primary2
 import com.dicoding.tugas_akhir.ui.theme.Primary3
 import com.dicoding.tugas_akhir.ui.theme.White
+import com.dicoding.tugas_akhir.ui.viewmodel.ScheduleViewModel
+import com.dicoding.tugas_akhir.ui.viewmodel.ViewModelFactory
 import java.text.SimpleDateFormat
 import java.util.Locale
-import com.dicoding.tugas_akhir.ui.components.dialog.filters.ScheduleFilter
-import com.dicoding.tugas_akhir.ui.components.dialog.filters.ScheduleFilterSection
 
 @Composable
 fun ScheduleScreen(
-    onScheduleClick: (Int) -> Unit
+    onScheduleClick: (Int) -> Unit,
+    modifier: Modifier = Modifier,
+    viewModel: ScheduleViewModel = viewModel(
+        factory = ViewModelFactory.getInstance()
+    )
+) {
+    val scheduleUiState by viewModel.scheduleUiState.collectAsStateWithLifecycle()
+
+    LaunchedEffect(Unit) {
+        viewModel.getUpcomingSchedules()
+    }
+
+    ScheduleScreenContent(
+        scheduleUiState = scheduleUiState,
+        onScheduleClick = onScheduleClick,
+        modifier = modifier
+    )
+}
+
+@Composable
+private fun ScheduleScreenContent(
+    scheduleUiState: ScheduleUiState,
+    onScheduleClick: (Int) -> Unit,
+    modifier: Modifier = Modifier
 ) {
     var selectedFilter by remember {
         mutableStateOf(ScheduleFilter.All)
     }
 
-    val schedules = remember(selectedFilter) {
-        dummyShipSchedules
-            .filterWithinNextDays(days = 60)
-            .filterBySelectedFilter(selectedFilter)
-            .sortBySelectedFilter(selectedFilter)
+    val schedules = remember(scheduleUiState, selectedFilter) {
+        when (scheduleUiState) {
+            is ScheduleUiState.Success -> {
+                scheduleUiState.schedules
+                    .filterWithinNextDays(days = 60)
+                    .filterBySelectedFilter(selectedFilter)
+                    .sortBySelectedFilter(selectedFilter)
+            }
+
+            else -> emptyList()
+        }
     }
 
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
             .background(Background)
+            .testTag("schedule_screen")
     ) {
         ScheduleHeader(
             totalSchedule = schedules.size
@@ -75,36 +113,90 @@ fun ScheduleScreen(
             }
         )
 
-        if (schedules.isEmpty()) {
-            EmptyScheduleState()
-        } else {
-            LazyColumn(
-                modifier = Modifier.fillMaxSize(),
-                contentPadding = PaddingValues(
-                    start = 24.dp,
-                    end = 24.dp,
-                    top = 16.dp,
-                    bottom = 24.dp
-                ),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                items(schedules) { schedule ->
-                    ShipScheduleCard(
-                        shipName = schedule.shipName,
-                        route = schedule.route,
-                        departureDate = schedule.departureDate,
-                        departureTime = schedule.departureTime,
-                        arrivalTime = "${schedule.arrivalDate}, ${schedule.arrivalTime}",
-                        duration = schedule.duration,
-                        price = schedule.price,
-                        quota = schedule.quota,
-                        status = schedule.status,
-                        onClick = {
-                            onScheduleClick(schedule.id)
-                        }
+        when (scheduleUiState) {
+            is ScheduleUiState.Loading -> {
+                ScheduleLoadingState()
+            }
+
+            is ScheduleUiState.Success -> {
+                if (schedules.isEmpty()) {
+                    EmptyScheduleState()
+                } else {
+                    ScheduleListContent(
+                        schedules = schedules,
+                        onScheduleClick = onScheduleClick
                     )
                 }
             }
+
+            is ScheduleUiState.Empty -> {
+                EmptyScheduleState(
+                    title = "Jadwal tidak tersedia",
+                    description = scheduleUiState.message
+                )
+            }
+
+            is ScheduleUiState.Error -> {
+                ErrorScheduleState(
+                    message = scheduleUiState.message
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun ScheduleListContent(
+    schedules: List<ShipSchedule>,
+    onScheduleClick: (Int) -> Unit
+) {
+    LazyColumn(
+        modifier = Modifier.fillMaxSize(),
+        contentPadding = PaddingValues(
+            start = 24.dp,
+            end = 24.dp,
+            top = 16.dp,
+            bottom = 24.dp
+        ),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        items(
+            items = schedules,
+            key = { schedule -> schedule.id }
+        ) { schedule ->
+            ShipScheduleCard(
+                shipName = schedule.shipName,
+                route = schedule.route,
+                departureDate = schedule.departureDate,
+                departureTime = schedule.departureTime,
+                arrivalTime = "${schedule.arrivalDate}, ${schedule.arrivalTime}",
+                duration = schedule.duration,
+                price = schedule.price,
+                quota = schedule.quota,
+                status = schedule.status,
+                onClick = {
+                    onScheduleClick(schedule.id)
+                }
+            )
+        }
+    }
+}
+
+@Composable
+private fun ScheduleLoadingState() {
+    LazyColumn(
+        modifier = Modifier.fillMaxSize(),
+        contentPadding = PaddingValues(
+            start = 24.dp,
+            end = 24.dp,
+            top = 16.dp,
+            bottom = 24.dp
+        )
+    ) {
+        item {
+            ScheduleListPlaceholder(
+                itemCount = 4
+            )
         }
     }
 }
@@ -136,7 +228,10 @@ private fun ScheduleHeader(
 }
 
 @Composable
-private fun EmptyScheduleState() {
+private fun EmptyScheduleState(
+    title: String = "Jadwal tidak tersedia",
+    description: String = "Belum ada jadwal kapal pada filter yang dipilih. Coba pilih filter lain."
+) {
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -166,7 +261,7 @@ private fun EmptyScheduleState() {
                 }
 
                 Text(
-                    text = "Jadwal tidak tersedia",
+                    text = title,
                     color = Neutral700,
                     fontWeight = FontWeight.Bold,
                     style = MaterialTheme.typography.titleMedium,
@@ -174,7 +269,58 @@ private fun EmptyScheduleState() {
                 )
 
                 Text(
-                    text = "Belum ada jadwal kapal pada filter yang dipilih. Coba pilih filter lain.",
+                    text = description,
+                    color = Neutral500,
+                    style = MaterialTheme.typography.bodyMedium,
+                    textAlign = TextAlign.Center
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun ErrorScheduleState(
+    message: String
+) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(24.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        Surface(
+            color = White,
+            shape = MaterialTheme.shapes.large,
+            border = BorderStroke(1.dp, Neutral200)
+        ) {
+            Column(
+                modifier = Modifier.padding(24.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                Surface(
+                    color = Primary3,
+                    shape = RoundedCornerShape(16.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Outlined.WarningAmber,
+                        contentDescription = null,
+                        tint = Primary2,
+                        modifier = Modifier.padding(18.dp)
+                    )
+                }
+
+                Text(
+                    text = "Gagal memuat jadwal",
+                    color = Neutral700,
+                    fontWeight = FontWeight.Bold,
+                    style = MaterialTheme.typography.titleMedium,
+                    textAlign = TextAlign.Center
+                )
+
+                Text(
+                    text = message,
                     color = Neutral500,
                     style = MaterialTheme.typography.bodyMedium,
                     textAlign = TextAlign.Center
@@ -204,15 +350,19 @@ private fun List<ShipSchedule>.filterBySelectedFilter(
 ): List<ShipSchedule> {
     return when (filter) {
         ScheduleFilter.All -> this
+
         ScheduleFilter.Available -> this.filter {
             it.status == ShipScheduleStatus.Available
         }
+
         ScheduleFilter.Limited -> this.filter {
             it.status == ShipScheduleStatus.Limited
         }
+
         ScheduleFilter.Unavailable -> this.filter {
             it.status == ShipScheduleStatus.Unavailable
         }
+
         ScheduleFilter.Cheapest -> this
     }
 }

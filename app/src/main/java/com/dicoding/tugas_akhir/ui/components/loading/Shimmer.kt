@@ -17,27 +17,31 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun Modifier.shimmerEffect(): Modifier {
+fun Modifier.shimmerEffect(
+    cornerRadius: Int = 10
+): Modifier {
     val transition = rememberInfiniteTransition(label = "shimmer_transition")
 
     val translateAnim by transition.animateFloat(
         initialValue = 0f,
-        targetValue = 1000f,
+        targetValue = 1200f,
         animationSpec = infiniteRepeatable(
-            animation = tween(durationMillis = 1200),
+            animation = tween(durationMillis = 1100),
             repeatMode = RepeatMode.Restart
         ),
         label = "shimmer_animation"
     )
 
     val shimmerColors = listOf(
-        Color.LightGray.copy(alpha = 0.5f),
-        Color.LightGray.copy(alpha = 0.2f),
-        Color.LightGray.copy(alpha = 0.5f),
+        Color(0xFFF1F5F9),
+        Color(0xFFE9EEF5),
+        Color(0xFFF8FAFC),
+        Color(0xFFE9EEF5),
+        Color(0xFFF1F5F9),
     )
 
     return this
-        .clip(RoundedCornerShape(12.dp))
+        .clip(RoundedCornerShape(cornerRadius.dp))
         .background(
             brush = Brush.linearGradient(
                 colors = shimmerColors,

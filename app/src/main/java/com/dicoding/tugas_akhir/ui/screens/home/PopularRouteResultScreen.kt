@@ -17,7 +17,7 @@ import androidx.compose.ui.unit.dp
 import com.dicoding.tugas_akhir.data.dummy.PopularRoute
 import com.dicoding.tugas_akhir.data.dummy.ShipSchedule
 import com.dicoding.tugas_akhir.data.dummy.dummyShipSchedules
-import com.dicoding.tugas_akhir.ui.components.dialog.cards.ShipScheduleCard
+import com.dicoding.tugas_akhir.ui.components.cards.ShipScheduleCard
 import com.dicoding.tugas_akhir.ui.theme.Background
 import com.dicoding.tugas_akhir.ui.theme.Neutral500
 import com.dicoding.tugas_akhir.ui.theme.Neutral700

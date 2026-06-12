@@ -1,19 +1,16 @@
 package com.dicoding.tugas_akhir.core.utils
 
-import android.os.Build
-import androidx.annotation.RequiresApi
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
+import java.text.SimpleDateFormat
 import java.util.Locale
 
 object DateFormatter {
 
-    @RequiresApi(Build.VERSION_CODES.O)
     fun formatDate(input: String): String {
         return try {
-            val date = LocalDate.parse(input)
-            val formatter = DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale("id", "ID"))
-            date.format(formatter)
+            val inputFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+            val outputFormat = SimpleDateFormat("dd MMMM yyyy", Locale("id", "ID"))
+            val date = inputFormat.parse(input)
+            if (date != null) outputFormat.format(date) else input
         } catch (e: Exception) {
             input
         }

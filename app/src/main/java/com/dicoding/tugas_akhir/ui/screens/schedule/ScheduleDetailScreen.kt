@@ -16,7 +16,9 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.AccessTime
@@ -27,31 +29,43 @@ import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.LocationOn
 import androidx.compose.material.icons.outlined.Payments
 import androidx.compose.material.icons.outlined.Sailing
+import androidx.compose.material.icons.outlined.Shield
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.dicoding.tugas_akhir.data.dummy.ShipSchedule
+import com.dicoding.tugas_akhir.ui.components.cards.ShipScheduleStatus
 import com.dicoding.tugas_akhir.ui.components.dialog.buttons.PrimaryButton
 import com.dicoding.tugas_akhir.ui.components.dialog.feedback.BadgeVariant
 import com.dicoding.tugas_akhir.ui.components.dialog.feedback.InfoBox
 import com.dicoding.tugas_akhir.ui.components.dialog.feedback.InfoBoxVariant
 import com.dicoding.tugas_akhir.ui.components.dialog.feedback.StatusBadge
+import com.dicoding.tugas_akhir.ui.components.loading.ScheduleDetailPlaceholder
+import com.dicoding.tugas_akhir.ui.state.ScheduleDetailUiState
 import com.dicoding.tugas_akhir.ui.theme.Background
 import com.dicoding.tugas_akhir.ui.theme.Neutral200
 import com.dicoding.tugas_akhir.ui.theme.Neutral500
 import com.dicoding.tugas_akhir.ui.theme.Neutral700
 import com.dicoding.tugas_akhir.ui.theme.Primary2
+import com.dicoding.tugas_akhir.ui.theme.Primary3
 import com.dicoding.tugas_akhir.ui.theme.White
-import com.dicoding.tugas_akhir.ui.components.dialog.cards.ShipScheduleStatus
+import com.dicoding.tugas_akhir.ui.viewmodel.ScheduleViewModel
+import com.dicoding.tugas_akhir.ui.viewmodel.ViewModelFactory
 
 private data class TicketClass(
     val name: String,
@@ -62,17 +76,53 @@ private data class TicketClass(
 
 @Composable
 fun ScheduleDetailScreen(
-    schedule: ShipSchedule?,
+    scheduleId: Int,
     onBackClick: () -> Unit,
-    onBookTicketClick: () -> Unit
+    onBookTicketClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    viewModel: ScheduleViewModel = viewModel(
+        factory = ViewModelFactory.getInstance()
+    )
 ) {
-    if (schedule == null) {
-        ScheduleNotFoundState()
-        return
+    val detailUiState by viewModel.scheduleDetailUiState.collectAsStateWithLifecycle()
+
+    LaunchedEffect(scheduleId) {
+        viewModel.getScheduleDetail(scheduleId)
     }
 
+    when (val state = detailUiState) {
+        is ScheduleDetailUiState.Loading -> {
+            ScheduleDetailLoadingState(
+                modifier = modifier
+            )
+        }
+
+        is ScheduleDetailUiState.Success -> {
+            ScheduleDetailContent(
+                schedule = state.schedule,
+                onBookTicketClick = onBookTicketClick,
+                modifier = modifier
+            )
+        }
+
+        is ScheduleDetailUiState.Error -> {
+            ScheduleNotFoundState(
+                message = state.message
+            )
+        }
+    }
+}
+
+@Composable
+private fun ScheduleDetailContent(
+    schedule: ShipSchedule,
+    onBookTicketClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
     val routeDirection = schedule.route.toRouteDirection()
+
     val ticketClasses = schedule.toTicketClasses()
+
     val facilities = listOf(
         "Area Bersantai",
         "Mushola",
@@ -87,7 +137,7 @@ fun ScheduleDetailScreen(
     val isTicketAvailable = schedule.status != ShipScheduleStatus.Unavailable
 
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
             .background(Background)
     ) {
@@ -151,7 +201,9 @@ fun ScheduleDetailScreen(
 
         Surface(
             modifier = Modifier.fillMaxWidth(),
-            color = Background
+            color = White,
+            border = BorderStroke(1.dp, Neutral200),
+            shadowElevation = 8.dp
         ) {
             PrimaryButton(
                 text = if (isTicketAvailable) "Pesan Tiket" else "Tiket Habis",
@@ -162,6 +214,21 @@ fun ScheduleDetailScreen(
                     .navigationBarsPadding()
             )
         }
+    }
+}
+
+@Composable
+private fun ScheduleDetailLoadingState(
+    modifier: Modifier = Modifier
+) {
+    Box(
+        modifier = modifier
+            .fillMaxSize()
+            .background(Background)
+    ) {
+        ScheduleDetailPlaceholder(
+            modifier = Modifier.fillMaxSize()
+        )
     }
 }
 
@@ -183,68 +250,159 @@ private fun ScheduleDetailHeroCard(
 
     Surface(
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(16.dp),
+        shape = RoundedCornerShape(20.dp),
         color = White,
         border = BorderStroke(1.dp, Neutral200),
-        shadowElevation = 2.dp
+        shadowElevation = 3.dp
     ) {
-        Column(
-            modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            Row(
-                verticalAlignment = Alignment.Top
-            ) {
-                Column(
-                    modifier = Modifier.weight(1f),
-                    verticalArrangement = Arrangement.spacedBy(6.dp)
-                ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Icon(
-                            imageVector = Icons.Outlined.DirectionsBoat,
-                            contentDescription = null,
-                            tint = Primary2,
-                            modifier = Modifier.size(28.dp)
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(
+                    brush = Brush.linearGradient(
+                        colors = listOf(
+                            Primary3,
+                            White,
+                            White
                         )
+                    )
+                )
+                .padding(16.dp)
+        ) {
+            Column(
+                verticalArrangement = Arrangement.spacedBy(14.dp)
+            ) {
+                Row(
+                    verticalAlignment = Alignment.Top
+                ) {
+                    Surface(
+                        modifier = Modifier.size(52.dp),
+                        shape = RoundedCornerShape(16.dp),
+                        color = White,
+                        border = BorderStroke(1.dp, Neutral200),
+                        shadowElevation = 1.dp
+                    ) {
+                        Box(
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
+                                imageVector = Icons.Outlined.DirectionsBoat,
+                                contentDescription = null,
+                                tint = Primary2,
+                                modifier = Modifier.size(28.dp)
+                            )
+                        }
+                    }
 
-                        Spacer(modifier = Modifier.width(10.dp))
+                    Spacer(modifier = Modifier.width(12.dp))
 
+                    Column(
+                        modifier = Modifier.weight(1f),
+                        verticalArrangement = Arrangement.spacedBy(6.dp)
+                    ) {
                         Text(
                             text = schedule.shipName,
                             color = Neutral700,
                             fontWeight = FontWeight.Bold,
-                            style = MaterialTheme.typography.titleMedium
+                            style = MaterialTheme.typography.titleLarge
                         )
+
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Icon(
+                                imageVector = Icons.Outlined.LocationOn,
+                                contentDescription = null,
+                                tint = Neutral500,
+                                modifier = Modifier.size(18.dp)
+                            )
+
+                            Spacer(modifier = Modifier.width(6.dp))
+
+                            Text(
+                                text = schedule.route,
+                                color = Neutral500,
+                                style = MaterialTheme.typography.bodyMedium
+                            )
+                        }
                     }
 
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Icon(
-                            imageVector = Icons.Outlined.LocationOn,
-                            contentDescription = null,
-                            tint = Neutral500,
-                            modifier = Modifier.size(20.dp)
-                        )
-
-                        Spacer(modifier = Modifier.width(8.dp))
-
-                        Text(
-                            text = schedule.route,
-                            color = Neutral500,
-                            style = MaterialTheme.typography.bodyMedium
-                        )
-                    }
+                    StatusBadge(
+                        text = badgeText,
+                        variant = badgeVariant
+                    )
                 }
 
-                StatusBadge(
-                    text = badgeText,
-                    variant = badgeVariant
+                Divider(color = Neutral200)
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    HeroMiniInfo(
+                        label = "Durasi",
+                        value = schedule.duration,
+                        icon = Icons.Outlined.AccessTime
+                    )
+
+                    HeroMiniInfo(
+                        label = "Harga mulai",
+                        value = schedule.price,
+                        icon = Icons.Outlined.Payments
+                    )
+
+                    HeroMiniInfo(
+                        label = "Kuota",
+                        value = schedule.quota,
+                        icon = Icons.Outlined.EventSeat
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun HeroMiniInfo(
+    label: String,
+    value: String,
+    icon: ImageVector
+) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(5.dp)
+    ) {
+        Surface(
+            modifier = Modifier.size(30.dp),
+            shape = CircleShape,
+            color = White,
+            border = BorderStroke(1.dp, Neutral200)
+        ) {
+            Box(
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = icon,
+                    contentDescription = null,
+                    tint = Primary2,
+                    modifier = Modifier.size(16.dp)
                 )
             }
         }
+
+        Text(
+            text = label,
+            color = Neutral500,
+            style = MaterialTheme.typography.labelSmall
+        )
+
+        Text(
+            text = value,
+            color = Neutral700,
+            fontWeight = FontWeight.Bold,
+            style = MaterialTheme.typography.bodySmall,
+            textAlign = TextAlign.Center
+        )
     }
 }
 
@@ -258,53 +416,118 @@ private fun ScheduleRouteInfoCard(
     arrivalTime: String,
     duration: String
 ) {
-    Surface(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(16.dp),
-        color = White,
-        border = BorderStroke(1.dp, Neutral200),
-        shadowElevation = 2.dp
+    DetailSectionCard(
+        title = "Detail Perjalanan"
     ) {
+        RouteSummaryRow(
+            originCity = originCity,
+            destinationCity = destinationCity
+        )
+
+        Divider(color = Neutral200)
+
+        DetailInfoRow(
+            icon = Icons.Outlined.LocationOn,
+            label = "Pelabuhan Asal",
+            value = cityToPortName(originCity)
+        )
+
+        DetailInfoRow(
+            icon = Icons.Outlined.LocationOn,
+            label = "Pelabuhan Tujuan",
+            value = cityToPortName(destinationCity)
+        )
+
+        DetailInfoRow(
+            icon = Icons.Outlined.CalendarMonth,
+            label = "Tanggal Keberangkatan",
+            value = departureDate
+        )
+
+        DetailInfoRow(
+            icon = Icons.Outlined.AccessTime,
+            label = "Jam Keberangkatan",
+            value = departureTime
+        )
+
+        DetailInfoRow(
+            icon = Icons.Outlined.Sailing,
+            label = "Estimasi Tiba",
+            value = "$arrivalDate, $arrivalTime"
+        )
+
+        DetailInfoRow(
+            icon = Icons.Outlined.Info,
+            label = "Durasi Perjalanan",
+            value = duration
+        )
+    }
+}
+
+@Composable
+private fun RouteSummaryRow(
+    originCity: String,
+    destinationCity: String
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        RoutePoint(
+            city = originCity,
+            label = "Asal",
+            modifier = Modifier.weight(1f)
+        )
+
         Column(
-            modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            DetailInfoRow(
-                icon = Icons.Outlined.LocationOn,
-                label = "Pelabuhan Asal",
-                value = cityToPortName(originCity)
+            Divider(
+                modifier = Modifier.width(44.dp),
+                color = Primary2
             )
 
-            DetailInfoRow(
-                icon = Icons.Outlined.LocationOn,
-                label = "Pelabuhan Tujuan",
-                value = cityToPortName(destinationCity)
-            )
-
-            DetailInfoRow(
-                icon = Icons.Outlined.CalendarMonth,
-                label = "Tanggal Keberangkatan",
-                value = departureDate
-            )
-
-            DetailInfoRow(
-                icon = Icons.Outlined.AccessTime,
-                label = "Jam Keberangkatan",
-                value = departureTime
-            )
-
-            DetailInfoRow(
-                icon = Icons.Outlined.Sailing,
-                label = "Estimasi Tiba",
-                value = "$arrivalDate, $arrivalTime"
-            )
-
-            DetailInfoRow(
-                icon = Icons.Outlined.Info,
-                label = "Durasi Perjalanan",
-                value = duration
+            Text(
+                text = "ke",
+                color = Neutral500,
+                style = MaterialTheme.typography.labelSmall,
+                modifier = Modifier.padding(top = 2.dp)
             )
         }
+
+        RoutePoint(
+            city = destinationCity,
+            label = "Tujuan",
+            modifier = Modifier.weight(1f),
+            alignEnd = true
+        )
+    }
+}
+
+@Composable
+private fun RoutePoint(
+    city: String,
+    label: String,
+    modifier: Modifier = Modifier,
+    alignEnd: Boolean = false
+) {
+    Column(
+        modifier = modifier,
+        horizontalAlignment = if (alignEnd) Alignment.End else Alignment.Start,
+        verticalArrangement = Arrangement.spacedBy(3.dp)
+    ) {
+        Text(
+            text = label,
+            color = Neutral500,
+            style = MaterialTheme.typography.labelSmall
+        )
+
+        Text(
+            text = city.ifBlank { "-" },
+            color = Neutral700,
+            fontWeight = FontWeight.Bold,
+            style = MaterialTheme.typography.titleMedium
+        )
     }
 }
 
@@ -314,47 +537,31 @@ private fun TicketInformationCard(
     quota: String,
     status: ShipScheduleStatus
 ) {
-    Surface(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(16.dp),
-        color = White,
-        border = BorderStroke(1.dp, Neutral200),
-        shadowElevation = 2.dp
+    DetailSectionCard(
+        title = "Informasi Tiket"
     ) {
-        Column(
-            modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            Text(
-                text = "Informasi Tiket",
-                color = Neutral700,
-                fontWeight = FontWeight.Bold,
-                style = MaterialTheme.typography.titleMedium
-            )
+        DetailInfoRow(
+            icon = Icons.Outlined.Payments,
+            label = "Harga Mulai",
+            value = price,
+            valueColor = Primary2
+        )
 
-            DetailInfoRow(
-                icon = Icons.Outlined.Payments,
-                label = "Harga Mulai",
-                value = price,
-                valueColor = Primary2
-            )
+        DetailInfoRow(
+            icon = Icons.Outlined.EventSeat,
+            label = "Kuota Tersedia",
+            value = quota
+        )
 
-            DetailInfoRow(
-                icon = Icons.Outlined.EventSeat,
-                label = "Kuota Tersedia",
-                value = quota
-            )
-
-            DetailInfoRow(
-                icon = Icons.Outlined.Info,
-                label = "Status Tiket",
-                value = when (status) {
-                    ShipScheduleStatus.Available -> "Masih tersedia"
-                    ShipScheduleStatus.Limited -> "Kuota terbatas"
-                    ShipScheduleStatus.Unavailable -> "Tiket habis"
-                }
-            )
-        }
+        DetailInfoRow(
+            icon = Icons.Outlined.Info,
+            label = "Status Tiket",
+            value = when (status) {
+                ShipScheduleStatus.Available -> "Masih tersedia"
+                ShipScheduleStatus.Limited -> "Kuota terbatas"
+                ShipScheduleStatus.Unavailable -> "Tiket habis"
+            }
+        )
     }
 }
 
@@ -362,30 +569,14 @@ private fun TicketInformationCard(
 private fun TicketClassCard(
     ticketClasses: List<TicketClass>
 ) {
-    Surface(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(16.dp),
-        color = White,
-        border = BorderStroke(1.dp, Neutral200),
-        shadowElevation = 2.dp
+    DetailSectionCard(
+        title = "Pilihan Kelas"
     ) {
-        Column(
-            modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            Text(
-                text = "Pilihan Kelas",
-                color = Neutral700,
-                fontWeight = FontWeight.Bold,
-                style = MaterialTheme.typography.titleMedium
-            )
+        ticketClasses.forEachIndexed { index, ticketClass ->
+            TicketClassItem(ticketClass = ticketClass)
 
-            ticketClasses.forEachIndexed { index, ticketClass ->
-                TicketClassItem(ticketClass = ticketClass)
-
-                if (index != ticketClasses.lastIndex) {
-                    Divider(color = Neutral200)
-                }
+            if (index != ticketClasses.lastIndex) {
+                Divider(color = Neutral200)
             }
         }
     }
@@ -399,6 +590,25 @@ private fun TicketClassItem(
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.Top
     ) {
+        Surface(
+            modifier = Modifier.size(38.dp),
+            shape = RoundedCornerShape(12.dp),
+            color = Primary3
+        ) {
+            Box(
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = Icons.Outlined.EventSeat,
+                    contentDescription = null,
+                    tint = Primary2,
+                    modifier = Modifier.size(20.dp)
+                )
+            }
+        }
+
+        Spacer(modifier = Modifier.width(12.dp))
+
         Column(
             modifier = Modifier.weight(1f),
             verticalArrangement = Arrangement.spacedBy(3.dp)
@@ -406,7 +616,7 @@ private fun TicketClassItem(
             Text(
                 text = ticketClass.name,
                 color = Neutral700,
-                fontWeight = FontWeight.SemiBold,
+                fontWeight = FontWeight.Bold,
                 style = MaterialTheme.typography.bodyMedium
             )
 
@@ -437,16 +647,9 @@ private fun TicketClassItem(
 private fun FacilitySection(
     facilities: List<String>
 ) {
-    Column(
-        verticalArrangement = Arrangement.spacedBy(12.dp)
+    DetailSectionCard(
+        title = "Fasilitas"
     ) {
-        Text(
-            text = "Fasilitas",
-            color = Neutral700,
-            fontWeight = FontWeight.Bold,
-            style = MaterialTheme.typography.titleMedium
-        )
-
         FlowRow(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)
@@ -464,15 +667,56 @@ private fun FacilityChip(
 ) {
     Surface(
         shape = RoundedCornerShape(50.dp),
-        color = White,
-        border = BorderStroke(1.dp, Neutral500)
+        color = Color(0xFFF8FAFC),
+        border = BorderStroke(1.dp, Neutral200)
     ) {
-        Text(
-            text = text,
-            modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
-            color = Neutral700,
-            style = MaterialTheme.typography.labelSmall
-        )
+        Row(
+            modifier = Modifier.padding(horizontal = 12.dp, vertical = 7.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                imageVector = Icons.Outlined.Shield,
+                contentDescription = null,
+                tint = Primary2,
+                modifier = Modifier.size(14.dp)
+            )
+
+            Spacer(modifier = Modifier.width(6.dp))
+
+            Text(
+                text = text,
+                color = Neutral700,
+                style = MaterialTheme.typography.labelSmall
+            )
+        }
+    }
+}
+
+@Composable
+private fun DetailSectionCard(
+    title: String,
+    content: @Composable () -> Unit
+) {
+    Surface(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(18.dp),
+        color = White,
+        border = BorderStroke(1.dp, Neutral200),
+        shadowElevation = 2.dp
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(14.dp)
+        ) {
+            Text(
+                text = title,
+                color = Neutral700,
+                fontWeight = FontWeight.Bold,
+                style = MaterialTheme.typography.titleMedium
+            )
+
+            content()
+        }
     }
 }
 
@@ -487,12 +731,22 @@ private fun DetailInfoRow(
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.Top
     ) {
-        Icon(
-            imageVector = icon,
-            contentDescription = null,
-            tint = Primary2,
-            modifier = Modifier.size(18.dp)
-        )
+        Surface(
+            modifier = Modifier.size(28.dp),
+            shape = CircleShape,
+            color = Primary3
+        ) {
+            Box(
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = icon,
+                    contentDescription = null,
+                    tint = Primary2,
+                    modifier = Modifier.size(16.dp)
+                )
+            }
+        }
 
         Spacer(modifier = Modifier.width(10.dp))
 
@@ -506,7 +760,7 @@ private fun DetailInfoRow(
         Text(
             text = value,
             color = valueColor,
-            fontWeight = FontWeight.Medium,
+            fontWeight = FontWeight.SemiBold,
             style = MaterialTheme.typography.bodySmall,
             textAlign = TextAlign.End
         )
@@ -514,7 +768,9 @@ private fun DetailInfoRow(
 }
 
 @Composable
-private fun ScheduleNotFoundState() {
+private fun ScheduleNotFoundState(
+    message: String = "Detail jadwal tidak ditemukan"
+) {
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -522,11 +778,32 @@ private fun ScheduleNotFoundState() {
             .padding(24.dp),
         contentAlignment = Alignment.Center
     ) {
-        Text(
-            text = "Detail jadwal tidak ditemukan",
-            color = Neutral500,
-            style = MaterialTheme.typography.bodyMedium
-        )
+        Surface(
+            color = White,
+            shape = MaterialTheme.shapes.large,
+            border = BorderStroke(1.dp, Neutral200)
+        ) {
+            Column(
+                modifier = Modifier.padding(24.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                Text(
+                    text = "Detail jadwal tidak ditemukan",
+                    color = Neutral700,
+                    fontWeight = FontWeight.Bold,
+                    style = MaterialTheme.typography.titleMedium,
+                    textAlign = TextAlign.Center
+                )
+
+                Text(
+                    text = message,
+                    color = Neutral500,
+                    style = MaterialTheme.typography.bodyMedium,
+                    textAlign = TextAlign.Center
+                )
+            }
+        }
     }
 }
 

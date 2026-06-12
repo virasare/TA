@@ -1,6 +1,6 @@
 package com.dicoding.tugas_akhir.data.dummy
 
-import com.dicoding.tugas_akhir.ui.components.dialog.cards.ShipScheduleStatus
+import com.dicoding.tugas_akhir.ui.components.cards.ShipScheduleStatus
 
 data class ShipSchedule(
     val id: Int,

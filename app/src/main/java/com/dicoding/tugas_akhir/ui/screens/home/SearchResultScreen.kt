@@ -29,7 +29,7 @@ import com.dicoding.tugas_akhir.data.recomendation.findExactSchedules
 import com.dicoding.tugas_akhir.data.recomendation.findRecommendedSchedules
 import com.dicoding.tugas_akhir.ui.components.dialog.buttons.PrimaryButton
 import com.dicoding.tugas_akhir.ui.components.dialog.buttons.SecondaryButton
-import com.dicoding.tugas_akhir.ui.components.dialog.cards.ShipScheduleCard
+import com.dicoding.tugas_akhir.ui.components.cards.ShipScheduleCard
 import com.dicoding.tugas_akhir.ui.theme.Background
 import com.dicoding.tugas_akhir.ui.theme.Neutral500
 import com.dicoding.tugas_akhir.ui.theme.Neutral700

@@ -1,6 +1,6 @@
-package com.dicoding.tugas_akhir.domain.model
+package com.dicoding.tugas_akhir.data.remote.response
 
-data class ShipSchedule(
+data class ShipScheduleResponse(
     val id: String,
     val shipName: String,
     val shipCode: String,

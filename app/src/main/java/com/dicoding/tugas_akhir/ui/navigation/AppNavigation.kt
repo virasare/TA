@@ -464,28 +464,15 @@ fun AppNavigation() {
                     }
                 )
             ) { backStackEntry ->
-                val scheduleId = backStackEntry.arguments?.getInt("scheduleId")
-                val schedule = dummyShipSchedules.find {
-                    it.id == scheduleId
-                }
+                val scheduleId = backStackEntry.arguments?.getInt("scheduleId") ?: 0
 
                 ScheduleDetailScreen(
-                    schedule = schedule,
+                    scheduleId = scheduleId,
                     onBackClick = {
                         navController.popBackStack()
                     },
                     onBookTicketClick = {
-                        selectedBookingSchedule = schedule
-
-                        if (isLoggedIn) {
-                            navController.navigate(Screens.SelectTicket)
-                        } else {
-                            pendingProtectedRoute = Screens.SelectTicket
-
-                            navController.navigate(Screens.AuthRequired) {
-                                launchSingleTop = true
-                            }
-                        }
+                        navController.navigate(Screens.SelectTicket)
                     }
                 )
             }
