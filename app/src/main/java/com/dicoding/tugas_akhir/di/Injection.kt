@@ -1,5 +1,9 @@
 package com.dicoding.tugas_akhir.di
 
+import com.dicoding.tugas_akhir.TugasAkhirApplication
+import com.dicoding.tugas_akhir.data.local.LocalDataSource
+
+import com.dicoding.tugas_akhir.data.local.room.AppDatabase
 import com.dicoding.tugas_akhir.data.remote.datasource.FakeRemoteDataSource
 import com.dicoding.tugas_akhir.data.repository.AuthRepository
 import com.dicoding.tugas_akhir.data.repository.BookingRepository
@@ -12,6 +16,21 @@ object Injection {
 
     private fun provideFakeRemoteDataSource(): FakeRemoteDataSource {
         return FakeRemoteDataSource.getInstance()
+    }
+
+    private fun provideAppDatabase(): AppDatabase {
+        return AppDatabase.getInstance(
+            context = TugasAkhirApplication.instance,
+        )
+    }
+
+    private fun provideLocalDataSource(): LocalDataSource {
+        val database = provideAppDatabase()
+
+        return LocalDataSource.getInstance(
+            bookingDao = database.bookingDao(),
+            paymentDao = database.paymentDao(),
+        )
     }
 
     fun provideAuthRepository(): AuthRepository {
@@ -29,18 +48,20 @@ object Injection {
     fun provideBookingRepository(): BookingRepository {
         return BookingRepository.getInstance(
             remoteDataSource = provideFakeRemoteDataSource(),
+            localDataSource = provideLocalDataSource(),
         )
     }
 
     fun providePaymentRepository(): PaymentRepository {
         return PaymentRepository.getInstance(
             remoteDataSource = provideFakeRemoteDataSource(),
+            localDataSource = provideLocalDataSource(),
         )
     }
 
     fun provideMyTicketRepository(): MyTicketRepository {
         return MyTicketRepository.getInstance(
-            remoteDataSource = provideFakeRemoteDataSource(),
+            localDataSource = provideLocalDataSource(),
         )
     }
 }
