@@ -67,6 +67,7 @@ import com.dicoding.tugas_akhir.ui.theme.Background
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.UserProfileChangeRequest
 import kotlinx.coroutines.launch
+import com.dicoding.tugas_akhir.ui.navigation.AuthGate
 
 @Composable
 fun AppNavigation() {
@@ -271,6 +272,30 @@ fun AppNavigation() {
 
             composable(Screens.Login) {
                 LoginScreen(
+                    onContinueAsGuestClick = {
+                        navController.navigate(Screens.Home) {
+                            popUpTo(Screens.Login) {
+                                inclusive = true
+                            }
+                            launchSingleTop = true
+                        }
+                    },
+                    onGoogleLoginClick = {
+                        scope.launch {
+                            signInWithGoogle(
+                                context = context,
+                                scope = scope,
+                                auth = auth,
+                                onSuccess = {
+                                    isLoggedIn = true
+                                    navigateAfterAuthSuccess()
+                                },
+                                onError = {
+                                    // Nanti bisa kita tampilkan snackbar/toast.
+                                }
+                            )
+                        }
+                    },
                     onLoginClick = { email, password, onError ->
                         auth.signInWithEmailAndPassword(email, password)
                             .addOnSuccessListener {
@@ -281,37 +306,8 @@ fun AppNavigation() {
                                 onError(exception.message ?: "Login gagal")
                             }
                     },
-                    onGoogleLoginClick = { onError ->
-                        signInWithGoogle(
-                            context = context,
-                            auth = auth,
-                            scope = scope,
-                            onSuccess = {
-                                isLoggedIn = true
-                                navigateAfterAuthSuccess()
-                            },
-                            onError = onError
-                        )
-                    },
                     onRegisterClick = {
                         navController.navigate(Screens.Register)
-                    },
-                    onContinueAsGuestClick = {
-                        val fromProtectedRoute = pendingProtectedRoute != null
-                        pendingProtectedRoute = null
-
-                        navController.navigate(Screens.Home) {
-                            popUpTo(
-                                if (fromProtectedRoute) {
-                                    Screens.AuthRequired
-                                } else {
-                                    Screens.Login
-                                }
-                            ) {
-                                inclusive = true
-                            }
-                            launchSingleTop = true
-                        }
                     }
                 )
             }
@@ -347,7 +343,7 @@ fun AppNavigation() {
                             launchSingleTop = true
                         }
                     },
-                    onBackHomeClick = {
+                    onBackClick = {
                         pendingProtectedRoute = null
 
                         navController.navigate(Screens.Home) {
@@ -484,22 +480,31 @@ fun AppNavigation() {
             ) { backStackEntry ->
                 val scheduleId = backStackEntry.arguments?.getString("scheduleId").orEmpty()
 
-                SelectTicketScreen(
-                    scheduleId = scheduleId,
+                AuthGate(
+                    onLoginClick = {
+                        navController.navigate(Screens.Login)
+                    },
                     onBackClick = {
                         navController.popBackStack()
-                    },
-                    onContinueClick = { selectedScheduleId, ticketClassId, ticketPrice, passengerCount ->
-                        navController.navigate(
-                            Screens.passengerForm(
-                                scheduleId = selectedScheduleId,
-                                ticketClassId = ticketClassId,
-                                ticketPrice = ticketPrice,
-                                passengerCount = passengerCount
-                            )
-                        )
                     }
-                )
+                ) {
+                    SelectTicketScreen(
+                        scheduleId = scheduleId,
+                        onBackClick = {
+                            navController.popBackStack()
+                        },
+                        onContinueClick = { selectedScheduleId, ticketClassId, ticketPrice, passengerCount ->
+                            navController.navigate(
+                                Screens.passengerForm(
+                                    scheduleId = selectedScheduleId,
+                                    ticketClassId = ticketClassId,
+                                    ticketPrice = ticketPrice,
+                                    passengerCount = passengerCount,
+                                )
+                            )
+                        }
+                    )
+                }
             }
 
             composable(
@@ -524,18 +529,27 @@ fun AppNavigation() {
                 val ticketPrice = backStackEntry.arguments?.getInt("ticketPrice") ?: 0
                 val passengerCount = backStackEntry.arguments?.getInt("passengerCount") ?: 1
 
-                PassengerFormScreen(
-                    scheduleId = scheduleId,
-                    ticketClassId = ticketClassId,
-                    ticketPrice = ticketPrice,
-                    passengerCount = passengerCount,
+                AuthGate(
+                    onLoginClick = {
+                        navController.navigate(Screens.Login)
+                    },
                     onBackClick = {
                         navController.popBackStack()
-                    },
-                    onBookingCreated = { bookingId ->
-                        navController.navigate(Screens.bookingSummary(bookingId))
                     }
-                )
+                ) {
+                    PassengerFormScreen(
+                        scheduleId = scheduleId,
+                        ticketClassId = ticketClassId,
+                        ticketPrice = ticketPrice,
+                        passengerCount = passengerCount,
+                        onBackClick = {
+                            navController.popBackStack()
+                        },
+                        onBookingCreated = { bookingId ->
+                            navController.navigate(Screens.bookingSummary(bookingId))
+                        }
+                    )
+                }
             }
 
             composable(
@@ -548,15 +562,24 @@ fun AppNavigation() {
             ) { backStackEntry ->
                 val bookingId = backStackEntry.arguments?.getString("bookingId").orEmpty()
 
-                BookingSummaryScreen(
-                    bookingId = bookingId,
+                AuthGate(
+                    onLoginClick = {
+                        navController.navigate(Screens.Login)
+                    },
                     onBackClick = {
                         navController.popBackStack()
-                    },
-                    onPaymentClick = { selectedBookingId ->
-                        navController.navigate(Screens.payment(selectedBookingId))
                     }
-                )
+                ) {
+                    BookingSummaryScreen(
+                        bookingId = bookingId,
+                        onBackClick = {
+                            navController.popBackStack()
+                        },
+                        onPaymentClick = { selectedBookingId ->
+                            navController.navigate(Screens.payment(selectedBookingId))
+                        }
+                    )
+                }
             }
 
             composable(
@@ -569,15 +592,24 @@ fun AppNavigation() {
             ) { backStackEntry ->
                 val bookingId = backStackEntry.arguments?.getString("bookingId").orEmpty()
 
-                PaymentScreen(
-                    bookingId = bookingId,
+                AuthGate(
+                    onLoginClick = {
+                        navController.navigate(Screens.Login)
+                    },
                     onBackClick = {
                         navController.popBackStack()
-                    },
-                    onPaymentCreated = { paymentId ->
-                        navController.navigate(Screens.paymentWaiting(paymentId))
                     }
-                )
+                ) {
+                    PaymentScreen(
+                        bookingId = bookingId,
+                        onBackClick = {
+                            navController.popBackStack()
+                        },
+                        onPaymentCreated = { paymentId ->
+                            navController.navigate(Screens.paymentWaiting(paymentId))
+                        }
+                    )
+                }
             }
 
             composable(
@@ -590,18 +622,27 @@ fun AppNavigation() {
             ) { backStackEntry ->
                 val paymentId = backStackEntry.arguments?.getString("paymentId").orEmpty()
 
-                PaymentWaitingScreen(
-                    paymentId = paymentId,
+                AuthGate(
+                    onLoginClick = {
+                        navController.navigate(Screens.Login)
+                    },
                     onBackClick = {
                         navController.popBackStack()
-                    },
-                    onPaymentSuccess = { selectedPaymentId ->
-                        navController.navigate(Screens.paymentSuccess(selectedPaymentId))
-                    },
-                    onPaymentFailed = { selectedPaymentId ->
-                        navController.navigate(Screens.paymentFailed(selectedPaymentId))
                     }
-                )
+                ) {
+                    PaymentWaitingScreen(
+                        paymentId = paymentId,
+                        onBackClick = {
+                            navController.popBackStack()
+                        },
+                        onPaymentSuccess = { selectedPaymentId ->
+                            navController.navigate(Screens.paymentSuccess(selectedPaymentId))
+                        },
+                        onPaymentFailed = { selectedPaymentId ->
+                            navController.navigate(Screens.paymentFailed(selectedPaymentId))
+                        }
+                    )
+                }
             }
 
             composable(
@@ -614,19 +655,28 @@ fun AppNavigation() {
             ) { backStackEntry ->
                 val paymentId = backStackEntry.arguments?.getString("paymentId").orEmpty()
 
-                PaymentSuccessScreen(
-                    paymentId = paymentId,
-                    onViewTicketClick = {
-                        navController.navigate(Screens.eTicketByPayment(paymentId))
+                AuthGate(
+                    onLoginClick = {
+                        navController.navigate(Screens.Login)
                     },
-                    onBackHomeClick = {
-                        navController.navigate(Screens.Home) {
-                            popUpTo(Screens.Home) {
-                                inclusive = true
+                    onBackClick = {
+                        navController.navigate(Screens.Home)
+                    }
+                ) {
+                    PaymentSuccessScreen(
+                        paymentId = paymentId,
+                        onViewTicketClick = {
+                            navController.navigate(Screens.eTicketByPayment(paymentId))
+                        },
+                        onBackHomeClick = {
+                            navController.navigate(Screens.Home) {
+                                popUpTo(Screens.Home) {
+                                    inclusive = true
+                                }
                             }
                         }
-                    }
-                )
+                    )
+                }
             }
 
             composable(
@@ -639,30 +689,45 @@ fun AppNavigation() {
             ) { backStackEntry ->
                 val paymentId = backStackEntry.arguments?.getString("paymentId").orEmpty()
 
-                PaymentFailedScreen(
-                    paymentId = paymentId,
-                    onRetryClick = {
-                        navController.popBackStack()
+                AuthGate(
+                    onLoginClick = {
+                        navController.navigate(Screens.Login)
                     },
-                    onBackHomeClick = {
-                        navController.navigate(Screens.Home) {
-                            popUpTo(Screens.Home) {
-                                inclusive = true
+                    onBackClick = {
+                        navController.navigate(Screens.Home)
+                    }
+                ) {
+                    PaymentFailedScreen(
+                        paymentId = paymentId,
+                        onRetryClick = {
+                            navController.popBackStack()
+                        },
+                        onBackHomeClick = {
+                            navController.navigate(Screens.Home) {
+                                popUpTo(Screens.Home) {
+                                    inclusive = true
+                                }
                             }
                         }
-                    }
-                )
+                    )
+                }
             }
 
             composable(Screens.MyTicket) {
-                MyTicketScreen(
-                    onTicketClick = { bookingId ->
-                        navController.navigate(Screens.eTicket(bookingId))
-                    },
-                    onPayNowClick = { bookingId ->
-                        navController.navigate(Screens.payment(bookingId))
+                AuthGate(
+                    onLoginClick = {
+                        navController.navigate(Screens.Login)
                     }
-                )
+                ) {
+                    MyTicketScreen(
+                        onTicketClick = { bookingId ->
+                            navController.navigate(Screens.eTicket(bookingId))
+                        },
+                        onPayNowClick = { bookingId ->
+                            navController.navigate(Screens.payment(bookingId))
+                        }
+                    )
+                }
             }
 
             composable(
@@ -675,12 +740,21 @@ fun AppNavigation() {
             ) { backStackEntry ->
                 val bookingId = backStackEntry.arguments?.getString("bookingId").orEmpty()
 
-                ETicketScreen(
-                    bookingId = bookingId,
+                AuthGate(
+                    onLoginClick = {
+                        navController.navigate(Screens.Login)
+                    },
                     onBackClick = {
                         navController.popBackStack()
                     }
-                )
+                ) {
+                    ETicketScreen(
+                        bookingId = bookingId,
+                        onBackClick = {
+                            navController.popBackStack()
+                        }
+                    )
+                }
             }
 
             composable(
@@ -693,20 +767,35 @@ fun AppNavigation() {
             ) { backStackEntry ->
                 val paymentId = backStackEntry.arguments?.getString("paymentId").orEmpty()
 
-                ETicketScreen(
-                    paymentId = paymentId,
+                AuthGate(
+                    onLoginClick = {
+                        navController.navigate(Screens.Login)
+                    },
                     onBackClick = {
                         navController.popBackStack()
                     }
-                )
+                ) {
+                    ETicketScreen(
+                        paymentId = paymentId,
+                        onBackClick = {
+                            navController.popBackStack()
+                        }
+                    )
+                }
             }
 
             composable(Screens.Notification) {
-                NotificationScreen(
-                    onNotificationClick = { notificationId ->
-                        navController.navigate(Screens.notificationDetail(notificationId))
+                AuthGate(
+                    onLoginClick = {
+                        navController.navigate(Screens.Login)
                     }
-                )
+                ) {
+                    NotificationScreen(
+                        onNotificationClick = { notificationId ->
+                            navController.navigate(Screens.notificationDetail(notificationId))
+                        }
+                    )
+                }
             }
 
             composable(
@@ -731,37 +820,41 @@ fun AppNavigation() {
             }
 
             composable(Screens.Profile) {
-                val user = auth.currentUser
+                AuthGate(
+                    onLoginClick = {
+                        navController.navigate(Screens.Login)
+                    }
+                ) {
+                    val user = auth.currentUser
 
-                ProfileScreen(
-                    name = user?.displayName ?: "Vira Sare",
-                    email = user?.email ?: "virasare@gmail.com",
-                    onEditProfileClick = {
-                        navController.navigate(Screens.ProfileEdit)
-                    },
-                    onPassengerDataClick = {
-                        navController.navigate(Screens.ProfilePassengerData)
-                    },
-                    onSettingsClick = {
-                        navController.navigate(Screens.ProfileSettings)
-                    },
-                    onHelpClick = {
-                        navController.navigate(Screens.ProfileHelp)
-                    },
-                    onAboutClick = {
-                        navController.navigate(Screens.ProfileAbout)
-                    },
-                    onLogoutClick = {
-                        scope.launch {
-                            val credentialManager = CredentialManager.create(context)
-
+                    ProfileScreen(
+                        name = user?.displayName ?: "Pengguna",
+                        email = user?.email ?: "-",
+                        onEditProfileClick = {
+                            navController.navigate(Screens.ProfileEdit)
+                        },
+                        onPassengerDataClick = {
+                            navController.navigate(Screens.ProfilePassengerData)
+                        },
+                        onSettingsClick = {
+                            navController.navigate(Screens.ProfileSettings)
+                        },
+                        onHelpClick = {
+                            navController.navigate(Screens.ProfileHelp)
+                        },
+                        onAboutClick = {
+                            navController.navigate(Screens.ProfileAbout)
+                        },
+                        onLogoutClick = {
                             auth.signOut()
-                            credentialManager.clearCredentialState(
-                                ClearCredentialStateRequest()
-                            )
-
                             isLoggedIn = false
                             pendingProtectedRoute = null
+
+                            scope.launch {
+                                CredentialManager.create(context).clearCredentialState(
+                                    ClearCredentialStateRequest()
+                                )
+                            }
 
                             navController.navigate(Screens.Home) {
                                 popUpTo(Screens.Home) {
@@ -770,8 +863,8 @@ fun AppNavigation() {
                                 launchSingleTop = true
                             }
                         }
-                    }
-                )
+                    )
+                }
             }
 
             composable(Screens.ProfileEdit) {

@@ -2,6 +2,7 @@ package com.dicoding.tugas_akhir.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import com.dicoding.tugas_akhir.data.repository.AuthRepository
 import com.dicoding.tugas_akhir.data.repository.BookingRepository
 import com.dicoding.tugas_akhir.data.repository.MyTicketRepository
 import com.dicoding.tugas_akhir.data.repository.PaymentRepository
@@ -9,6 +10,7 @@ import com.dicoding.tugas_akhir.data.repository.ScheduleRepository
 import com.dicoding.tugas_akhir.di.Injection
 
 class ViewModelFactory private constructor(
+    private val authRepository: AuthRepository,
     private val scheduleRepository: ScheduleRepository,
     private val bookingRepository: BookingRepository,
     private val paymentRepository: PaymentRepository,
@@ -17,6 +19,10 @@ class ViewModelFactory private constructor(
 
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        if (modelClass.isAssignableFrom(AuthViewModel::class.java)) {
+            return AuthViewModel(authRepository) as T
+        }
+
         if (modelClass.isAssignableFrom(ScheduleViewModel::class.java)) {
             return ScheduleViewModel(scheduleRepository) as T
         }
@@ -43,6 +49,7 @@ class ViewModelFactory private constructor(
         fun getInstance(): ViewModelFactory {
             return INSTANCE ?: synchronized(this) {
                 val instance = ViewModelFactory(
+                    authRepository = Injection.provideAuthRepository(),
                     scheduleRepository = Injection.provideScheduleRepository(),
                     bookingRepository = Injection.provideBookingRepository(),
                     paymentRepository = Injection.providePaymentRepository(),

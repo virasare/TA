@@ -1,15 +1,23 @@
 package com.dicoding.tugas_akhir.di
 
 import com.dicoding.tugas_akhir.data.remote.datasource.FakeRemoteDataSource
+import com.dicoding.tugas_akhir.data.repository.AuthRepository
 import com.dicoding.tugas_akhir.data.repository.BookingRepository
 import com.dicoding.tugas_akhir.data.repository.MyTicketRepository
 import com.dicoding.tugas_akhir.data.repository.PaymentRepository
 import com.dicoding.tugas_akhir.data.repository.ScheduleRepository
+import com.google.firebase.auth.FirebaseAuth
 
 object Injection {
 
     private fun provideFakeRemoteDataSource(): FakeRemoteDataSource {
         return FakeRemoteDataSource.getInstance()
+    }
+
+    fun provideAuthRepository(): AuthRepository {
+        return AuthRepository.getInstance(
+            firebaseAuth = FirebaseAuth.getInstance(),
+        )
     }
 
     fun provideScheduleRepository(): ScheduleRepository {
