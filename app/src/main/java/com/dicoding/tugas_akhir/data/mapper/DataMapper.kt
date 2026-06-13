@@ -2,9 +2,13 @@ package com.dicoding.tugas_akhir.data.mapper
 
 import com.dicoding.tugas_akhir.data.remote.response.BookingResponse
 import com.dicoding.tugas_akhir.data.remote.response.PassengerResponse
+import com.dicoding.tugas_akhir.data.remote.response.PaymentMethodResponse
+import com.dicoding.tugas_akhir.data.remote.response.PaymentResponse
 import com.dicoding.tugas_akhir.data.remote.response.ShipScheduleResponse
 import com.dicoding.tugas_akhir.domain.model.Booking
 import com.dicoding.tugas_akhir.domain.model.Passenger
+import com.dicoding.tugas_akhir.domain.model.Payment
+import com.dicoding.tugas_akhir.domain.model.PaymentMethod
 import com.dicoding.tugas_akhir.domain.model.ShipSchedule
 
 object DataMapper {
@@ -66,6 +70,33 @@ object DataMapper {
             status = input.status,
             createdAt = input.createdAt,
             paymentDeadline = input.paymentDeadline,
+        )
+    }
+
+    fun mapPaymentMethodResponseToDomain(input: PaymentMethodResponse): PaymentMethod {
+        return PaymentMethod(
+            id = input.id,
+            name = input.name,
+            description = input.description,
+        )
+    }
+
+    fun mapPaymentMethodResponsesToDomain(input: List<PaymentMethodResponse>): List<PaymentMethod> {
+        return input.map { mapPaymentMethodResponseToDomain(it) }
+    }
+
+    fun mapPaymentResponseToDomain(input: PaymentResponse): Payment {
+        return Payment(
+            id = input.id,
+            bookingId = input.bookingId,
+            paymentMethodId = input.paymentMethodId,
+            paymentMethodName = input.paymentMethodName,
+            totalPrice = input.totalPrice,
+            paymentCode = input.paymentCode,
+            status = input.status,
+            expiredIn = input.expiredIn,
+            instructions = input.instructions,
+            createdAt = input.createdAt,
         )
     }
 }

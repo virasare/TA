@@ -451,7 +451,7 @@ fun AppNavigation() {
             composable(Screens.Schedule) {
                 ScheduleScreen(
                     onScheduleClick = { scheduleId ->
-                        navController.navigate(Screens.scheduleDetail(scheduleId.toString()))
+                        navController.navigate(Screens.scheduleDetail(scheduleId))
                     }
                 )
             }
@@ -471,8 +471,8 @@ fun AppNavigation() {
                     onBackClick = {
                         navController.popBackStack()
                     },
-                    onBookTicketClick = {
-                        navController.navigate(Screens.selectTicket(scheduleId))
+                    onBookTicketClick = { selectedScheduleId ->
+                        navController.navigate(Screens.selectTicket(selectedScheduleId))
                     }
                 )
             }
@@ -557,74 +557,102 @@ fun AppNavigation() {
                         navController.popBackStack()
                     },
                     onPaymentClick = { selectedBookingId ->
-
-                        navController.navigate(Screens.Payment)
+                        navController.navigate(Screens.payment(selectedBookingId))
                     }
                 )
             }
 
-            composable(Screens.Payment) {
+            composable(
+                route = Screens.Payment,
+                arguments = listOf(
+                    navArgument("bookingId") {
+                        type = NavType.StringType
+                    }
+                )
+            ) { backStackEntry ->
+                val bookingId = backStackEntry.arguments?.getString("bookingId").orEmpty()
+
                 PaymentScreen(
-                    schedule = selectedBookingSchedule,
-                    selectedTicket = selectedTicketClass,
-                    passengerList = passengerList,
+                    bookingId = bookingId,
                     onBackClick = {
                         navController.popBackStack()
                     },
-                    onPayNowClick = {
-                        navController.navigate(Screens.PaymentWaiting)
+                    onPaymentCreated = { paymentId ->
+                        navController.navigate(Screens.paymentWaiting(paymentId))
                     }
                 )
             }
 
-            composable(Screens.PaymentWaiting) {
+            composable(
+                route = Screens.PaymentWaiting,
+                arguments = listOf(
+                    navArgument("paymentId") {
+                        type = NavType.StringType
+                    }
+                )
+            ) { backStackEntry ->
+                val paymentId = backStackEntry.arguments?.getString("paymentId").orEmpty()
+
                 PaymentWaitingScreen(
-                    schedule = selectedBookingSchedule,
-                    selectedTicket = selectedTicketClass,
-                    onCancelClick = {
-                        navController.navigate(Screens.MyTicket) {
-                            launchSingleTop = true
-                        }
+                    paymentId = paymentId,
+                    onBackClick = {
+                        navController.popBackStack()
                     },
-                    onCheckStatusClick = {
-                        navController.navigate(Screens.PaymentSuccess)
+                    onPaymentSuccess = { selectedPaymentId ->
+                        navController.navigate(Screens.paymentSuccess(selectedPaymentId))
+                    },
+                    onPaymentFailed = { selectedPaymentId ->
+                        navController.navigate(Screens.paymentFailed(selectedPaymentId))
                     }
                 )
             }
 
-            composable(Screens.PaymentSuccess) {
-                PaymentSuccessScreen(
-                    bookingCode = "NKP12345",
-                    onSeeTicketClick = {
-                        selectedETicketData = createETicketFromCurrentBooking(
-                            schedule = selectedBookingSchedule,
-                            selectedTicket = selectedTicketClass,
-                            passengerList = passengerList,
-                            bookingCode = "NKP12345"
-                        )
+            composable(
+                route = Screens.PaymentSuccess,
+                arguments = listOf(
+                    navArgument("paymentId") {
+                        type = NavType.StringType
+                    }
+                )
+            ) { backStackEntry ->
+                val paymentId = backStackEntry.arguments?.getString("paymentId").orEmpty()
 
-                        navController.navigate(Screens.ETicket)
+                PaymentSuccessScreen(
+                    paymentId = paymentId,
+                    onViewTicketClick = {
+                        navController.navigate(Screens.Home)
                     },
                     onBackHomeClick = {
                         navController.navigate(Screens.Home) {
                             popUpTo(Screens.Home) {
-                                inclusive = false
+                                inclusive = true
                             }
-                            launchSingleTop = true
                         }
                     }
                 )
             }
 
-            composable(Screens.PaymentFailed) {
+            composable(
+                route = Screens.PaymentFailed,
+                arguments = listOf(
+                    navArgument("paymentId") {
+                        type = NavType.StringType
+                    }
+                )
+            ) { backStackEntry ->
+                val paymentId = backStackEntry.arguments?.getString("paymentId").orEmpty()
+
                 PaymentFailedScreen(
-                    onHelpClick = {
-                        navController.navigate(Screens.Home) {
-                            launchSingleTop = true
-                        }
+                    paymentId = paymentId,
+                    onRetryClick = {
+                        navController.popBackStack()
                     },
-                    onCheckAgainClick = {
-                        navController.navigate(Screens.PaymentSuccess)
+                    onBackHomeClick = {
+                        navController.navigate(Screens.Home) {
+                            popUpTo(Screens.Home) {
+                                inclusive = true
+                            }
+                        }
                     }
                 )
             }

@@ -51,10 +51,28 @@ object Screens {
     }
 
 //   Payment
-    const val Payment = "payment"
-    const val PaymentWaiting = "payment_waiting"
-    const val PaymentSuccess = "payment_success"
-    const val PaymentFailed = "payment_failed"
+    const val Payment = "payment/{bookingId}"
+    const val PaymentWaiting = "payment_waiting/{paymentId}"
+    const val PaymentSuccess = "payment_success/{paymentId}"
+    const val PaymentFailed = "payment_failed/{paymentId}"
+
+    fun payment(bookingId: String): String {
+        return "payment/$bookingId"
+    }
+
+    fun paymentWaiting(paymentId: String): String {
+        return "payment_waiting/$paymentId"
+    }
+
+    fun paymentSuccess(paymentId: String): String {
+        return "payment_success/$paymentId"
+    }
+
+    fun paymentFailed(paymentId: String): String {
+        return "payment_failed/$paymentId"
+    }
+
+
     const val OrderDetail = "order_detail"
     const val ETicket = "e_ticket"
 

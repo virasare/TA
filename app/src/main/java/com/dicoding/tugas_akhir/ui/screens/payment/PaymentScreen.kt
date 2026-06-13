@@ -2,216 +2,260 @@ package com.dicoding.tugas_akhir.ui.screens.payment
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.AccountBalance
-import androidx.compose.material.icons.outlined.CreditCard
-import androidx.compose.material.icons.outlined.Person
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material.icons.outlined.ArrowBack
+import androidx.compose.material.icons.outlined.Lock
+import androidx.compose.material.icons.outlined.Payments
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.dicoding.tugas_akhir.data.dummy.PassengerData
-import com.dicoding.tugas_akhir.data.dummy.ShipSchedule
-import com.dicoding.tugas_akhir.data.dummy.TicketClassOption
-import com.dicoding.tugas_akhir.data.dummy.toRupiah
-import com.dicoding.tugas_akhir.ui.components.dialog.buttons.PrimaryButton
-import com.dicoding.tugas_akhir.ui.theme.*
-
-private enum class PaymentMethod(
-    val title: String,
-    val description: String,
-    val icon: ImageVector
-) {
-    VirtualAccount(
-        title = "Transfer Bank",
-        description = "Bayar melalui virtual account bank",
-        icon = Icons.Outlined.AccountBalance
-    ),
-    Qris(
-        title = "QRIS",
-        description = "Bayar menggunakan e-wallet atau mobile banking",
-        icon = Icons.Outlined.CreditCard
-    )
-}
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.dicoding.tugas_akhir.ui.components.cards.PaymentMethodCard
+import com.dicoding.tugas_akhir.ui.components.loading.PaymentMethodListPlaceholder
+import com.dicoding.tugas_akhir.ui.components.lottie.LottieStateView
+import com.dicoding.tugas_akhir.ui.state.CreatePaymentUiState
+import com.dicoding.tugas_akhir.ui.state.PaymentMethodUiState
+import com.dicoding.tugas_akhir.ui.theme.Background
+import com.dicoding.tugas_akhir.ui.theme.Neutral200
+import com.dicoding.tugas_akhir.ui.theme.Neutral500
+import com.dicoding.tugas_akhir.ui.theme.Neutral700
+import com.dicoding.tugas_akhir.ui.theme.Primary2
+import com.dicoding.tugas_akhir.ui.theme.Primary3
+import com.dicoding.tugas_akhir.ui.theme.White
+import com.dicoding.tugas_akhir.ui.viewmodel.PaymentViewModel
+import com.dicoding.tugas_akhir.ui.viewmodel.ViewModelFactory
 
 @Composable
 fun PaymentScreen(
-    schedule: ShipSchedule?,
-    selectedTicket: TicketClassOption?,
-    passengerList: List<PassengerData>,
+    bookingId: String,
     onBackClick: () -> Unit,
-    onPayNowClick: () -> Unit
+    onPaymentCreated: (String) -> Unit,
+    modifier: Modifier = Modifier,
+    viewModel: PaymentViewModel = viewModel(
+        factory = ViewModelFactory.getInstance()
+    ),
 ) {
-    if (schedule == null || selectedTicket == null) {
-        PaymentEmptyState()
-        return
+    val paymentMethodUiState by viewModel.paymentMethodUiState.collectAsStateWithLifecycle()
+    val selectedPaymentMethod by viewModel.selectedPaymentMethod.collectAsStateWithLifecycle()
+    val createPaymentUiState by viewModel.createPaymentUiState.collectAsStateWithLifecycle()
+
+    LaunchedEffect(Unit) {
+        viewModel.loadPaymentMethods()
     }
 
-    var selectedMethod by remember {
-        mutableStateOf(PaymentMethod.VirtualAccount)
+    LaunchedEffect(createPaymentUiState) {
+        val state = createPaymentUiState
+        if (state is CreatePaymentUiState.Success) {
+            onPaymentCreated(state.payment.id)
+            viewModel.resetCreatePaymentState()
+        }
     }
-
-    val adminFee = 5000
-    val ticketPrice = selectedTicket.price * selectedTicket.passengerCount
-    val totalPrice = ticketPrice + adminFee
-    val firstPassenger = passengerList.firstOrNull()
 
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
             .background(Background)
+            .testTag("payment_screen"),
     ) {
         LazyColumn(
             modifier = Modifier.weight(1f),
             contentPadding = PaddingValues(
                 start = 24.dp,
                 end = 24.dp,
-                top = 16.dp,
-                bottom = 24.dp
+                top = 14.dp,
+                bottom = 24.dp,
             ),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             item {
-                PaymentPassengerCard(
-                    passenger = firstPassenger,
-                    passengerCount = selectedTicket.passengerCount
-                )
+                PaymentSecurityInfo()
             }
 
             item {
-                PaymentSummaryCard(
-                    ticketPrice = ticketPrice,
-                    adminFee = adminFee,
-                    totalPrice = totalPrice
+                Text(
+                    text = "Metode Pembayaran",
+                    color = Neutral700,
+                    fontWeight = FontWeight.Bold,
+                    style = MaterialTheme.typography.titleMedium,
                 )
             }
 
-            item {
-                Column(
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    PaymentMethod.entries.forEach { method ->
-                        PaymentMethodItem(
+            when (val state = paymentMethodUiState) {
+                is PaymentMethodUiState.Loading -> {
+                    item {
+                        PaymentMethodListPlaceholder()
+                    }
+                }
+
+                is PaymentMethodUiState.Success -> {
+                    items(
+                        items = state.methods,
+                        key = { method -> method.id },
+                    ) { method ->
+                        PaymentMethodCard(
                             method = method,
-                            selected = selectedMethod == method,
+                            selected = selectedPaymentMethod?.id == method.id,
                             onClick = {
-                                selectedMethod = method
-                            }
+                                viewModel.selectPaymentMethod(method)
+                            },
+                        )
+                    }
+                }
+
+                is PaymentMethodUiState.Empty -> {
+                    item {
+                        LottieStateView(
+                            animationFile = "empty_schedule.json",
+                            title = "Metode pembayaran kosong",
+                            message = state.message,
+                        )
+                    }
+                }
+
+                is PaymentMethodUiState.Error -> {
+                    item {
+                        LottieStateView(
+                            animationFile = "no_internet.json",
+                            title = "Terjadi Kesalahan",
+                            message = state.message,
                         )
                     }
                 }
             }
         }
 
-        Surface(
-            modifier = Modifier.fillMaxWidth(),
-            color = Background
-        ) {
-            PrimaryButton(
-                text = "Bayar Sekarang",
-                onClick = onPayNowClick,
-                modifier = Modifier
-                    .padding(horizontal = 24.dp, vertical = 16.dp)
-                    .navigationBarsPadding()
-            )
-        }
-    }
-}
-
-@Composable
-private fun PaymentPassengerCard(
-    passenger: PassengerData?,
-    passengerCount: Int
-) {
-    PaymentCard {
-        SectionHeader(
-            icon = Icons.Outlined.Person,
-            title = "Data Penumpang"
-        )
-
-        Text(
-            text = "Periksa kembali data penumpang",
-            color = Neutral500,
-            style = MaterialTheme.typography.bodySmall,
-            modifier = Modifier.padding(top = 8.dp, bottom = 12.dp)
-        )
-
-        PaymentRow(
-            label = "Nama Lengkap",
-            value = passenger?.fullName?.ifBlank { "Vira Sare" } ?: "Vira Sare"
-        )
-
-        PaymentRow(
-            label = "Jumlah Penumpang",
-            value = "$passengerCount orang"
-        )
-
-        PaymentRow(
-            label = "Nomor Telepon",
-            value = passenger?.phoneNumber?.ifBlank { "0812xxxxxxxx" } ?: "0812xxxxxxxx"
+        PaymentBottomActionBar(
+            selectedMethodName = selectedPaymentMethod?.name,
+            createPaymentUiState = createPaymentUiState,
+            onContinueClick = {
+                viewModel.createPayment(bookingId)
+            },
         )
     }
 }
 
 @Composable
-private fun PaymentSummaryCard(
-    ticketPrice: Int,
-    adminFee: Int,
-    totalPrice: Int
+private fun PaymentHeaderCard(
+    onBackClick: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
-    PaymentCard {
-        Text(
-            text = "Ringkasan Pembayaran",
-            color = Neutral700,
-            fontWeight = FontWeight.Bold,
-            style = MaterialTheme.typography.titleMedium
-        )
-
-        Column(
-            modifier = Modifier.padding(top = 12.dp),
-            verticalArrangement = Arrangement.spacedBy(10.dp)
+    Surface(
+        modifier = modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(22.dp),
+        color = White,
+        border = BorderStroke(1.dp, Neutral200),
+        shadowElevation = 3.dp,
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(
+                    Brush.linearGradient(
+                        listOf(
+                            Primary3,
+                            White,
+                            White,
+                        )
+                    )
+                )
+                .padding(16.dp),
         ) {
-            PaymentRow(
-                label = "Harga Tiket",
-                value = ticketPrice.toRupiah()
-            )
-
-            PaymentRow(
-                label = "Biaya Admin",
-                value = adminFee.toRupiah()
-            )
-
-            HorizontalDivider(color = Neutral200)
-
-            Surface(
-                modifier = Modifier.fillMaxWidth(),
-                color = Primary3,
-                shape = RoundedCornerShape(10.dp)
+            Column(
+                verticalArrangement = Arrangement.spacedBy(14.dp),
             ) {
                 Row(
-                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 10.dp),
-                    verticalAlignment = Alignment.CenterVertically
+                    verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    Text(
-                        text = "Total",
-                        color = Neutral700,
-                        style = MaterialTheme.typography.bodyMedium,
-                        modifier = Modifier.weight(1f)
-                    )
+                    IconButton(
+                        onClick = onBackClick,
+                        modifier = Modifier.size(40.dp),
+                    ) {
+                        Icon(
+                            imageVector = Icons.Outlined.ArrowBack,
+                            contentDescription = "Kembali",
+                            tint = Neutral700,
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.width(8.dp))
 
                     Text(
-                        text = totalPrice.toRupiah(),
-                        color = Primary2,
+                        text = "Pembayaran",
+                        color = Neutral700,
                         fontWeight = FontWeight.Bold,
-                        style = MaterialTheme.typography.bodyMedium
+                        style = MaterialTheme.typography.titleLarge,
                     )
+                }
+
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Surface(
+                        modifier = Modifier.size(52.dp),
+                        shape = CircleShape,
+                        color = Primary3,
+                    ) {
+                        Box(
+                            contentAlignment = Alignment.Center,
+                        ) {
+                            Icon(
+                                imageVector = Icons.Outlined.Payments,
+                                contentDescription = null,
+                                tint = Primary2,
+                                modifier = Modifier.size(28.dp),
+                            )
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.width(12.dp))
+
+                    Column(
+                        verticalArrangement = Arrangement.spacedBy(4.dp),
+                    ) {
+                        Text(
+                            text = "Pilih metode pembayaran",
+                            color = Neutral700,
+                            fontWeight = FontWeight.Bold,
+                            style = MaterialTheme.typography.titleMedium,
+                        )
+
+                        Text(
+                            text = "Selesaikan pembayaran untuk menerbitkan e-ticket kamu.",
+                            color = Neutral500,
+                            style = MaterialTheme.typography.bodyMedium,
+                        )
+                    }
                 }
             }
         }
@@ -219,154 +263,103 @@ private fun PaymentSummaryCard(
 }
 
 @Composable
-private fun PaymentMethodItem(
-    method: PaymentMethod,
-    selected: Boolean,
-    onClick: () -> Unit
+private fun PaymentSecurityInfo(
+    modifier: Modifier = Modifier,
 ) {
-    val borderColor = if (selected) Primary2 else Neutral200
-
     Surface(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable { onClick() },
-        color = White,
-        shape = RoundedCornerShape(14.dp),
-        border = BorderStroke(1.dp, borderColor),
-        shadowElevation = 2.dp
+        modifier = modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(16.dp),
+        color = Primary3,
+        border = BorderStroke(1.dp, Neutral200),
     ) {
         Row(
             modifier = Modifier.padding(14.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Surface(
-                color = if (selected) Primary3 else Neutral200,
-                shape = RoundedCornerShape(10.dp)
-            ) {
-                Icon(
-                    imageVector = method.icon,
-                    contentDescription = null,
-                    tint = if (selected) Primary2 else Neutral500,
-                    modifier = Modifier
-                        .padding(8.dp)
-                        .size(20.dp)
-                )
-            }
-
-            Column(
-                modifier = Modifier
-                    .weight(1f)
-                    .padding(start = 12.dp)
-            ) {
-                Text(
-                    text = method.title,
-                    color = Neutral700,
-                    fontWeight = FontWeight.SemiBold,
-                    style = MaterialTheme.typography.bodyMedium
-                )
-
-                Text(
-                    text = method.description,
-                    color = Neutral500,
-                    style = MaterialTheme.typography.bodySmall
-                )
-            }
-
-            RadioButton(
-                selected = selected,
-                onClick = onClick
-            )
-        }
-    }
-}
-
-@Composable
-private fun PaymentCard(
-    content: @Composable ColumnScope.() -> Unit
-) {
-    Surface(
-        modifier = Modifier.fillMaxWidth(),
-        color = White,
-        shape = RoundedCornerShape(16.dp),
-        border = BorderStroke(1.dp, Neutral200),
-        shadowElevation = 2.dp
-    ) {
-        Column(
-            modifier = Modifier.padding(16.dp),
-            content = content
-        )
-    }
-}
-
-@Composable
-private fun SectionHeader(
-    icon: ImageVector,
-    title: String
-) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Surface(
-            color = Primary3,
-            shape = RoundedCornerShape(10.dp)
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             Icon(
-                imageVector = icon,
+                imageVector = Icons.Outlined.Lock,
                 contentDescription = null,
                 tint = Primary2,
-                modifier = Modifier
-                    .padding(8.dp)
-                    .size(22.dp)
+                modifier = Modifier.size(22.dp),
+            )
+
+            Spacer(modifier = Modifier.width(10.dp))
+
+            Text(
+                text = "Pembayaran diproses secara aman. Pastikan nominal dan metode pembayaran sudah sesuai.",
+                color = Neutral700,
+                style = MaterialTheme.typography.bodySmall,
             )
         }
-
-        Text(
-            text = title,
-            color = Neutral700,
-            fontWeight = FontWeight.Bold,
-            style = MaterialTheme.typography.titleMedium,
-            modifier = Modifier.padding(start = 12.dp)
-        )
     }
 }
 
 @Composable
-private fun PaymentRow(
-    label: String,
-    value: String
+private fun PaymentBottomActionBar(
+    selectedMethodName: String?,
+    createPaymentUiState: CreatePaymentUiState,
+    onContinueClick: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.Top
+    Surface(
+        modifier = modifier.fillMaxWidth(),
+        color = White,
+        border = BorderStroke(1.dp, Neutral200),
+        shadowElevation = 8.dp,
     ) {
-        Text(
-            text = label,
-            color = Neutral500,
-            style = MaterialTheme.typography.bodySmall,
-            modifier = Modifier.weight(1f)
-        )
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .navigationBarsPadding()
+                .padding(horizontal = 24.dp, vertical = 14.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp),
+        ) {
+            if (selectedMethodName != null) {
+                Text(
+                    text = "Dipilih: $selectedMethodName",
+                    color = Neutral700,
+                    fontWeight = FontWeight.SemiBold,
+                    style = MaterialTheme.typography.bodyMedium,
+                )
+            } else {
+                Text(
+                    text = "Pilih metode pembayaran terlebih dahulu.",
+                    color = Neutral500,
+                    style = MaterialTheme.typography.bodyMedium,
+                )
+            }
 
-        Text(
-            text = value,
-            color = Neutral700,
-            fontWeight = FontWeight.Medium,
-            style = MaterialTheme.typography.bodySmall
-        )
-    }
-}
+            if (createPaymentUiState is CreatePaymentUiState.Error) {
+                Text(
+                    text = createPaymentUiState.message,
+                    color = MaterialTheme.colorScheme.error,
+                    style = MaterialTheme.typography.bodySmall,
+                )
+            }
 
-@Composable
-private fun PaymentEmptyState() {
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Background),
-        contentAlignment = Alignment.Center
-    ) {
-        Text(
-            text = "Data pembayaran belum tersedia",
-            color = Neutral500,
-            style = MaterialTheme.typography.bodyMedium
-        )
+            Button(
+                onClick = onContinueClick,
+                enabled = selectedMethodName != null &&
+                        createPaymentUiState !is CreatePaymentUiState.Loading,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Primary2,
+                    contentColor = White,
+                    disabledContainerColor = Neutral200,
+                    disabledContentColor = Neutral500,
+                ),
+                shape = RoundedCornerShape(14.dp),
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                if (createPaymentUiState is CreatePaymentUiState.Loading) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(20.dp),
+                        strokeWidth = 2.dp,
+                        color = White,
+                    )
+                } else {
+                    Text("Lanjut ke Instruksi Pembayaran")
+                }
+            }
+        }
     }
 }

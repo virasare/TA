@@ -3,12 +3,14 @@ package com.dicoding.tugas_akhir.ui.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.dicoding.tugas_akhir.data.repository.BookingRepository
+import com.dicoding.tugas_akhir.data.repository.PaymentRepository
 import com.dicoding.tugas_akhir.data.repository.ScheduleRepository
 import com.dicoding.tugas_akhir.di.Injection
 
 class ViewModelFactory private constructor(
     private val scheduleRepository: ScheduleRepository,
     private val bookingRepository: BookingRepository,
+    private val paymentRepository: PaymentRepository,
 ) : ViewModelProvider.Factory {
 
     @Suppress("UNCHECKED_CAST")
@@ -19,6 +21,10 @@ class ViewModelFactory private constructor(
 
         if (modelClass.isAssignableFrom(BookingViewModel::class.java)) {
             return BookingViewModel(bookingRepository) as T
+        }
+
+        if (modelClass.isAssignableFrom(PaymentViewModel::class.java)) {
+            return PaymentViewModel(paymentRepository) as T
         }
 
         throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
@@ -33,6 +39,7 @@ class ViewModelFactory private constructor(
                 val instance = ViewModelFactory(
                     scheduleRepository = Injection.provideScheduleRepository(),
                     bookingRepository = Injection.provideBookingRepository(),
+                    paymentRepository = Injection.providePaymentRepository(),
                 )
                 INSTANCE = instance
                 instance

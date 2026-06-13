@@ -33,7 +33,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.dicoding.tugas_akhir.data.dummy.ShipSchedule
+import com.dicoding.tugas_akhir.core.utils.DateFormatter
+import com.dicoding.tugas_akhir.core.utils.PriceFormatter
+import com.dicoding.tugas_akhir.domain.model.ShipSchedule
 import com.dicoding.tugas_akhir.ui.components.cards.ShipScheduleCard
 import com.dicoding.tugas_akhir.ui.components.cards.ShipScheduleStatus
 import com.dicoding.tugas_akhir.ui.components.dialog.filters.ScheduleFilter
@@ -54,7 +56,7 @@ import java.util.Locale
 
 @Composable
 fun ScheduleScreen(
-    onScheduleClick: (Int) -> Unit,
+    onScheduleClick: (String) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: ScheduleViewModel = viewModel(
         factory = ViewModelFactory.getInstance()
@@ -76,7 +78,7 @@ fun ScheduleScreen(
 @Composable
 private fun ScheduleScreenContent(
     scheduleUiState: ScheduleUiState,
-    onScheduleClick: (Int) -> Unit,
+    onScheduleClick: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     var selectedFilter by remember {
@@ -148,7 +150,7 @@ private fun ScheduleScreenContent(
 @Composable
 private fun ScheduleListContent(
     schedules: List<ShipSchedule>,
-    onScheduleClick: (Int) -> Unit
+    onScheduleClick: (String) -> Unit
 ) {
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
@@ -166,14 +168,14 @@ private fun ScheduleListContent(
         ) { schedule ->
             ShipScheduleCard(
                 shipName = schedule.shipName,
-                route = schedule.route,
-                departureDate = schedule.departureDate,
+                route = schedule.routeText(),
+                departureDate = DateFormatter.formatDate(schedule.departureDate),
                 departureTime = schedule.departureTime,
-                arrivalTime = "${schedule.arrivalDate}, ${schedule.arrivalTime}",
+                arrivalTime = "${DateFormatter.formatDate(schedule.arrivalDate)}, ${schedule.arrivalTime}",
                 duration = schedule.duration,
-                price = schedule.price,
-                quota = schedule.quota,
-                status = schedule.status,
+                price = schedule.startingPriceText(),
+                quota = schedule.quotaText(),
+                status = schedule.toUiStatus(),
                 onClick = {
                     onScheduleClick(schedule.id)
                 }
@@ -352,15 +354,15 @@ private fun List<ShipSchedule>.filterBySelectedFilter(
         ScheduleFilter.All -> this
 
         ScheduleFilter.Available -> this.filter {
-            it.status == ShipScheduleStatus.Available
+            it.toUiStatus() == ShipScheduleStatus.Available
         }
 
         ScheduleFilter.Limited -> this.filter {
-            it.status == ShipScheduleStatus.Limited
+            it.toUiStatus() == ShipScheduleStatus.Limited
         }
 
         ScheduleFilter.Unavailable -> this.filter {
-            it.status == ShipScheduleStatus.Unavailable
+            it.toUiStatus() == ShipScheduleStatus.Unavailable
         }
 
         ScheduleFilter.Cheapest -> this
@@ -374,7 +376,7 @@ private fun List<ShipSchedule>.sortBySelectedFilter(
         ScheduleFilter.Cheapest -> {
             sortedWith(
                 compareBy<ShipSchedule> {
-                    it.price.toPriceNumber()
+                    it.economyPrice
                 }.thenBy {
                     it.departureDate.toDateMillis() ?: Long.MAX_VALUE
                 }.thenBy {
@@ -390,10 +392,44 @@ private fun List<ShipSchedule>.sortBySelectedFilter(
                 }.thenBy {
                     it.departureTime.toTimeRank()
                 }.thenBy {
-                    it.status.toStatusRank()
+                    it.toUiStatus().toStatusRank()
                 }
             )
         }
+    }
+}
+
+private fun ShipSchedule.routeText(): String {
+    return "$origin → $destination"
+}
+
+private fun ShipSchedule.startingPriceText(): String {
+    return PriceFormatter.formatToRupiah(economyPrice)
+}
+
+private fun ShipSchedule.quotaText(): String {
+    return if (quota <= 0) {
+        "Habis"
+    } else {
+        "$quota kursi"
+    }
+}
+
+private fun ShipSchedule.toUiStatus(): ShipScheduleStatus {
+    return when {
+        quota <= 0 -> ShipScheduleStatus.Unavailable
+
+        status.contains("habis", ignoreCase = true) -> {
+            ShipScheduleStatus.Unavailable
+        }
+
+        status.contains("terbatas", ignoreCase = true) -> {
+            ShipScheduleStatus.Limited
+        }
+
+        quota <= 10 -> ShipScheduleStatus.Limited
+
+        else -> ShipScheduleStatus.Available
     }
 }
 
@@ -408,8 +444,8 @@ private fun ShipScheduleStatus.toStatusRank(): Int {
 private fun String.toDateMillis(): Long? {
     return try {
         val formatter = SimpleDateFormat(
-            "dd MMM yyyy",
-            Locale.forLanguageTag("id-ID")
+            "yyyy-MM-dd",
+            Locale.getDefault()
         )
 
         formatter.parse(this)?.time
@@ -424,6 +460,7 @@ private fun String.toTimeRank(): Int {
             .replace("WITA", "")
             .replace("WIB", "")
             .replace("WIT", "")
+            .replace(":", ".")
             .trim()
 
         val parts = cleanTime.split(".")

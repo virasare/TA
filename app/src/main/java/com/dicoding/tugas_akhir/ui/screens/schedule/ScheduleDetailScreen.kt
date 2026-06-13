@@ -16,7 +16,6 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -48,7 +47,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.dicoding.tugas_akhir.data.dummy.ShipSchedule
+import com.dicoding.tugas_akhir.core.utils.DateFormatter
+import com.dicoding.tugas_akhir.core.utils.PriceFormatter
+import com.dicoding.tugas_akhir.domain.model.ShipSchedule
 import com.dicoding.tugas_akhir.ui.components.cards.ShipScheduleStatus
 import com.dicoding.tugas_akhir.ui.components.dialog.buttons.PrimaryButton
 import com.dicoding.tugas_akhir.ui.components.dialog.feedback.BadgeVariant
@@ -78,7 +79,7 @@ private data class TicketClass(
 fun ScheduleDetailScreen(
     scheduleId: String,
     onBackClick: () -> Unit,
-    onBookTicketClick: () -> Unit,
+    onBookTicketClick: (String) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: ScheduleViewModel = viewModel(
         factory = ViewModelFactory.getInstance()
@@ -116,25 +117,31 @@ fun ScheduleDetailScreen(
 @Composable
 private fun ScheduleDetailContent(
     schedule: ShipSchedule,
-    onBookTicketClick: () -> Unit,
+    onBookTicketClick: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val routeDirection = schedule.route.toRouteDirection()
+    val routeDirection = RouteDirection(
+        origin = schedule.origin,
+        destination = schedule.destination
+    )
 
     val ticketClasses = schedule.toTicketClasses()
 
-    val facilities = listOf(
-        "Area Bersantai",
-        "Mushola",
-        "Toilet",
-        "Klinik Kesehatan",
-        "Area Bermain Anak",
-        "Ruang Laktasi",
-        "Ruang Baca",
-        "Kantin"
-    )
+    val facilities = schedule.facilities.ifEmpty {
+        listOf(
+            "Area Bersantai",
+            "Mushola",
+            "Toilet",
+            "Klinik Kesehatan",
+            "Area Bermain Anak",
+            "Ruang Laktasi",
+            "Ruang Baca",
+            "Kantin"
+        )
+    }
 
-    val isTicketAvailable = schedule.status != ShipScheduleStatus.Unavailable
+    val uiStatus = schedule.toUiStatus()
+    val isTicketAvailable = uiStatus != ShipScheduleStatus.Unavailable
 
     Column(
         modifier = modifier
@@ -161,9 +168,9 @@ private fun ScheduleDetailContent(
                 ScheduleRouteInfoCard(
                     originCity = routeDirection.origin,
                     destinationCity = routeDirection.destination,
-                    departureDate = schedule.departureDate,
+                    departureDate = DateFormatter.formatDate(schedule.departureDate),
                     departureTime = schedule.departureTime,
-                    arrivalDate = schedule.arrivalDate,
+                    arrivalDate = DateFormatter.formatDate(schedule.arrivalDate),
                     arrivalTime = schedule.arrivalTime,
                     duration = schedule.duration
                 )
@@ -171,9 +178,9 @@ private fun ScheduleDetailContent(
 
             item {
                 TicketInformationCard(
-                    price = schedule.price,
-                    quota = schedule.quota,
-                    status = schedule.status
+                    price = schedule.startingPriceText(),
+                    quota = schedule.quotaText(),
+                    status = uiStatus
                 )
             }
 
@@ -207,7 +214,9 @@ private fun ScheduleDetailContent(
         ) {
             PrimaryButton(
                 text = if (isTicketAvailable) "Pesan Tiket" else "Tiket Habis",
-                onClick = onBookTicketClick,
+                onClick = {
+                    onBookTicketClick(schedule.id)
+                },
                 enabled = isTicketAvailable,
                 modifier = Modifier
                     .padding(horizontal = 24.dp, vertical = 16.dp)
@@ -236,13 +245,14 @@ private fun ScheduleDetailLoadingState(
 private fun ScheduleDetailHeroCard(
     schedule: ShipSchedule
 ) {
-    val badgeText = when (schedule.status) {
+    val uiStatus = schedule.toUiStatus()
+    val badgeText = when (uiStatus) {
         ShipScheduleStatus.Available -> "Tersedia"
         ShipScheduleStatus.Limited -> "Terbatas"
         ShipScheduleStatus.Unavailable -> "Habis"
     }
 
-    val badgeVariant = when (schedule.status) {
+        val badgeVariant = when (uiStatus) {
         ShipScheduleStatus.Available -> BadgeVariant.Success
         ShipScheduleStatus.Limited -> BadgeVariant.Warning
         ShipScheduleStatus.Unavailable -> BadgeVariant.Error
@@ -320,7 +330,7 @@ private fun ScheduleDetailHeroCard(
                             Spacer(modifier = Modifier.width(6.dp))
 
                             Text(
-                                text = schedule.route,
+                                text = schedule.routeText(),
                                 color = Neutral500,
                                 style = MaterialTheme.typography.bodyMedium
                             )
@@ -347,13 +357,13 @@ private fun ScheduleDetailHeroCard(
 
                     HeroMiniInfo(
                         label = "Harga mulai",
-                        value = schedule.price,
+                        value = schedule.startingPriceText(),
                         icon = Icons.Outlined.Payments
                     )
 
                     HeroMiniInfo(
                         label = "Kuota",
-                        value = schedule.quota,
+                        value = schedule.quotaText(),
                         icon = Icons.Outlined.EventSeat
                     )
                 }
@@ -812,15 +822,6 @@ private data class RouteDirection(
     val destination: String
 )
 
-private fun String.toRouteDirection(): RouteDirection {
-    val parts = split("→")
-
-    return RouteDirection(
-        origin = parts.getOrNull(0)?.trim().orEmpty(),
-        destination = parts.getOrNull(1)?.trim().orEmpty()
-    )
-}
-
 private fun cityToPortName(city: String): String {
     return when (city.lowercase()) {
         "ende" -> "Pelabuhan Ende"
@@ -830,43 +831,67 @@ private fun cityToPortName(city: String): String {
         "labuan bajo" -> "Pelabuhan Labuan Bajo"
         "maumere" -> "Pelabuhan Laurens Say"
         "makassar" -> "Pelabuhan Makassar"
-        else -> "Pelabuhan $city"
+        else -> if (city.isBlank()) "-" else "Pelabuhan $city"
+    }
+}
+
+private fun ShipSchedule.routeText(): String {
+    return "$origin → $destination"
+}
+
+private fun ShipSchedule.startingPriceText(): String {
+    return PriceFormatter.formatToRupiah(economyPrice)
+}
+
+private fun ShipSchedule.quotaText(): String {
+    return if (quota <= 0) {
+        "Habis"
+    } else {
+        "$quota kursi"
+    }
+}
+
+private fun ShipSchedule.toUiStatus(): ShipScheduleStatus {
+    return when {
+        quota <= 0 -> ShipScheduleStatus.Unavailable
+
+        status.contains("habis", ignoreCase = true) -> {
+            ShipScheduleStatus.Unavailable
+        }
+
+        status.contains("terbatas", ignoreCase = true) -> {
+            ShipScheduleStatus.Limited
+        }
+
+        quota <= 10 -> ShipScheduleStatus.Limited
+
+        else -> ShipScheduleStatus.Available
     }
 }
 
 private fun ShipSchedule.toTicketClasses(): List<TicketClass> {
-    val basePrice = price.toPriceNumber()
-
     return listOf(
         TicketClass(
             name = "Ekonomi",
             description = "Tempat duduk standar penumpang",
-            price = price,
-            quota = quota
+            price = economyPrice.toRupiah(),
+            quota = quotaText()
         ),
         TicketClass(
             name = "Bisnis",
             description = "Tempat duduk lebih nyaman",
-            price = (basePrice + 150000).toRupiah(),
-            quota = "12 kursi"
+            price = businessPrice.toRupiah(),
+            quota = if (quota <= 0) "Habis" else "12 kursi"
         ),
         TicketClass(
             name = "Kelas I",
             description = "Kabin terbatas dengan fasilitas lebih lengkap",
-            price = (basePrice + 350000).toRupiah(),
-            quota = "6 kursi"
+            price = firstClassPrice.toRupiah(),
+            quota = if (quota <= 0) "Habis" else "6 kursi"
         )
     )
 }
 
-private fun String.toPriceNumber(): Int {
-    return replace("Rp", "")
-        .replace(".", "")
-        .replace(",", "")
-        .trim()
-        .toIntOrNull() ?: 0
-}
-
 private fun Int.toRupiah(): String {
-    return "Rp%,d".format(this).replace(",", ".")
+    return PriceFormatter.formatToRupiah(this)
 }
