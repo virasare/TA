@@ -416,7 +416,7 @@ fun AppNavigation() {
                     destinationPort = destinationPort,
                     selectedDate = selectedDate,
                     onScheduleClick = { scheduleId ->
-                        navController.navigate(Screens.scheduleDetail(scheduleId))
+                        navController.navigate(Screens.scheduleDetail(scheduleId.toString()))
                     },
                     onBackToHomeClick = {
                         navController.popBackStack()
@@ -443,7 +443,7 @@ fun AppNavigation() {
                 PopularRouteResultScreen(
                     popularRoute = selectedPopularRoute,
                     onScheduleClick = { scheduleId ->
-                        navController.navigate(Screens.scheduleDetail(scheduleId))
+                        navController.navigate(Screens.scheduleDetail(scheduleId.toString()))
                     }
                 )
             }
@@ -451,7 +451,7 @@ fun AppNavigation() {
             composable(Screens.Schedule) {
                 ScheduleScreen(
                     onScheduleClick = { scheduleId ->
-                        navController.navigate(Screens.scheduleDetail(scheduleId))
+                        navController.navigate(Screens.scheduleDetail(scheduleId.toString()))
                     }
                 )
             }
@@ -460,11 +460,11 @@ fun AppNavigation() {
                 route = Screens.ScheduleDetail,
                 arguments = listOf(
                     navArgument("scheduleId") {
-                        type = NavType.IntType
+                        type = NavType.StringType
                     }
                 )
             ) { backStackEntry ->
-                val scheduleId = backStackEntry.arguments?.getInt("scheduleId") ?: 0
+                val scheduleId = backStackEntry.arguments?.getString("scheduleId").orEmpty()
 
                 ScheduleDetailScreen(
                     scheduleId = scheduleId,
@@ -472,50 +472,95 @@ fun AppNavigation() {
                         navController.popBackStack()
                     },
                     onBookTicketClick = {
-                        navController.navigate(Screens.SelectTicket)
+                        navController.navigate(Screens.selectTicket(scheduleId))
                     }
                 )
             }
 
-            composable(Screens.SelectTicket) {
+            composable(
+                route = Screens.SelectTicket,
+                arguments = listOf(
+                    navArgument("scheduleId") {
+                        type = NavType.StringType
+                    }
+                )
+            ) { backStackEntry ->
+                val scheduleId = backStackEntry.arguments?.getString("scheduleId").orEmpty()
+
                 SelectTicketScreen(
-                    schedule = selectedBookingSchedule,
-                    onContinueClick = { ticket ->
-                        selectedTicketClass = ticket
-                        navController.navigate(Screens.PassengerForm)
-                    }
-                )
-            }
-
-            composable(Screens.PassengerForm) {
-                PassengerFormScreen(
+                    scheduleId = scheduleId,
                     onBackClick = {
                         navController.popBackStack()
                     },
-                    onContinueClick = { passenger ->
-                        passengerData = passenger
-                        passengerList = listOf(passenger)
-                        navController.navigate(Screens.BookingSummary)
+                    onContinueClick = { selectedScheduleId, ticketClassId, ticketPrice, passengerCount ->
+                        navController.navigate(
+                            Screens.passengerForm(
+                                scheduleId = selectedScheduleId,
+                                ticketClassId = ticketClassId,
+                                ticketPrice = ticketPrice,
+                                passengerCount = passengerCount
+                            )
+                        )
                     }
                 )
             }
 
-            composable(Screens.BookingSummary) {
-                val currentPassengerData = passengerData
+            composable(
+                route = Screens.PassengerForm,
+                arguments = listOf(
+                    navArgument("scheduleId") {
+                        type = NavType.StringType
+                    },
+                    navArgument("ticketClassId") {
+                        type = NavType.StringType
+                    },
+                    navArgument("ticketPrice") {
+                        type = NavType.IntType
+                    },
+                    navArgument("passengerCount") {
+                        type = NavType.IntType
+                    },
+                )
+            ) { backStackEntry ->
+                val scheduleId = backStackEntry.arguments?.getString("scheduleId").orEmpty()
+                val ticketClassId = backStackEntry.arguments?.getString("ticketClassId").orEmpty()
+                val ticketPrice = backStackEntry.arguments?.getInt("ticketPrice") ?: 0
+                val passengerCount = backStackEntry.arguments?.getInt("passengerCount") ?: 1
 
-                if (currentPassengerData != null) {
-                    BookingSummaryScreen(
-                        schedule = selectedBookingSchedule,
-                        selectedTicket = selectedTicketClass,
-                        passengerData = currentPassengerData,
-                        onBackClick = {
-                            navController.popBackStack()
-                        },
-                        onPaymentClick = {
-                            navController.navigate(Screens.Payment)
-                        }
-                    )
-                }
+                PassengerFormScreen(
+                    scheduleId = scheduleId,
+                    ticketClassId = ticketClassId,
+                    ticketPrice = ticketPrice,
+                    passengerCount = passengerCount,
+                    onBackClick = {
+                        navController.popBackStack()
+                    },
+                    onBookingCreated = { bookingId ->
+                        navController.navigate(Screens.bookingSummary(bookingId))
+                    }
+                )
+            }
+
+            composable(
+                route = Screens.BookingSummary,
+                arguments = listOf(
+                    navArgument("bookingId") {
+                        type = NavType.StringType
+                    }
+                )
+            ) { backStackEntry ->
+                val bookingId = backStackEntry.arguments?.getString("bookingId").orEmpty()
+
+                BookingSummaryScreen(
+                    bookingId = bookingId,
+                    onBackClick = {
+                        navController.popBackStack()
+                    },
+                    onPaymentClick = { selectedBookingId ->
+
+                        navController.navigate(Screens.Payment)
+                    }
+                )
             }
 
             composable(Screens.Payment) {

@@ -29,7 +29,7 @@ class ScheduleRepository private constructor(
         )
     }
 
-    fun getScheduleDetail(scheduleId: Int): Flow<Resource<ShipSchedule>> = flow {
+    fun getScheduleDetail(scheduleId: String): Flow<Resource<ShipSchedule>> = flow {
         emit(Resource.Loading)
 
         val schedule = remoteDataSource.getScheduleById(scheduleId)

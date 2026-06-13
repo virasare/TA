@@ -76,7 +76,7 @@ private data class TicketClass(
 
 @Composable
 fun ScheduleDetailScreen(
-    scheduleId: Int,
+    scheduleId: String,
     onBackClick: () -> Unit,
     onBookTicketClick: () -> Unit,
     modifier: Modifier = Modifier,

@@ -51,7 +51,7 @@ class ScheduleViewModel(
         }
     }
 
-    fun getScheduleDetail(scheduleId: Int) {
+    fun getScheduleDetail(scheduleId: String) {
         viewModelScope.launch {
             scheduleRepository.getScheduleDetail(scheduleId).collect { result ->
                 _scheduleDetailUiState.value = when (result) {

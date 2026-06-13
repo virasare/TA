@@ -1,6 +1,6 @@
-package com.dicoding.tugas_akhir.domain.model
+package com.dicoding.tugas_akhir.data.remote.response
 
-data class Booking(
+data class BookingResponse(
     val id: String,
     val scheduleId: String,
     val shipName: String,
@@ -11,7 +11,7 @@ data class Booking(
     val ticketClassName: String,
     val ticketPrice: Int,
     val passengerCount: Int,
-    val passengers: List<Passenger>,
+    val passengers: List<PassengerResponse>,
     val adminFee: Int,
     val totalPrice: Int,
     val status: String,

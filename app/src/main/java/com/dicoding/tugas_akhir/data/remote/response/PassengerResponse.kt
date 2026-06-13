@@ -1,6 +1,6 @@
-package com.dicoding.tugas_akhir.domain.model
+package com.dicoding.tugas_akhir.data.remote.response
 
-data class Passenger(
+data class PassengerResponse(
     val id: String,
     val fullName: String,
     val nik: String,

@@ -1,12 +1,24 @@
 package com.dicoding.tugas_akhir.di
 
 import com.dicoding.tugas_akhir.data.remote.datasource.FakeRemoteDataSource
+import com.dicoding.tugas_akhir.data.repository.BookingRepository
 import com.dicoding.tugas_akhir.data.repository.ScheduleRepository
 
 object Injection {
 
+    private fun provideFakeRemoteDataSource(): FakeRemoteDataSource {
+        return FakeRemoteDataSource.getInstance()
+    }
+
     fun provideScheduleRepository(): ScheduleRepository {
-        val remoteDataSource = FakeRemoteDataSource.getInstance()
-        return ScheduleRepository.getInstance(remoteDataSource)
+        return ScheduleRepository.getInstance(
+            remoteDataSource = provideFakeRemoteDataSource(),
+        )
+    }
+
+    fun provideBookingRepository(): BookingRepository {
+        return BookingRepository.getInstance(
+            remoteDataSource = provideFakeRemoteDataSource(),
+        )
     }
 }
