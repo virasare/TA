@@ -24,12 +24,9 @@ import com.dicoding.tugas_akhir.data.dummy.PassengerData
 import com.dicoding.tugas_akhir.data.dummy.Port
 import com.dicoding.tugas_akhir.data.dummy.ShipSchedule
 import com.dicoding.tugas_akhir.data.dummy.TicketClassOption
-import com.dicoding.tugas_akhir.data.dummy.createETicketFromCurrentBooking
 import com.dicoding.tugas_akhir.data.dummy.dummyNotifications
 import com.dicoding.tugas_akhir.data.dummy.dummyPorts
-import com.dicoding.tugas_akhir.data.dummy.dummyShipSchedules
 import com.dicoding.tugas_akhir.data.dummy.popularRoutes
-import com.dicoding.tugas_akhir.data.dummy.toETicketData
 import com.dicoding.tugas_akhir.ui.components.dialog.navigation.AppBackTopBar
 import com.dicoding.tugas_akhir.ui.components.dialog.navigation.AppBottomNavigationBar
 import com.dicoding.tugas_akhir.ui.components.dialog.navigation.AppTopBar
@@ -44,6 +41,7 @@ import com.dicoding.tugas_akhir.ui.screens.home.HomeScreen
 import com.dicoding.tugas_akhir.ui.screens.home.PopularRouteResultScreen
 import com.dicoding.tugas_akhir.ui.screens.home.PortSearchScreen
 import com.dicoding.tugas_akhir.ui.screens.home.SearchResultScreen
+import com.dicoding.tugas_akhir.ui.screens.myticket.ETicketScreen
 import com.dicoding.tugas_akhir.ui.screens.myticket.MyTicketScreen
 import com.dicoding.tugas_akhir.ui.screens.notification.NotificationDetailScreen
 import com.dicoding.tugas_akhir.ui.screens.notification.NotificationScreen
@@ -65,7 +63,6 @@ import com.dicoding.tugas_akhir.ui.screens.profile.ThemeSettingScreen
 import com.dicoding.tugas_akhir.ui.screens.schedule.ScheduleDetailScreen
 import com.dicoding.tugas_akhir.ui.screens.schedule.ScheduleScreen
 import com.dicoding.tugas_akhir.ui.screens.splash.SplashScreen
-import com.dicoding.tugas_akhir.ui.screens.ticket.ETicketScreen
 import com.dicoding.tugas_akhir.ui.theme.Background
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.UserProfileChangeRequest
@@ -620,7 +617,7 @@ fun AppNavigation() {
                 PaymentSuccessScreen(
                     paymentId = paymentId,
                     onViewTicketClick = {
-                        navController.navigate(Screens.Home)
+                        navController.navigate(Screens.eTicketByPayment(paymentId))
                     },
                     onBackHomeClick = {
                         navController.navigate(Screens.Home) {
@@ -659,20 +656,47 @@ fun AppNavigation() {
 
             composable(Screens.MyTicket) {
                 MyTicketScreen(
-                    onTicketClick = { order ->
-                        selectedETicketData = order.toETicketData()
-                        navController.navigate(Screens.ETicket)
+                    onTicketClick = { bookingId ->
+                        navController.navigate(Screens.eTicket(bookingId))
+                    },
+                    onPayNowClick = { bookingId ->
+                        navController.navigate(Screens.payment(bookingId))
                     }
                 )
             }
 
-            composable(Screens.ETicket) {
+            composable(
+                route = Screens.ETicket,
+                arguments = listOf(
+                    navArgument("bookingId") {
+                        type = NavType.StringType
+                    }
+                )
+            ) { backStackEntry ->
+                val bookingId = backStackEntry.arguments?.getString("bookingId").orEmpty()
+
                 ETicketScreen(
-                    ticketData = selectedETicketData,
+                    bookingId = bookingId,
                     onBackClick = {
-                        navController.navigate(Screens.MyTicket) {
-                            launchSingleTop = true
-                        }
+                        navController.popBackStack()
+                    }
+                )
+            }
+
+            composable(
+                route = Screens.ETicketByPayment,
+                arguments = listOf(
+                    navArgument("paymentId") {
+                        type = NavType.StringType
+                    }
+                )
+            ) { backStackEntry ->
+                val paymentId = backStackEntry.arguments?.getString("paymentId").orEmpty()
+
+                ETicketScreen(
+                    paymentId = paymentId,
+                    onBackClick = {
+                        navController.popBackStack()
                     }
                 )
             }

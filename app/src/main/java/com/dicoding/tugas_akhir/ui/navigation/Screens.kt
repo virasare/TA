@@ -25,8 +25,6 @@ object Screens {
         return "schedule_detail/$scheduleId"
     }
 
-    const val MyTicket = "my_ticket"
-
 //    Booking
     const val SelectTicket = "select_ticket/{scheduleId}"
     const val BookingSummary = "booking_summary/{bookingId}"
@@ -52,6 +50,7 @@ object Screens {
 
 //   Payment
     const val Payment = "payment/{bookingId}"
+    const val OrderDetail = "order_detail"
     const val PaymentWaiting = "payment_waiting/{paymentId}"
     const val PaymentSuccess = "payment_success/{paymentId}"
     const val PaymentFailed = "payment_failed/{paymentId}"
@@ -72,9 +71,18 @@ object Screens {
         return "payment_failed/$paymentId"
     }
 
+//  MyTicket & E-Ticket
+    const val MyTicket = "my_ticket"
+    const val ETicket = "e_ticket/{bookingId}"
+    const val ETicketByPayment = "e_ticket_payment/{paymentId}"
 
-    const val OrderDetail = "order_detail"
-    const val ETicket = "e_ticket"
+    fun eTicket(bookingId: String): String {
+        return "e_ticket/$bookingId"
+    }
+
+    fun eTicketByPayment(paymentId: String): String {
+        return "e_ticket_payment/$paymentId"
+    }
 
 //  Notification
     const val Notification = "notification"

@@ -1,11 +1,13 @@
 package com.dicoding.tugas_akhir.data.mapper
 
 import com.dicoding.tugas_akhir.data.remote.response.BookingResponse
+import com.dicoding.tugas_akhir.data.remote.response.ETicketResponse
 import com.dicoding.tugas_akhir.data.remote.response.PassengerResponse
 import com.dicoding.tugas_akhir.data.remote.response.PaymentMethodResponse
 import com.dicoding.tugas_akhir.data.remote.response.PaymentResponse
 import com.dicoding.tugas_akhir.data.remote.response.ShipScheduleResponse
 import com.dicoding.tugas_akhir.domain.model.Booking
+import com.dicoding.tugas_akhir.domain.model.ETicket
 import com.dicoding.tugas_akhir.domain.model.Passenger
 import com.dicoding.tugas_akhir.domain.model.Payment
 import com.dicoding.tugas_akhir.domain.model.PaymentMethod
@@ -97,6 +99,27 @@ object DataMapper {
             expiredIn = input.expiredIn,
             instructions = input.instructions,
             createdAt = input.createdAt,
+        )
+    }
+
+    fun mapETicketResponseToDomain(input: ETicketResponse): ETicket {
+        return ETicket(
+            bookingId = input.bookingId,
+            bookingCode = input.bookingCode,
+            paymentId = input.paymentId,
+            shipName = input.shipName,
+            origin = input.origin,
+            destination = input.destination,
+            departureDate = input.departureDate,
+            departureTime = input.departureTime,
+            ticketClassName = input.ticketClassName,
+            passengers = input.passengers.map { mapPassengerResponseToDomain(it) },
+            status = input.status,
+            qrCode = input.qrCode,
+            issuedAt = input.issuedAt,
+            terminal = input.terminal,
+            gate = input.gate,
+            note = input.note,
         )
     }
 }

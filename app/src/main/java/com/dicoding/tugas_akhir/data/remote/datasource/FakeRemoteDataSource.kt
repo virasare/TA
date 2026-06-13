@@ -4,6 +4,7 @@ import com.dicoding.tugas_akhir.data.dummy.DummyShipScheduleApiData
 import com.dicoding.tugas_akhir.data.remote.request.CreateBookingRequest
 import com.dicoding.tugas_akhir.data.remote.request.CreatePaymentRequest
 import com.dicoding.tugas_akhir.data.remote.response.BookingResponse
+import com.dicoding.tugas_akhir.data.remote.response.ETicketResponse
 import com.dicoding.tugas_akhir.data.remote.response.PassengerResponse
 import com.dicoding.tugas_akhir.data.remote.response.PaymentMethodResponse
 import com.dicoding.tugas_akhir.data.remote.response.PaymentResponse
@@ -215,6 +216,64 @@ class FakeRemoteDataSource private constructor() {
         )
 
         return updatedPayment
+    }
+
+    suspend fun getMyTickets(): List<BookingResponse> {
+        delay(700)
+
+        return bookings
+    }
+
+    suspend fun getETicketByBookingId(bookingId: String): ETicketResponse? {
+        delay(700)
+
+        return buildETicketResponse(
+            bookingId = bookingId,
+            paymentId = payments.find { payment ->
+                payment.bookingId == bookingId
+            }?.id,
+        )
+    }
+
+    suspend fun getETicketByPaymentId(paymentId: String): ETicketResponse? {
+        delay(700)
+
+        val payment = payments.find { item ->
+            item.id == paymentId
+        } ?: return null
+
+        return buildETicketResponse(
+            bookingId = payment.bookingId,
+            paymentId = payment.id,
+        )
+    }
+
+    private fun buildETicketResponse(
+        bookingId: String,
+        paymentId: String?,
+    ): ETicketResponse? {
+        val booking = bookings.find { item ->
+            item.id == bookingId
+        } ?: return null
+
+        return ETicketResponse(
+            bookingId = booking.id,
+            bookingCode = booking.id.replace("BKG", "NKP"),
+            paymentId = paymentId,
+            shipName = booking.shipName,
+            origin = booking.origin,
+            destination = booking.destination,
+            departureDate = booking.departureDate,
+            departureTime = booking.departureTime,
+            ticketClassName = booking.ticketClassName,
+            passengers = booking.passengers,
+            status = booking.status,
+            qrCode = "ETICKET-${booking.id}-${paymentId ?: "UNPAID"}",
+            issuedAt = getCurrentDateTime(),
+            terminal = "Pelabuhan ${booking.origin}",
+            gate = "Gate 2",
+            note = "Tunjukkan e-ticket ini kepada petugas pelabuhan saat proses check-in.",
+        )
     }
 
     private fun updateBookingStatus(
