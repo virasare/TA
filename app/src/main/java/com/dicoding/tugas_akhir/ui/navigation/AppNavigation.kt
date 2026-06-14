@@ -11,8 +11,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.credentials.ClearCredentialStateRequest
-import androidx.credentials.CredentialManager
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -52,14 +50,12 @@ import com.dicoding.tugas_akhir.ui.screens.payment.PaymentSuccessScreen
 import com.dicoding.tugas_akhir.ui.screens.payment.PaymentWaitingScreen
 import com.dicoding.tugas_akhir.ui.screens.profile.AboutAppScreen
 import com.dicoding.tugas_akhir.ui.screens.profile.EditProfileScreen
-import com.dicoding.tugas_akhir.ui.screens.profile.HelpDetailScreen
-import com.dicoding.tugas_akhir.ui.screens.profile.HelpScreen
-import com.dicoding.tugas_akhir.ui.screens.profile.LanguageSettingScreen
 import com.dicoding.tugas_akhir.ui.screens.profile.PassengerDataScreen
 import com.dicoding.tugas_akhir.ui.screens.profile.PassengerProfileFormScreen
+import com.dicoding.tugas_akhir.ui.screens.profile.ProfileHelpDetailScreen
+import com.dicoding.tugas_akhir.ui.screens.profile.ProfileHelpScreen
 import com.dicoding.tugas_akhir.ui.screens.profile.ProfileScreen
 import com.dicoding.tugas_akhir.ui.screens.profile.SettingsScreen
-import com.dicoding.tugas_akhir.ui.screens.profile.ThemeSettingScreen
 import com.dicoding.tugas_akhir.ui.screens.schedule.ScheduleDetailScreen
 import com.dicoding.tugas_akhir.ui.screens.schedule.ScheduleScreen
 import com.dicoding.tugas_akhir.ui.screens.splash.SplashScreen
@@ -67,7 +63,9 @@ import com.dicoding.tugas_akhir.ui.theme.Background
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.UserProfileChangeRequest
 import kotlinx.coroutines.launch
-import com.dicoding.tugas_akhir.ui.navigation.AuthGate
+import com.dicoding.tugas_akhir.ui.screens.profile.ProfileLanguageScreen
+import com.dicoding.tugas_akhir.ui.screens.profile.ProfileSecurityScreen
+import com.dicoding.tugas_akhir.ui.screens.profile.ProfileThemeScreen
 
 @Composable
 fun AppNavigation() {
@@ -825,11 +823,7 @@ fun AppNavigation() {
                         navController.navigate(Screens.Login)
                     }
                 ) {
-                    val user = auth.currentUser
-
                     ProfileScreen(
-                        name = user?.displayName ?: "Pengguna",
-                        email = user?.email ?: "-",
                         onEditProfileClick = {
                             navController.navigate(Screens.ProfileEdit)
                         },
@@ -845,24 +839,16 @@ fun AppNavigation() {
                         onAboutClick = {
                             navController.navigate(Screens.ProfileAbout)
                         },
-                        onLogoutClick = {
-                            auth.signOut()
-                            isLoggedIn = false
-                            pendingProtectedRoute = null
-
-                            scope.launch {
-                                CredentialManager.create(context).clearCredentialState(
-                                    ClearCredentialStateRequest()
-                                )
-                            }
-
+                        onSecurityClick = {
+                            navController.navigate(Screens.ProfileSecurity)
+                        },
+                        onLogoutSuccess = {
                             navController.navigate(Screens.Home) {
                                 popUpTo(Screens.Home) {
-                                    inclusive = false
+                                    inclusive = true
                                 }
-                                launchSingleTop = true
                             }
-                        }
+                        },
                     )
                 }
             }
@@ -880,79 +866,164 @@ fun AppNavigation() {
             }
 
             composable(Screens.ProfilePassengerData) {
-                PassengerDataScreen(
-                    onAddPassengerClick = {
-                        navController.navigate(Screens.ProfilePassengerForm)
-                    }
-                )
-            }
-
-            composable(Screens.ProfilePassengerForm) {
-                PassengerProfileFormScreen(
-                    onSaveClick = {
+                AuthGate(
+                    onLoginClick = {
+                        navController.navigate(Screens.Login)
+                    },
+                    onBackClick = {
                         navController.popBackStack()
                     }
+                ) {
+                    PassengerDataScreen(
+                        onAddPassengerClick = {
+                            navController.navigate(Screens.profilePassengerForm())
+                        },
+                        onEditPassengerClick = { passengerId ->
+                            navController.navigate(Screens.profilePassengerForm(passengerId))
+                        },
+                    )
+                }
+            }
+
+            composable(
+                route = Screens.ProfilePassengerForm,
+                arguments = listOf(
+                    navArgument("passengerId") {
+                        nullable = true
+                        defaultValue = null
+                    }
                 )
+            ) { backStackEntry ->
+                val passengerId = backStackEntry.arguments?.getString("passengerId")
+
+                AuthGate(
+                    onLoginClick = {
+                        navController.navigate(Screens.Login)
+                    },
+                    onBackClick = {
+                        navController.popBackStack()
+                    }
+                ) {
+                    PassengerProfileFormScreen(
+                        passengerId = passengerId,
+                        onSaveClick = {
+                            navController.popBackStack()
+                        },
+                    )
+                }
             }
 
             composable(Screens.ProfileSettings) {
-                SettingsScreen(
-                    onLanguageClick = {
-                        navController.navigate(Screens.ProfileLanguage)
+                AuthGate(
+                    onLoginClick = {
+                        navController.navigate(Screens.Login)
                     },
-                    onThemeClick = {
-                        navController.navigate(Screens.ProfileTheme)
-                    },
-                    onAboutClick = {
-                        navController.navigate(Screens.ProfileAbout)
-                    },
-                    onHelpClick = {
-                        navController.navigate(Screens.ProfileHelp)
+                    onBackClick = {
+                        navController.popBackStack()
                     }
-                )
+                ) {
+                    SettingsScreen(
+                        onLanguageClick = {
+                            navController.navigate(Screens.ProfileLanguage)
+                        },
+                        onThemeClick = {
+                            navController.navigate(Screens.ProfileTheme)
+                        },
+                        onAboutClick = {
+                            navController.navigate(Screens.ProfileAbout)
+                        },
+                        onHelpClick = {
+                            navController.navigate(Screens.ProfileHelp)
+                        },
+                        onSecurityClick = {
+                            navController.navigate(Screens.ProfileSecurity)
+                        },
+                    )
+                }
             }
 
             composable(Screens.ProfileLanguage) {
-                LanguageSettingScreen(
-                    onSaveClick = {
+                AuthGate(
+                    onLoginClick = {
+                        navController.navigate(Screens.Login)
+                    },
+                    onBackClick = {
                         navController.popBackStack()
                     }
-                )
+                ) {
+                    ProfileLanguageScreen()
+                }
             }
 
             composable(Screens.ProfileTheme) {
-                ThemeSettingScreen(
-                    onSaveClick = {
+                AuthGate(
+                    onLoginClick = {
+                        navController.navigate(Screens.Login)
+                    },
+                    onBackClick = {
                         navController.popBackStack()
                     }
-                )
+                ) {
+                    ProfileThemeScreen()
+                }
             }
 
             composable(Screens.ProfileHelp) {
-                HelpScreen(
-                    onHelpItemClick = { helpId ->
-                        navController.navigate(Screens.profileHelpDetail(helpId))
+                AuthGate(
+                    onLoginClick = {
+                        navController.navigate(Screens.Login)
+                    },
+                    onBackClick = {
+                        navController.popBackStack()
                     }
-                )
+                ) {
+                    ProfileHelpScreen(
+                        onHelpDetailClick = { type ->
+                            navController.navigate(Screens.profileHelpDetail(type))
+                        },
+                    )
+                }
             }
 
             composable(
                 route = Screens.ProfileHelpDetail,
                 arguments = listOf(
-                    navArgument("helpId") {
-                        type = NavType.IntType
+                    navArgument("type") {
+                        type = NavType.StringType
                     }
                 )
             ) { backStackEntry ->
-                val helpId = backStackEntry.arguments?.getInt("helpId") ?: 0
+                val type = backStackEntry.arguments?.getString("type").orEmpty()
 
-                HelpDetailScreen(
-                    helpId = helpId
-                )
+                AuthGate(
+                    onLoginClick = {
+                        navController.navigate(Screens.Login)
+                    },
+                    onBackClick = {
+                        navController.popBackStack()
+                    }
+                ) {
+                    ProfileHelpDetailScreen(
+                        type = type,
+                    )
+                }
             }
 
             composable(Screens.ProfileAbout) {
                 AboutAppScreen()
+            }
+
+            composable(Screens.ProfileSecurity) {
+                AuthGate(
+                    onLoginClick = {
+                        navController.navigate(Screens.Login)
+                    },
+                    onBackClick = {
+                        navController.popBackStack()
+                    }
+                ) {
+                    ProfileSecurityScreen()
+                }
             }
         }
     }

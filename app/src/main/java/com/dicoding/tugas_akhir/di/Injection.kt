@@ -2,16 +2,20 @@ package com.dicoding.tugas_akhir.di
 
 import com.dicoding.tugas_akhir.TugasAkhirApplication
 import com.dicoding.tugas_akhir.data.local.LocalDataSource
-
+import com.dicoding.tugas_akhir.data.local.datastore.ProfileDataStore
+import com.dicoding.tugas_akhir.data.local.datastore.SavedPassengerDataStore
+import com.dicoding.tugas_akhir.data.local.datastore.SettingsDataStore
 import com.dicoding.tugas_akhir.data.local.room.AppDatabase
 import com.dicoding.tugas_akhir.data.remote.datasource.FakeRemoteDataSource
 import com.dicoding.tugas_akhir.data.repository.AuthRepository
 import com.dicoding.tugas_akhir.data.repository.BookingRepository
 import com.dicoding.tugas_akhir.data.repository.MyTicketRepository
 import com.dicoding.tugas_akhir.data.repository.PaymentRepository
+import com.dicoding.tugas_akhir.data.repository.ProfileRepository
+import com.dicoding.tugas_akhir.data.repository.SavedPassengerRepository
 import com.dicoding.tugas_akhir.data.repository.ScheduleRepository
+import com.dicoding.tugas_akhir.data.repository.SettingsRepository
 import com.google.firebase.auth.FirebaseAuth
-
 object Injection {
 
     private fun provideFakeRemoteDataSource(): FakeRemoteDataSource {
@@ -30,6 +34,12 @@ object Injection {
         return LocalDataSource.getInstance(
             bookingDao = database.bookingDao(),
             paymentDao = database.paymentDao(),
+        )
+    }
+
+    private fun provideSettingsDataStore(): SettingsDataStore {
+        return SettingsDataStore.getInstance(
+            context = TugasAkhirApplication.instance,
         )
     }
 
@@ -62,6 +72,37 @@ object Injection {
     fun provideMyTicketRepository(): MyTicketRepository {
         return MyTicketRepository.getInstance(
             localDataSource = provideLocalDataSource(),
+        )
+    }
+
+    fun provideSettingsRepository(): SettingsRepository {
+        return SettingsRepository.getInstance(
+            settingsDataStore = provideSettingsDataStore(),
+        )
+    }
+
+    private fun provideProfileDataStore(): ProfileDataStore {
+        return ProfileDataStore.getInstance(
+            context = TugasAkhirApplication.instance,
+        )
+    }
+
+    fun provideProfileRepository(): ProfileRepository {
+        return ProfileRepository.getInstance(
+            profileDataStore = provideProfileDataStore(),
+            authRepository = provideAuthRepository(),
+        )
+    }
+
+    private fun provideSavedPassengerDataStore(): SavedPassengerDataStore {
+        return SavedPassengerDataStore.getInstance(
+            context = TugasAkhirApplication.instance,
+        )
+    }
+
+    fun provideSavedPassengerRepository(): SavedPassengerRepository {
+        return SavedPassengerRepository.getInstance(
+            dataStore = provideSavedPassengerDataStore(),
         )
     }
 }

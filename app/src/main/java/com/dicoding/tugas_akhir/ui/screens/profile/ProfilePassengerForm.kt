@@ -5,83 +5,118 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import com.dicoding.tugas_akhir.ui.components.profile.*
-import com.dicoding.tugas_akhir.ui.theme.Background
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.dicoding.tugas_akhir.ui.components.profile.BottomActionButton
+import com.dicoding.tugas_akhir.ui.components.profile.ChoiceSection
+import com.dicoding.tugas_akhir.ui.components.profile.InfoNote
+import com.dicoding.tugas_akhir.ui.components.profile.ProfileFormCard
+import com.dicoding.tugas_akhir.ui.components.profile.ProfileTextField
+import com.dicoding.tugas_akhir.ui.viewmodel.SavedPassengerViewModel
+import com.dicoding.tugas_akhir.ui.viewmodel.ViewModelFactory
 
 @Composable
 fun PassengerProfileFormScreen(
-    onSaveClick: () -> Unit
+    onSaveClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    passengerId: String? = null,
+    viewModel: SavedPassengerViewModel = viewModel(
+        factory = ViewModelFactory.getInstance()
+    ),
 ) {
-    var fullName by remember { mutableStateOf("") }
-    var nik by remember { mutableStateOf("") }
-    var phone by remember { mutableStateOf("") }
-    var gender by remember { mutableStateOf("Perempuan") }
+    val formState by viewModel.formState.collectAsStateWithLifecycle()
+
+    LaunchedEffect(passengerId) {
+        if (passengerId.isNullOrBlank()) {
+            viewModel.resetForm()
+        } else {
+            viewModel.loadPassengerForEdit(passengerId)
+        }
+    }
 
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
-            .background(Background)
+            .background(Color(0xFFF7FAFC))
     ) {
         LazyColumn(
             modifier = Modifier.weight(1f),
-            contentPadding = PaddingValues(24.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            contentPadding = PaddingValues(16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             item {
-                ProfileFormCard {
+                ProfileFormCard(
+                    title = if (passengerId.isNullOrBlank()) {
+                        "Tambah Data Penumpang"
+                    } else {
+                        "Edit Data Penumpang"
+                    },
+                ) {
                     ProfileTextField(
                         label = "Nama Lengkap",
-                        value = fullName,
-                        onValueChange = { fullName = it },
-                        placeholder = "Masukkan nama lengkap"
+                        value = formState.fullName,
+                        onValueChange = viewModel::updateFullName,
+                        placeholder = "Masukkan nama lengkap",
                     )
 
                     ProfileTextField(
                         label = "Nomor Induk Kependudukan",
-                        value = nik,
-                        onValueChange = { value ->
-                            if (value.length <= 16 && value.all { it.isDigit() }) {
-                                nik = value
-                            }
-                        },
+                        value = formState.nik,
+                        onValueChange = viewModel::updateNik,
                         placeholder = "Masukkan 16 digit NIK",
-                        keyboardType = KeyboardType.Number
+                        keyboardType = KeyboardType.Number,
+                        isError = formState.nik.isNotEmpty() && formState.nik.length < 16,
+                        supportingText = if (formState.nik.isNotEmpty() && formState.nik.length < 16) {
+                            "NIK harus 16 digit"
+                        } else {
+                            null
+                        },
                     )
 
                     ProfileTextField(
                         label = "Nomor Telepon",
-                        value = phone,
-                        onValueChange = { phone = it },
+                        value = formState.phoneNumber,
+                        onValueChange = viewModel::updatePhone,
                         placeholder = "Masukkan nomor telepon",
-                        keyboardType = KeyboardType.Phone
+                        keyboardType = KeyboardType.Phone,
                     )
 
                     ChoiceSection(
                         title = "Jenis Kelamin",
                         options = listOf("Perempuan", "Laki-laki"),
-                        selectedOption = gender,
-                        onOptionSelected = { gender = it }
+                        selectedOption = formState.gender,
+                        onOptionSelected = viewModel::updateGender,
                     )
 
                     InfoNote(
-                        text = "Pastikan data penumpang sesuai kartu identitas untuk menghindari kendala saat keberangkatan."
+                        text = "Pastikan data penumpang sesuai kartu identitas untuk menghindari kendala saat keberangkatan.",
                     )
                 }
             }
         }
 
         BottomActionButton(
-            text = "Simpan Penumpang",
-            onClick = onSaveClick
+            text = if (passengerId.isNullOrBlank()) {
+                "Simpan Penumpang"
+            } else {
+                "Simpan Perubahan"
+            },
+            onClick = {
+                viewModel.savePassenger(
+                    onSaved = onSaveClick,
+                )
+            },
+            enabled = formState.isValid,
+            modifier = Modifier.navigationBarsPadding(),
         )
     }
 }

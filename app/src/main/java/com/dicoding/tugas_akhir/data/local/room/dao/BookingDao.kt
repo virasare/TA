@@ -11,48 +11,36 @@ import com.dicoding.tugas_akhir.data.local.room.entity.PassengerEntity
 import kotlinx.coroutines.flow.Flow
 
 @Dao
-abstract class BookingDao {
+interface BookingDao {
 
     @Transaction
     @Query("SELECT * FROM bookings ORDER BY createdAtMillis DESC")
-    abstract fun getAllBookings(): Flow<List<BookingWithPassengers>>
+    fun getAllBookings(): Flow<List<BookingWithPassengers>>
 
     @Transaction
     @Query("SELECT * FROM bookings WHERE id = :bookingId LIMIT 1")
-    abstract suspend fun getBookingById(
+    suspend fun getBookingById(
         bookingId: String,
     ): BookingWithPassengers?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    abstract suspend fun insertBooking(
+    suspend fun insertBooking(
         booking: BookingEntity,
     ): Long
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    abstract suspend fun insertPassengers(
+    suspend fun insertPassengers(
         passengers: List<PassengerEntity>,
     ): List<Long>
 
     @Query("DELETE FROM passengers WHERE bookingId = :bookingId")
-    abstract suspend fun deletePassengersByBookingId(
+    suspend fun deletePassengersByBookingId(
         bookingId: String,
     ): Int
 
     @Query("UPDATE bookings SET status = :status WHERE id = :bookingId")
-    abstract suspend fun updateBookingStatus(
+    suspend fun updateBookingStatus(
         bookingId: String,
         status: String,
     ): Int
-
-    @Transaction
-    open suspend fun insertBookingWithPassengers(
-        booking: BookingEntity,
-        passengers: List<PassengerEntity>,
-    ): Boolean {
-        insertBooking(booking)
-        deletePassengersByBookingId(booking.id)
-        insertPassengers(passengers)
-
-        return true
-    }
 }

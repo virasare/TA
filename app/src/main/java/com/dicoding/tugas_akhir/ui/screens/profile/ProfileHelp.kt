@@ -6,59 +6,117 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Help
+import androidx.compose.material.icons.outlined.Call
+import androidx.compose.material.icons.outlined.Email
+import androidx.compose.material.icons.outlined.EventSeat
+import androidx.compose.material.icons.outlined.HelpOutline
+import androidx.compose.material.icons.outlined.Payment
+import androidx.compose.material.icons.outlined.Schedule
+import androidx.compose.material.icons.outlined.SupportAgent
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.dicoding.tugas_akhir.ui.components.profile.*
-import com.dicoding.tugas_akhir.ui.theme.Background
+import com.dicoding.tugas_akhir.ui.components.profile.DetailMenuItem
+import com.dicoding.tugas_akhir.ui.components.profile.InfoNote
+import com.dicoding.tugas_akhir.ui.components.profile.ProfileFormCard
+import com.dicoding.tugas_akhir.ui.localization.LocalAppStrings
 
 @Composable
-fun HelpScreen(
-    onHelpItemClick: (Int) -> Unit
+fun ProfileHelpScreen(
+    onHelpDetailClick: (String) -> Unit = {},
+    modifier: Modifier = Modifier,
 ) {
-    val helpItems = listOf(
-        "Cara mencari jadwal kapal",
-        "Cara memesan tiket",
-        "Metode pembayaran",
-        "Refund dan Reschedule",
-        "Data penumpang",
-        "Bantuan kendala aplikasi"
-    )
+    val strings = LocalAppStrings.current
 
     LazyColumn(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
-            .background(Background),
-        contentPadding = PaddingValues(24.dp),
-        verticalArrangement = Arrangement.spacedBy(14.dp)
+            .background(MaterialTheme.colorScheme.background),
+        contentPadding = PaddingValues(16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         item {
-            ProfileTextField(
-                label = "Cari Bantuan",
-                value = "",
-                onValueChange = {},
-                placeholder = "Cari topik bantuan"
+            InfoNote(
+                title = strings.helpTitle,
+                text = strings.helpIntro,
             )
         }
 
-        helpItems.forEachIndexed { index, title ->
-            item {
+        item {
+            ProfileFormCard(
+                title = strings.guideTitle,
+            ) {
                 DetailMenuItem(
-                    icon = Icons.Outlined.Help,
-                    title = title,
-                    description = "Panduan terkait $title",
+                    title = "Cari Jadwal Kapal",
+                    subtitle = "Panduan memilih pelabuhan asal, tujuan, dan tanggal.",
+                    icon = Icons.Outlined.Schedule,
                     onClick = {
-                        onHelpItemClick(index)
-                    }
+                        onHelpDetailClick("schedule")
+                    },
+                )
+
+                DetailMenuItem(
+                    title = "Pemesanan Tiket",
+                    subtitle = "Panduan memilih kelas tiket dan mengisi data penumpang.",
+                    icon = Icons.Outlined.EventSeat,
+                    onClick = {
+                        onHelpDetailClick("booking")
+                    },
+                )
+
+                DetailMenuItem(
+                    title = "Pembayaran",
+                    subtitle = "Panduan memilih metode pembayaran dan melihat status pembayaran.",
+                    icon = Icons.Outlined.Payment,
+                    onClick = {
+                        onHelpDetailClick("payment")
+                    },
+                )
+
+                DetailMenuItem(
+                    title = "Akun dan Data Penumpang",
+                    subtitle = "Panduan mengelola profil dan data penumpang tersimpan.",
+                    icon = Icons.Outlined.HelpOutline,
+                    onClick = {
+                        onHelpDetailClick("profile")
+                    },
                 )
             }
         }
 
         item {
-            InfoNote(
-                text = "Butuh bantuan lebih lanjut? Hubungi layanan bantuan melalui menu kontak bantuan aplikasi."
-            )
+            ProfileFormCard(
+                title = strings.contactTitle,
+            ) {
+                Text(
+                    text = strings.contactSubtitle,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+
+                DetailMenuItem(
+                    title = strings.emailSupport,
+                    subtitle = "Email Support",
+                    icon = Icons.Outlined.Email,
+                    onClick = {},
+                )
+
+                DetailMenuItem(
+                    title = strings.phoneSupport,
+                    subtitle = "WhatsApp / Call Center",
+                    icon = Icons.Outlined.Call,
+                    onClick = {},
+                )
+
+                DetailMenuItem(
+                    title = strings.serviceHours,
+                    subtitle = "Jam Operasional",
+                    icon = Icons.Outlined.SupportAgent,
+                    onClick = {},
+                )
+            }
         }
     }
 }

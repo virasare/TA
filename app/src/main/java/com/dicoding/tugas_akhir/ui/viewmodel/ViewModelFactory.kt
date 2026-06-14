@@ -2,40 +2,59 @@ package com.dicoding.tugas_akhir.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import com.dicoding.tugas_akhir.data.repository.AuthRepository
+import com.dicoding.tugas_akhir.data.repository.BookingRepository
+import com.dicoding.tugas_akhir.data.repository.MyTicketRepository
+import com.dicoding.tugas_akhir.data.repository.PaymentRepository
+import com.dicoding.tugas_akhir.data.repository.ProfileRepository
+import com.dicoding.tugas_akhir.data.repository.SavedPassengerRepository
+import com.dicoding.tugas_akhir.data.repository.ScheduleRepository
+import com.dicoding.tugas_akhir.data.repository.SettingsRepository
 import com.dicoding.tugas_akhir.di.Injection
 
-class ViewModelFactory private constructor() : ViewModelProvider.Factory {
+class ViewModelFactory private constructor(
+    private val authRepository: AuthRepository,
+    private val scheduleRepository: ScheduleRepository,
+    private val bookingRepository: BookingRepository,
+    private val paymentRepository: PaymentRepository,
+    private val myTicketRepository: MyTicketRepository,
+    private val settingsRepository: SettingsRepository,
+    private val profileRepository: ProfileRepository,
+    private val savedPassengerRepository: SavedPassengerRepository,
+) : ViewModelProvider.Factory {
 
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(AuthViewModel::class.java)) {
-            return AuthViewModel(
-                authRepository = Injection.provideAuthRepository()
-            ) as T
+            return AuthViewModel(authRepository) as T
         }
 
         if (modelClass.isAssignableFrom(ScheduleViewModel::class.java)) {
-            return ScheduleViewModel(
-                scheduleRepository = Injection.provideScheduleRepository()
-            ) as T
+            return ScheduleViewModel(scheduleRepository) as T
         }
 
         if (modelClass.isAssignableFrom(BookingViewModel::class.java)) {
-            return BookingViewModel(
-                bookingRepository = Injection.provideBookingRepository()
-            ) as T
+            return BookingViewModel(bookingRepository) as T
         }
 
         if (modelClass.isAssignableFrom(PaymentViewModel::class.java)) {
-            return PaymentViewModel(
-                paymentRepository = Injection.providePaymentRepository()
-            ) as T
+            return PaymentViewModel(paymentRepository) as T
         }
 
         if (modelClass.isAssignableFrom(MyTicketViewModel::class.java)) {
-            return MyTicketViewModel(
-                myTicketRepository = Injection.provideMyTicketRepository()
-            ) as T
+            return MyTicketViewModel(myTicketRepository) as T
+        }
+
+        if (modelClass.isAssignableFrom(SettingsViewModel::class.java)) {
+            return SettingsViewModel(settingsRepository) as T
+        }
+
+        if (modelClass.isAssignableFrom(ProfileViewModel::class.java)) {
+            return ProfileViewModel(profileRepository) as T
+        }
+
+        if (modelClass.isAssignableFrom(SavedPassengerViewModel::class.java)) {
+            return SavedPassengerViewModel(savedPassengerRepository) as T
         }
 
         throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
@@ -47,7 +66,16 @@ class ViewModelFactory private constructor() : ViewModelProvider.Factory {
 
         fun getInstance(): ViewModelFactory {
             return INSTANCE ?: synchronized(this) {
-                val instance = ViewModelFactory()
+                val instance = ViewModelFactory(
+                    authRepository = Injection.provideAuthRepository(),
+                    scheduleRepository = Injection.provideScheduleRepository(),
+                    bookingRepository = Injection.provideBookingRepository(),
+                    paymentRepository = Injection.providePaymentRepository(),
+                    myTicketRepository = Injection.provideMyTicketRepository(),
+                    settingsRepository = Injection.provideSettingsRepository(),
+                    profileRepository = Injection.provideProfileRepository(),
+                    savedPassengerRepository = Injection.provideSavedPassengerRepository(),
+                )
                 INSTANCE = instance
                 instance
             }

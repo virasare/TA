@@ -37,10 +37,12 @@ class LocalDataSource private constructor(
             )
         }
 
-        bookingDao.insertBookingWithPassengers(
-            booking = bookingEntity,
-            passengers = passengerEntities,
-        )
+        bookingDao.insertBooking(bookingEntity)
+        bookingDao.deletePassengersByBookingId(booking.id)
+
+        if (passengerEntities.isNotEmpty()) {
+            bookingDao.insertPassengers(passengerEntities)
+        }
     }
 
     suspend fun updateBookingStatus(
