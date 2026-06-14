@@ -5,6 +5,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Badge
+import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
@@ -13,6 +15,7 @@ import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import com.dicoding.tugas_akhir.R
 import com.dicoding.tugas_akhir.ui.theme.Neutral500
@@ -60,7 +63,8 @@ val bottomNavItems = listOf(
 @Composable
 fun AppBottomNavigationBar(
     currentRoute: String,
-    onItemClick: (BottomNavItem) -> Unit
+    onItemClick: (BottomNavItem) -> Unit,
+    unreadNotificationCount: Int = 0,
 ) {
     Box(
         modifier = Modifier
@@ -81,10 +85,27 @@ fun AppBottomNavigationBar(
                         onItemClick(item)
                     },
                     icon = {
-                        Icon(
-                            painter = painterResource(id = item.icon),
-                            contentDescription = item.label
-                        )
+                        val showBadge = item.route == "notification" && unreadNotificationCount > 0
+
+                        if (showBadge) {
+                            BadgedBox(
+                                badge = {
+                                    Badge(
+                                        containerColor = Color(0xFFD32F2F)
+                                    )
+                                }
+                            ) {
+                                Icon(
+                                    painter = painterResource(id = item.icon),
+                                    contentDescription = item.label,
+                                )
+                            }
+                        } else {
+                            Icon(
+                                painter = painterResource(id = item.icon),
+                                contentDescription = item.label,
+                            )
+                        }
                     },
                     label = {
                         Text(

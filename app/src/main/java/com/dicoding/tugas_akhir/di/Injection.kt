@@ -10,6 +10,7 @@ import com.dicoding.tugas_akhir.data.remote.datasource.FakeRemoteDataSource
 import com.dicoding.tugas_akhir.data.repository.AuthRepository
 import com.dicoding.tugas_akhir.data.repository.BookingRepository
 import com.dicoding.tugas_akhir.data.repository.MyTicketRepository
+import com.dicoding.tugas_akhir.data.repository.NotificationRepository
 import com.dicoding.tugas_akhir.data.repository.PaymentRepository
 import com.dicoding.tugas_akhir.data.repository.ProfileRepository
 import com.dicoding.tugas_akhir.data.repository.SavedPassengerRepository
@@ -103,6 +104,14 @@ object Injection {
     fun provideSavedPassengerRepository(): SavedPassengerRepository {
         return SavedPassengerRepository.getInstance(
             dataStore = provideSavedPassengerDataStore(),
+        )
+    }
+
+    fun provideNotificationRepository(): NotificationRepository {
+        val database = provideAppDatabase()
+
+        return NotificationRepository.getInstance(
+            notificationDao = database.notificationDao(),
         )
     }
 }

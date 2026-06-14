@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.dicoding.tugas_akhir.data.repository.AuthRepository
 import com.dicoding.tugas_akhir.data.repository.BookingRepository
 import com.dicoding.tugas_akhir.data.repository.MyTicketRepository
+import com.dicoding.tugas_akhir.data.repository.NotificationRepository
 import com.dicoding.tugas_akhir.data.repository.PaymentRepository
 import com.dicoding.tugas_akhir.data.repository.ProfileRepository
 import com.dicoding.tugas_akhir.data.repository.SavedPassengerRepository
@@ -21,6 +22,7 @@ class ViewModelFactory private constructor(
     private val settingsRepository: SettingsRepository,
     private val profileRepository: ProfileRepository,
     private val savedPassengerRepository: SavedPassengerRepository,
+    private val notificationRepository: NotificationRepository,
 ) : ViewModelProvider.Factory {
 
     @Suppress("UNCHECKED_CAST")
@@ -57,6 +59,10 @@ class ViewModelFactory private constructor(
             return SavedPassengerViewModel(savedPassengerRepository) as T
         }
 
+        if (modelClass.isAssignableFrom(NotificationViewModel::class.java)) {
+            return NotificationViewModel(notificationRepository) as T
+        }
+
         throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
     }
 
@@ -75,6 +81,7 @@ class ViewModelFactory private constructor(
                     settingsRepository = Injection.provideSettingsRepository(),
                     profileRepository = Injection.provideProfileRepository(),
                     savedPassengerRepository = Injection.provideSavedPassengerRepository(),
+                    notificationRepository = Injection.provideNotificationRepository(),
                 )
                 INSTANCE = instance
                 instance

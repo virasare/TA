@@ -11,6 +11,8 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -25,6 +27,7 @@ import com.dicoding.tugas_akhir.data.dummy.TicketClassOption
 import com.dicoding.tugas_akhir.data.dummy.dummyNotifications
 import com.dicoding.tugas_akhir.data.dummy.dummyPorts
 import com.dicoding.tugas_akhir.data.dummy.popularRoutes
+import com.dicoding.tugas_akhir.domain.model.NotificationType
 import com.dicoding.tugas_akhir.ui.components.dialog.navigation.AppBackTopBar
 import com.dicoding.tugas_akhir.ui.components.dialog.navigation.AppBottomNavigationBar
 import com.dicoding.tugas_akhir.ui.components.dialog.navigation.AppTopBar
@@ -66,6 +69,16 @@ import kotlinx.coroutines.launch
 import com.dicoding.tugas_akhir.ui.screens.profile.ProfileLanguageScreen
 import com.dicoding.tugas_akhir.ui.screens.profile.ProfileSecurityScreen
 import com.dicoding.tugas_akhir.ui.screens.profile.ProfileThemeScreen
+import com.dicoding.tugas_akhir.ui.viewmodel.NotificationViewModel
+import com.dicoding.tugas_akhir.ui.viewmodel.ViewModelFactory
+import android.Manifest
+import android.content.pm.PackageManager
+import android.os.Build
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.runtime.LaunchedEffect
+import androidx.core.content.ContextCompat
+import com.dicoding.tugas_akhir.ui.notification.AppSystemNotification
 
 @Composable
 fun AppNavigation() {
@@ -74,7 +87,34 @@ fun AppNavigation() {
     val currentRoute = navBackStackEntry?.destination?.route
 
     val context = LocalContext.current
+
+    val notificationPermissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission(),
+        onResult = {}
+    )
+
+    LaunchedEffect(Unit) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            val isGranted = ContextCompat.checkSelfPermission(
+                context,
+                Manifest.permission.POST_NOTIFICATIONS,
+            ) == PackageManager.PERMISSION_GRANTED
+
+            if (!isGranted) {
+                notificationPermissionLauncher.launch(
+                    Manifest.permission.POST_NOTIFICATIONS
+                )
+            }
+        }
+    }
+
     val scope = rememberCoroutineScope()
+
+    val notificationViewModel: NotificationViewModel = viewModel(
+        factory = ViewModelFactory.getInstance()
+    )
+
+    val unreadNotificationCount by notificationViewModel.unreadCount.collectAsStateWithLifecycle()
 
     val auth = remember {
         FirebaseAuth.getInstance()
@@ -185,6 +225,24 @@ fun AppNavigation() {
         mutableStateOf<ETicketData?>(null)
     }
 
+    fun pushNotification(
+        title: String,
+        message: String,
+        type: NotificationType,
+    ) {
+        notificationViewModel.addNotification(
+            title = title,
+            message = message,
+            type = type,
+        )
+
+        AppSystemNotification.show(
+            context = context,
+            title = title,
+            message = message,
+        )
+    }
+
     Scaffold(
         containerColor = Background,
         topBar = {
@@ -207,6 +265,7 @@ fun AppNavigation() {
             if (showBottomBar) {
                 AppBottomNavigationBar(
                     currentRoute = currentRoute.orEmpty(),
+                    unreadNotificationCount = unreadNotificationCount,
                     onItemClick = { item ->
                         if (!isLoggedIn && item.route in protectedRoutes) {
                             pendingProtectedRoute = item.route
@@ -544,6 +603,12 @@ fun AppNavigation() {
                             navController.popBackStack()
                         },
                         onBookingCreated = { bookingId ->
+                            pushNotification(
+                                title = "Booking Berhasil Dibuat",
+                                message = "Pesanan tiket berhasil dibuat. Silakan periksa ringkasan pesanan sebelum melanjutkan pembayaran.",
+                                type = NotificationType.INFO,
+                            )
+
                             navController.navigate(Screens.bookingSummary(bookingId))
                         }
                     )
@@ -604,6 +669,12 @@ fun AppNavigation() {
                             navController.popBackStack()
                         },
                         onPaymentCreated = { paymentId ->
+                            pushNotification(
+                                title = "Menunggu Pembayaran",
+                                message = "Pesanan kamu berhasil dibuat. Selesaikan pembayaran sebelum batas waktu berakhir.",
+                                type = NotificationType.PAYMENT,
+                            )
+
                             navController.navigate(Screens.paymentWaiting(paymentId))
                         }
                     )
@@ -634,9 +705,27 @@ fun AppNavigation() {
                             navController.popBackStack()
                         },
                         onPaymentSuccess = { selectedPaymentId ->
+                            pushNotification(
+                                title = "Pembayaran Berhasil",
+                                message = "Pembayaran tiket berhasil dikonfirmasi.",
+                                type = NotificationType.PAYMENT,
+                            )
+
+                            pushNotification(
+                                title = "E-Ticket Tersedia",
+                                message = "E-ticket kamu sudah tersedia dan dapat dilihat pada halaman Tiket Saya.",
+                                type = NotificationType.TICKET,
+                            )
+
                             navController.navigate(Screens.paymentSuccess(selectedPaymentId))
                         },
                         onPaymentFailed = { selectedPaymentId ->
+                            pushNotification(
+                                title = "Pembayaran Gagal",
+                                message = "Pembayaran belum berhasil. Silakan coba kembali atau gunakan metode pembayaran lain.",
+                                type = NotificationType.PAYMENT,
+                            )
+
                             navController.navigate(Screens.paymentFailed(selectedPaymentId))
                         }
                     )
@@ -786,12 +875,17 @@ fun AppNavigation() {
                 AuthGate(
                     onLoginClick = {
                         navController.navigate(Screens.Login)
+                    },
+                    onBackClick = {
+                        navController.popBackStack()
                     }
                 ) {
                     NotificationScreen(
                         onNotificationClick = { notificationId ->
-                            navController.navigate(Screens.notificationDetail(notificationId))
-                        }
+                            navController.navigate(
+                                Screens.notificationDetail(notificationId)
+                            )
+                        },
                     )
                 }
             }
@@ -800,21 +894,26 @@ fun AppNavigation() {
                 route = Screens.NotificationDetail,
                 arguments = listOf(
                     navArgument("notificationId") {
-                        type = NavType.IntType
+                        type = NavType.StringType
                     }
                 )
             ) { backStackEntry ->
-                val notificationId = backStackEntry.arguments?.getInt("notificationId")
-                val notification = dummyNotifications.find {
-                    it.id == notificationId
-                }
+                val notificationId = backStackEntry.arguments
+                    ?.getString("notificationId")
+                    .orEmpty()
 
-                NotificationDetailScreen(
-                    notification = notification,
-                    onSeeTicketClick = {
-                        navController.navigate(Screens.ETicket)
+                AuthGate(
+                    onLoginClick = {
+                        navController.navigate(Screens.Login)
+                    },
+                    onBackClick = {
+                        navController.popBackStack()
                     }
-                )
+                ) {
+                    NotificationDetailScreen(
+                        notificationId = notificationId,
+                    )
+                }
             }
 
             composable(Screens.Profile) {

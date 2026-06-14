@@ -76,6 +76,7 @@ fun PaymentScreen(
 
     LaunchedEffect(createPaymentUiState) {
         val state = createPaymentUiState
+
         if (state is CreatePaymentUiState.Success) {
             onPaymentCreated(state.payment.id)
             viewModel.resetCreatePaymentState()

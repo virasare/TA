@@ -2,6 +2,7 @@ package com.dicoding.tugas_akhir.data.mapper
 
 import com.dicoding.tugas_akhir.data.local.room.entity.BookingEntity
 import com.dicoding.tugas_akhir.data.local.room.entity.BookingWithPassengers
+import com.dicoding.tugas_akhir.data.local.room.entity.NotificationEntity
 import com.dicoding.tugas_akhir.data.local.room.entity.PassengerEntity
 import com.dicoding.tugas_akhir.data.local.room.entity.PaymentEntity
 import com.dicoding.tugas_akhir.data.remote.response.BookingResponse
@@ -10,8 +11,10 @@ import com.dicoding.tugas_akhir.data.remote.response.PassengerResponse
 import com.dicoding.tugas_akhir.data.remote.response.PaymentMethodResponse
 import com.dicoding.tugas_akhir.data.remote.response.PaymentResponse
 import com.dicoding.tugas_akhir.data.remote.response.ShipScheduleResponse
+import com.dicoding.tugas_akhir.domain.model.AppNotification
 import com.dicoding.tugas_akhir.domain.model.Booking
 import com.dicoding.tugas_akhir.domain.model.ETicket
+import com.dicoding.tugas_akhir.domain.model.NotificationType
 import com.dicoding.tugas_akhir.domain.model.Passenger
 import com.dicoding.tugas_akhir.domain.model.Payment
 import com.dicoding.tugas_akhir.domain.model.PaymentMethod
@@ -232,5 +235,39 @@ object DataMapper {
                 .filter { it.isNotBlank() },
             createdAt = input.createdAt,
         )
+    }
+
+    fun mapNotificationEntityToDomain(
+        input: NotificationEntity,
+    ): AppNotification {
+        return AppNotification(
+            id = input.id,
+            title = input.title,
+            message = input.message,
+            type = input.type.toNotificationType(),
+            isRead = input.isRead,
+            createdAt = input.createdAtMillis,
+        )
+    }
+
+    fun mapNotificationDomainToEntity(
+        input: AppNotification,
+    ): NotificationEntity {
+        return NotificationEntity(
+            id = input.id,
+            title = input.title,
+            message = input.message,
+            type = input.type.name,
+            isRead = input.isRead,
+            createdAtMillis = input.createdAt,
+        )
+    }
+
+    private fun String.toNotificationType(): NotificationType {
+        return try {
+            NotificationType.valueOf(this)
+        } catch (exception: Exception) {
+            NotificationType.INFO
+        }
     }
 }
