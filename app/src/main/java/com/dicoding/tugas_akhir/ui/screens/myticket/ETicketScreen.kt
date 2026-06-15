@@ -15,10 +15,14 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -26,6 +30,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -47,11 +52,15 @@ private val Primary2 = Color(0xFF1976D2)
 private val Primary3 = Color(0xFFE8F2FD)
 private val Neutral100 = Color(0xFFF3F4F6)
 private val Neutral200 = Color(0xFFE5E7EB)
+private val Neutral300 = Color(0xFFD1D5DB)
 private val Neutral500 = Color(0xFF6B7280)
+private val Neutral700 = Color(0xFF374151)
 private val Success = Color(0xFF16A34A)
 private val SuccessLight = Color(0xFFDCFCE7)
 private val Warning = Color(0xFFF59E0B)
 private val WarningLight = Color(0xFFFEF3C7)
+private val Danger = Color(0xFFDC2626)
+private val DangerLight = Color(0xFFFEE2E2)
 private val Info = Color(0xFF2563EB)
 private val InfoLight = Color(0xFFDBEAFE)
 
@@ -60,6 +69,8 @@ fun ETicketScreen(
     bookingId: String? = null,
     paymentId: String? = null,
     onBackClick: () -> Unit,
+    onRefundClick: (String) -> Unit = {},
+    onRescheduleClick: (String) -> Unit = {},
     modifier: Modifier = Modifier,
     viewModel: MyTicketViewModel = viewModel(
         factory = ViewModelFactory.getInstance()
@@ -86,6 +97,8 @@ fun ETicketScreen(
         is ETicketUiState.Success -> {
             ETicketContent(
                 ticket = state.ticket,
+                onRefundClick = onRefundClick,
+                onRescheduleClick = onRescheduleClick,
                 modifier = modifier,
             )
         }
@@ -106,6 +119,8 @@ fun ETicketScreen(
 @Composable
 private fun ETicketContent(
     ticket: ETicket,
+    onRefundClick: (String) -> Unit,
+    onRescheduleClick: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -121,7 +136,17 @@ private fun ETicketContent(
 
         PassengerListCard(ticket = ticket)
 
+        if (ticket.status.equals("Aktif", ignoreCase = true)) {
+            ManageTicketCard(
+                bookingId = ticket.bookingId,
+                onRefundClick = onRefundClick,
+                onRescheduleClick = onRescheduleClick,
+            )
+        }
+
         BoardingInfoCard(ticket = ticket)
+
+        ImportantInfoCard()
 
         Spacer(modifier = Modifier.height(12.dp))
     }
@@ -134,7 +159,7 @@ private fun ETicketMainCard(
 ) {
     Card(
         modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(28.dp),
+        shape = RoundedCornerShape(30.dp),
         colors = CardDefaults.cardColors(
             containerColor = White,
         ),
@@ -142,11 +167,11 @@ private fun ETicketMainCard(
             width = 1.dp,
             color = Neutral200,
         ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
     ) {
         Column(
             modifier = Modifier.padding(20.dp),
-            verticalArrangement = Arrangement.spacedBy(20.dp),
+            verticalArrangement = Arrangement.spacedBy(18.dp),
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -154,17 +179,20 @@ private fun ETicketMainCard(
                 verticalAlignment = Alignment.Top,
             ) {
                 Column(
-                    verticalArrangement = Arrangement.spacedBy(4.dp),
+                    verticalArrangement = Arrangement.spacedBy(5.dp),
                     modifier = Modifier.weight(1f),
                 ) {
                     Text(
                         text = "E-Ticket Kapal",
                         color = Black,
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Bold,
                     )
 
                     Text(
-                        text = ticket.bookingCode,
+                        text = "Kode Booking: ${ticket.bookingCode}",
                         color = Neutral500,
+                        style = MaterialTheme.typography.bodySmall,
                     )
                 }
 
@@ -173,31 +201,7 @@ private fun ETicketMainCard(
 
             RouteSection(ticket = ticket)
 
-            Surface(
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(22.dp),
-                color = White,
-                border = BorderStroke(
-                    width = 1.dp,
-                    color = Neutral200,
-                ),
-            ) {
-                Column(
-                    modifier = Modifier.padding(18.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(12.dp),
-                ) {
-                    FakeQrCode(
-                        value = ticket.qrCode,
-                    )
-
-                    Text(
-                        text = "Tunjukkan QR ini saat check-in di pelabuhan",
-                        color = Neutral500,
-                        textAlign = TextAlign.Center,
-                    )
-                }
-            }
+            QrTicketSection(ticket = ticket)
 
             SoftDivider()
 
@@ -249,7 +253,7 @@ private fun RouteSection(
 ) {
     Surface(
         modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(22.dp),
+        shape = RoundedCornerShape(24.dp),
         color = Primary3,
         border = BorderStroke(
             width = 1.dp,
@@ -264,16 +268,19 @@ private fun RouteSection(
             Column(
                 horizontalAlignment = Alignment.Start,
                 modifier = Modifier.weight(1f),
-                verticalArrangement = Arrangement.spacedBy(4.dp),
+                verticalArrangement = Arrangement.spacedBy(5.dp),
             ) {
                 Text(
                     text = ticket.origin,
                     color = Primary2,
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
                 )
 
                 Text(
                     text = "Pelabuhan asal",
                     color = Neutral500,
+                    style = MaterialTheme.typography.bodySmall,
                 )
             }
 
@@ -287,26 +294,86 @@ private fun RouteSection(
             ) {
                 Text(
                     text = "→",
-                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
+                    modifier = Modifier.padding(horizontal = 13.dp, vertical = 9.dp),
                     color = Primary2,
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
                 )
             }
 
             Column(
                 horizontalAlignment = Alignment.End,
                 modifier = Modifier.weight(1f),
-                verticalArrangement = Arrangement.spacedBy(4.dp),
+                verticalArrangement = Arrangement.spacedBy(5.dp),
             ) {
                 Text(
                     text = ticket.destination,
                     color = Primary2,
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
                 )
 
                 Text(
                     text = "Pelabuhan tujuan",
                     color = Neutral500,
+                    style = MaterialTheme.typography.bodySmall,
                 )
             }
+        }
+    }
+}
+
+@Composable
+private fun QrTicketSection(
+    ticket: ETicket,
+    modifier: Modifier = Modifier,
+) {
+    Surface(
+        modifier = modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(24.dp),
+        color = White,
+        border = BorderStroke(
+            width = 1.dp,
+            color = Neutral200,
+        ),
+    ) {
+        Column(
+            modifier = Modifier.padding(18.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(12.dp),
+        ) {
+            Surface(
+                shape = RoundedCornerShape(22.dp),
+                color = Neutral100,
+                border = BorderStroke(
+                    width = 1.dp,
+                    color = Neutral200,
+                ),
+            ) {
+                Box(
+                    modifier = Modifier.padding(14.dp),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    FakeQrCode(
+                        value = ticket.qrCode,
+                    )
+                }
+            }
+
+            Text(
+                text = "Tunjukkan QR ini saat check-in di pelabuhan",
+                color = Neutral700,
+                style = MaterialTheme.typography.bodyMedium,
+                fontWeight = FontWeight.SemiBold,
+                textAlign = TextAlign.Center,
+            )
+
+            Text(
+                text = "Pastikan layar cukup terang agar QR mudah dipindai.",
+                color = Neutral500,
+                style = MaterialTheme.typography.bodySmall,
+                textAlign = TextAlign.Center,
+            )
         }
     }
 }
@@ -319,21 +386,24 @@ private fun TicketInfoItem(
 ) {
     Surface(
         modifier = modifier,
-        shape = RoundedCornerShape(16.dp),
+        shape = RoundedCornerShape(18.dp),
         color = Neutral100,
     ) {
         Column(
             modifier = Modifier.padding(14.dp),
-            verticalArrangement = Arrangement.spacedBy(5.dp),
+            verticalArrangement = Arrangement.spacedBy(6.dp),
         ) {
             Text(
                 text = title,
                 color = Neutral500,
+                style = MaterialTheme.typography.bodySmall,
             )
 
             Text(
                 text = value,
                 color = Black,
+                style = MaterialTheme.typography.bodyMedium,
+                fontWeight = FontWeight.SemiBold,
             )
         }
     }
@@ -346,7 +416,7 @@ private fun PassengerListCard(
 ) {
     Card(
         modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(22.dp),
+        shape = RoundedCornerShape(24.dp),
         colors = CardDefaults.cardColors(
             containerColor = White,
         ),
@@ -360,31 +430,114 @@ private fun PassengerListCard(
             modifier = Modifier.padding(18.dp),
             verticalArrangement = Arrangement.spacedBy(14.dp),
         ) {
-            Text(
-                text = "Data Penumpang",
-                color = Black,
+            SectionHeader(
+                title = "Data Penumpang",
+                description = "${ticket.passengers.size} penumpang terdaftar pada e-ticket ini.",
             )
 
             ticket.passengers.forEachIndexed { index, passenger ->
                 Surface(
                     modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(16.dp),
+                    shape = RoundedCornerShape(18.dp),
                     color = Neutral100,
                 ) {
                     Column(
                         modifier = Modifier.padding(14.dp),
-                        verticalArrangement = Arrangement.spacedBy(4.dp),
+                        verticalArrangement = Arrangement.spacedBy(5.dp),
                     ) {
                         Text(
-                            text = "${index + 1}. ${passenger.fullName}",
-                            color = Black,
+                            text = "Penumpang ${index + 1}",
+                            color = Primary2,
+                            style = MaterialTheme.typography.labelMedium,
+                            fontWeight = FontWeight.Bold,
                         )
 
                         Text(
-                            text = "NIK: ${passenger.nik}",
+                            text = passenger.fullName,
+                            color = Black,
+                            style = MaterialTheme.typography.bodyMedium,
+                            fontWeight = FontWeight.SemiBold,
+                        )
+
+                        Text(
+                            text = "NIK: ${maskNik(passenger.nik)}",
                             color = Neutral500,
+                            style = MaterialTheme.typography.bodySmall,
                         )
                     }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun ManageTicketCard(
+    bookingId: String,
+    onRefundClick: (String) -> Unit,
+    onRescheduleClick: (String) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Card(
+        modifier = modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(24.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = White,
+        ),
+        border = BorderStroke(
+            width = 1.dp,
+            color = Neutral200,
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
+    ) {
+        Column(
+            modifier = Modifier.padding(18.dp),
+            verticalArrangement = Arrangement.spacedBy(14.dp),
+        ) {
+            SectionHeader(
+                title = "Kelola Tiket",
+                description = "Gunakan menu ini jika kamu ingin mengajukan refund atau mengubah jadwal keberangkatan.",
+            )
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+            ) {
+                OutlinedButton(
+                    onClick = {
+                        onRefundClick(bookingId)
+                    },
+                    modifier = Modifier.weight(1f),
+                    colors = ButtonDefaults.outlinedButtonColors(
+                        contentColor = Danger,
+                    ),
+                    border = BorderStroke(
+                        width = 1.dp,
+                        color = Danger,
+                    ),
+                    shape = RoundedCornerShape(16.dp),
+                ) {
+                    Text(
+                        text = "Refund",
+                        fontWeight = FontWeight.SemiBold,
+                    )
+                }
+
+                Button(
+                    onClick = {
+                        onRescheduleClick(bookingId)
+                    },
+                    modifier = Modifier.weight(1f),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Primary2,
+                        contentColor = White,
+                    ),
+                    shape = RoundedCornerShape(16.dp),
+                ) {
+                    Text(
+                        text = "Reschedule",
+                        fontWeight = FontWeight.SemiBold,
+                    )
                 }
             }
         }
@@ -398,7 +551,7 @@ private fun BoardingInfoCard(
 ) {
     Card(
         modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(22.dp),
+        shape = RoundedCornerShape(24.dp),
         colors = CardDefaults.cardColors(
             containerColor = White,
         ),
@@ -410,11 +563,11 @@ private fun BoardingInfoCard(
     ) {
         Column(
             modifier = Modifier.padding(18.dp),
-            verticalArrangement = Arrangement.spacedBy(10.dp),
+            verticalArrangement = Arrangement.spacedBy(14.dp),
         ) {
-            Text(
-                text = "Informasi Keberangkatan",
-                color = Black,
+            SectionHeader(
+                title = "Informasi Keberangkatan",
+                description = "Periksa terminal dan gate sebelum menuju pelabuhan.",
             )
 
             BoardingInfoRow(
@@ -437,8 +590,67 @@ private fun BoardingInfoCard(
             Text(
                 text = ticket.note,
                 color = Neutral500,
+                style = MaterialTheme.typography.bodySmall,
             )
         }
+    }
+}
+
+@Composable
+private fun ImportantInfoCard(
+    modifier: Modifier = Modifier,
+) {
+    Surface(
+        modifier = modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(20.dp),
+        color = InfoLight,
+        border = BorderStroke(
+            width = 1.dp,
+            color = Color(0xFFBBD7FF),
+        ),
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(6.dp),
+        ) {
+            Text(
+                text = "Informasi Penting",
+                color = Primary1,
+                style = MaterialTheme.typography.titleSmall,
+                fontWeight = FontWeight.Bold,
+            )
+
+            Text(
+                text = "Datang lebih awal ke pelabuhan dan siapkan identitas sesuai data penumpang. E-ticket ini berlaku sebagai bukti pemesanan yang sah.",
+                color = Neutral700,
+                style = MaterialTheme.typography.bodySmall,
+            )
+        }
+    }
+}
+
+@Composable
+private fun SectionHeader(
+    title: String,
+    description: String,
+    modifier: Modifier = Modifier,
+) {
+    Column(
+        modifier = modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(4.dp),
+    ) {
+        Text(
+            text = title,
+            color = Black,
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.Bold,
+        )
+
+        Text(
+            text = description,
+            color = Neutral500,
+            style = MaterialTheme.typography.bodySmall,
+        )
     }
 }
 
@@ -451,16 +663,22 @@ private fun BoardingInfoRow(
     Row(
         modifier = modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.Top,
     ) {
         Text(
             text = title,
             color = Neutral500,
+            style = MaterialTheme.typography.bodyMedium,
+            modifier = Modifier.weight(1f),
         )
 
         Text(
             text = value,
             color = Black,
+            style = MaterialTheme.typography.bodyMedium,
+            fontWeight = FontWeight.SemiBold,
             textAlign = TextAlign.End,
+            modifier = Modifier.weight(1f),
         )
     }
 }
@@ -501,6 +719,11 @@ private fun ETicketStatusPill(
             contentColor = Warning
         }
 
+        status.equals("Dibatalkan", ignoreCase = true) -> {
+            backgroundColor = DangerLight
+            contentColor = Danger
+        }
+
         status.equals("Selesai", ignoreCase = true) -> {
             backgroundColor = Neutral200
             contentColor = Neutral500
@@ -521,6 +744,16 @@ private fun ETicketStatusPill(
             text = status,
             modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
             color = contentColor,
+            style = MaterialTheme.typography.labelSmall,
+            fontWeight = FontWeight.SemiBold,
         )
+    }
+}
+
+private fun maskNik(nik: String): String {
+    return if (nik.length >= 6) {
+        nik.take(6) + "xxxxxxxxxx"
+    } else {
+        nik
     }
 }

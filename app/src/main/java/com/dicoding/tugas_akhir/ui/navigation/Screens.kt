@@ -82,6 +82,27 @@ object Screens {
         return "e_ticket_by_payment/$paymentId"
     }
 
+    const val Refund = "refund/{bookingId}"
+    const val Reschedule = "reschedule/{bookingId}"
+    const val RefundSuccess = "refund_success/{bookingId}"
+    const val RescheduleSuccess = "reschedule_success/{bookingId}"
+
+    fun refund(bookingId: String): String {
+        return "refund/$bookingId"
+    }
+
+    fun reschedule(bookingId: String): String {
+        return "reschedule/$bookingId"
+    }
+
+    fun refundSuccess(bookingId: String): String {
+        return "refund_success/$bookingId"
+    }
+
+    fun rescheduleSuccess(bookingId: String): String {
+        return "reschedule_success/$bookingId"
+    }
+
     const val NotificationDetail = "notification_detail/{notificationId}"
     fun notificationDetail(notificationId: String): String {
         return "notification_detail/$notificationId"

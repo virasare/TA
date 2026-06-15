@@ -79,6 +79,9 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.LaunchedEffect
 import androidx.core.content.ContextCompat
 import com.dicoding.tugas_akhir.ui.notification.AppSystemNotification
+import com.dicoding.tugas_akhir.ui.screens.ticket.RefundScreen
+import com.dicoding.tugas_akhir.ui.screens.ticket.RescheduleScreen
+import com.dicoding.tugas_akhir.ui.screens.ticket.ManageTicketSuccessScreen
 
 @Composable
 fun AppNavigation() {
@@ -839,6 +842,12 @@ fun AppNavigation() {
                         bookingId = bookingId,
                         onBackClick = {
                             navController.popBackStack()
+                        },
+                        onRefundClick = { selectedBookingId ->
+                            navController.navigate(Screens.refund(selectedBookingId))
+                        },
+                        onRescheduleClick = { selectedBookingId ->
+                            navController.navigate(Screens.reschedule(selectedBookingId))
                         }
                     )
                 }
@@ -866,6 +875,134 @@ fun AppNavigation() {
                         paymentId = paymentId,
                         onBackClick = {
                             navController.popBackStack()
+                        },
+                        onRefundClick = { selectedBookingId ->
+                            navController.navigate(Screens.refund(selectedBookingId))
+                        },
+                        onRescheduleClick = { selectedBookingId ->
+                            navController.navigate(Screens.reschedule(selectedBookingId))
+                        }
+                    )
+                }
+            }
+
+            composable(
+                route = Screens.Refund,
+                arguments = listOf(
+                    navArgument("bookingId") {
+                        type = NavType.StringType
+                    }
+                )
+            ) { backStackEntry ->
+                val bookingId = backStackEntry.arguments?.getString("bookingId").orEmpty()
+
+                AuthGate(
+                    onLoginClick = {
+                        navController.navigate(Screens.Login)
+                    },
+                    onBackClick = {
+                        navController.popBackStack()
+                    }
+                ) {
+                    RefundScreen(
+                        bookingId = bookingId,
+                        onSubmitClick = { selectedBookingId ->
+                            pushNotification(
+                                title = "Refund Diproses",
+                                message = "Pengajuan refund tiket berhasil dikirim dan sedang diproses.",
+                                type = NotificationType.INFO,
+                            )
+
+                            navController.navigate(
+                                Screens.refundSuccess(selectedBookingId)
+                            )
+                        }
+                    )
+                }
+            }
+
+            composable(
+                route = Screens.Reschedule,
+                arguments = listOf(
+                    navArgument("bookingId") {
+                        type = NavType.StringType
+                    }
+                )
+            ) { backStackEntry ->
+                val bookingId = backStackEntry.arguments?.getString("bookingId").orEmpty()
+
+                AuthGate(
+                    onLoginClick = {
+                        navController.navigate(Screens.Login)
+                    },
+                    onBackClick = {
+                        navController.popBackStack()
+                    }
+                ) {
+                    RescheduleScreen(
+                        bookingId = bookingId,
+                        onSubmitClick = { selectedBookingId ->
+                            pushNotification(
+                                title = "Reschedule Berhasil Diajukan",
+                                message = "Pengajuan reschedule tiket berhasil dikirim dan sedang diproses.",
+                                type = NotificationType.INFO,
+                            )
+
+                            navController.navigate(
+                                Screens.rescheduleSuccess(selectedBookingId)
+                            )
+                        }
+                    )
+                }
+            }
+
+            composable(
+                route = Screens.RefundSuccess,
+                arguments = listOf(
+                    navArgument("bookingId") {
+                        type = NavType.StringType
+                    }
+                )
+            ) {
+                AuthGate(
+                    onLoginClick = {
+                        navController.navigate(Screens.Login)
+                    },
+                    onBackClick = {
+                        navController.navigate(Screens.MyTicket)
+                    }
+                ) {
+                    ManageTicketSuccessScreen(
+                        title = "Refund Diproses",
+                        description = "Pengajuan refund berhasil dikirim. Status refund dapat dilihat pada halaman Pesanan Saya.",
+                        onContinueClick = {
+                            navController.navigate(Screens.MyTicket)
+                        }
+                    )
+                }
+            }
+
+            composable(
+                route = Screens.RescheduleSuccess,
+                arguments = listOf(
+                    navArgument("bookingId") {
+                        type = NavType.StringType
+                    }
+                )
+            ) {
+                AuthGate(
+                    onLoginClick = {
+                        navController.navigate(Screens.Login)
+                    },
+                    onBackClick = {
+                        navController.navigate(Screens.MyTicket)
+                    }
+                ) {
+                    ManageTicketSuccessScreen(
+                        title = "Reschedule Berhasil",
+                        description = "Pengajuan reschedule berhasil dikirim. Tiket baru akan tersedia setelah proses dikonfirmasi.",
+                        onContinueClick = {
+                            navController.navigate(Screens.MyTicket)
                         }
                     )
                 }
@@ -1143,6 +1280,10 @@ private fun getTopBarTitle(route: String): String {
         Screens.PaymentSuccess -> "Status Pembayaran"
         Screens.MyTicket -> "Pesanan Saya"
         Screens.ETicket -> "E-Ticket"
+        Screens.Refund -> "Ajukan Refund"
+        Screens.Reschedule -> "Reschedule Tiket"
+        Screens.RefundSuccess -> "Refund Diproses"
+        Screens.RescheduleSuccess -> "Reschedule Berhasil"
         Screens.Notification -> "Notifikasi"
         Screens.NotificationDetail -> "Detail Notifikasi"
         Screens.Profile -> "Profil"
