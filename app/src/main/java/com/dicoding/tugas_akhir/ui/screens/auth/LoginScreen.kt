@@ -22,12 +22,6 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.DirectionsBoat
-import androidx.compose.material.icons.outlined.Email
-import androidx.compose.material.icons.outlined.Lock
-import androidx.compose.material.icons.outlined.Visibility
-import androidx.compose.material.icons.outlined.VisibilityOff
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -49,8 +43,8 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Dialog
 import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.LottieConstants
@@ -58,7 +52,6 @@ import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.dicoding.tugas_akhir.R
 import com.dicoding.tugas_akhir.ui.components.dialog.buttons.PrimaryButton
-import com.dicoding.tugas_akhir.ui.components.dialog.buttons.SecondaryButton
 import com.dicoding.tugas_akhir.ui.theme.Background
 import com.dicoding.tugas_akhir.ui.theme.Error
 import com.dicoding.tugas_akhir.ui.theme.Neutral500
@@ -96,134 +89,144 @@ fun LoginScreen(
 
     val isButtonEnabled = email.isNotBlank() && password.isNotBlank() && !isLoading
 
-    if (isLoading) {
-        LoginLoadingDialog()
-    }
-
-    Column(
+    Box(
         modifier = Modifier
             .fillMaxSize()
             .background(Background)
-            .verticalScroll(rememberScrollState())
-            .padding(24.dp)
-            .navigationBarsPadding()
-            .imePadding(),
-        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Spacer(modifier = Modifier.size(34.dp))
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Background)
+                .verticalScroll(rememberScrollState())
+                .padding(16.dp)
+                .navigationBarsPadding()
+                .imePadding(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            Spacer(modifier = Modifier.size(48.dp))
 
-        Image(
-            painter = painterResource(id = R.drawable.logo),
-            contentDescription = null,
-            modifier = Modifier.size(86.dp),
-        )
-
-        Text(
-            text = "Masuk ke Akun",
-            color = Neutral700,
-            fontWeight = FontWeight.Bold,
-            style = MaterialTheme.typography.headlineSmall,
-            modifier = Modifier.padding(top = 24.dp),
-        )
-
-        Text(
-            text = "Masuk untuk memesan tiket dan melihat riwayat perjalanan",
-            color = Neutral500,
-            style = MaterialTheme.typography.bodySmall,
-            textAlign = TextAlign.Center,
-            modifier = Modifier.padding(top = 8.dp, bottom = 28.dp),
-        )
-
-        LoginTextField(
-            value = email,
-            onValueChange = {
-                email = it
-                errorMessage = ""
-            },
-            label = "Email",
-            placeholder = "contoh@email.com",
-            leadingIcon = {
-                Icon(
-                    imageVector = Icons.Outlined.Email,
-                    contentDescription = null,
-                    tint = Primary2,
-                )
-            },
-            keyboardType = KeyboardType.Email,
-            enabled = !isLoading,
-        )
-
-        LoginTextField(
-            value = password,
-            onValueChange = {
-                password = it
-                errorMessage = ""
-            },
-            label = "Password",
-            placeholder = "Masukkan password",
-            leadingIcon = {
-                Icon(
-                    imageVector = Icons.Outlined.Lock,
-                    contentDescription = null,
-                    tint = Primary2,
-                )
-            },
-            trailingIcon = {
-                IconButton(
-                    enabled = !isLoading,
-                    onClick = {
-                        passwordVisible = !passwordVisible
-                    }
-                ) {
-                    Icon(
-                        imageVector = if (passwordVisible) {
-                            Icons.Outlined.VisibilityOff
-                        } else {
-                            Icons.Outlined.Visibility
-                        },
-                        contentDescription = null,
-                        tint = Neutral500,
-                    )
-                }
-            },
-            keyboardType = KeyboardType.Password,
-            visualTransformation = if (passwordVisible) {
-                VisualTransformation.None
-            } else {
-                PasswordVisualTransformation()
-            },
-            enabled = !isLoading,
-            modifier = Modifier.padding(top = 12.dp),
-        )
-
-        if (errorMessage.isNotBlank()) {
-            ErrorMessageBox(
-                message = errorMessage,
-                modifier = Modifier.padding(top = 10.dp),
+            Image(
+                painter = painterResource(id = R.drawable.logo),
+                contentDescription = null,
+                modifier = Modifier.size(60.dp),
             )
-        }
 
-        PrimaryButton(
-            text = if (isLoading) "Memproses..." else "Masuk",
-            enabled = isButtonEnabled,
-            onClick = {
-                isLoading = true
-                errorMessage = ""
+            Text(
+                text = "Masuk ke Akun",
+                color = Neutral700,
+                fontWeight = FontWeight.Bold,
+                style = MaterialTheme.typography.headlineSmall,
+                modifier = Modifier.padding(top = 24.dp),
+            )
 
-                onLoginClick(email, password) { message ->
-                    isLoading = false
-                    errorMessage = message
-                }
-            },
-            modifier = Modifier.padding(top = 18.dp),
-        )
+            Text(
+                text = "Masuk untuk memesan tiket dan melihat riwayat perjalanan",
+                color = Neutral500,
+                style = MaterialTheme.typography.bodySmall,
+                textAlign = TextAlign.Center,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 32.dp)
+                    .padding(top = 8.dp, bottom = 28.dp),
+            )
 
-        Spacer(modifier = Modifier.size(32.dp))
+            LoginTextField(
+                value = email,
+                onValueChange = {
+                    email = it
+                    errorMessage = ""
+                },
+                label = "Email",
+                placeholder = "contoh@email.com",
+                leadingIcon = {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_message_outlined),
+                        contentDescription = null,
+                        tint = Primary2,
+                    )
+                },
+                keyboardType = KeyboardType.Email,
+                enabled = !isLoading,
+            )
 
-        SecondaryButton(
-            text = "Masuk dengan Google",
-            onClick = {
-                if (!isLoading) {
+            LoginTextField(
+                value = password,
+                onValueChange = {
+                    password = it
+                    errorMessage = ""
+                },
+                label = "Password",
+                placeholder = "Masukkan password",
+                leadingIcon = {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_lock_outlined),
+                        contentDescription = null,
+                        tint = Primary2,
+                    )
+                },
+                trailingIcon = {
+                    IconButton(
+                        enabled = !isLoading,
+                        onClick = {
+                            passwordVisible = !passwordVisible
+                        }
+                    ) {
+                        Icon(
+                            painter = painterResource(
+                                id = if (passwordVisible) {
+                                    R.drawable.ic_show_outlined
+                                } else {
+                                    R.drawable.ic_hide_outlined
+                                }
+                            ),
+                            contentDescription = null,
+                            tint = Neutral500,
+                        )
+                    }
+                },
+                keyboardType = KeyboardType.Password,
+                visualTransformation = if (passwordVisible) {
+                    VisualTransformation.None
+                } else {
+                    PasswordVisualTransformation()
+                },
+                enabled = !isLoading,
+                modifier = Modifier.padding(top = 12.dp),
+            )
+
+            if (errorMessage.isNotBlank()) {
+                ErrorMessageBox(
+                    message = errorMessage,
+                    modifier = Modifier.padding(top = 10.dp),
+                )
+            }
+
+            PrimaryButton(
+                text = if (isLoading) "Memproses..." else "Masuk",
+                enabled = isButtonEnabled,
+                onClick = {
+                    isLoading = true
+                    errorMessage = ""
+
+                    onLoginClick(email, password) { message ->
+                        isLoading = false
+                        errorMessage = message
+                    }
+                },
+                modifier = Modifier.padding(top = 18.dp),
+            )
+
+            Text(
+                text = "atau masuk dengan",
+                color = Neutral500,
+                style = MaterialTheme.typography.bodySmall,
+                modifier = Modifier.padding(top = 28.dp, bottom = 16.dp),
+            )
+
+            GoogleLoginButton(
+                enabled = !isLoading,
+                onClick = {
                     isLoading = true
                     errorMessage = ""
 
@@ -231,41 +234,43 @@ fun LoginScreen(
                         isLoading = false
                         errorMessage = message
                     }
-                }
-            },
-        )
-
-        Row(
-            modifier = Modifier.padding(top = 18.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Center,
-        ) {
-            Text(
-                text = "Belum punya akun?",
-                color = Neutral500,
-                style = MaterialTheme.typography.bodySmall,
+                },
+                modifier = Modifier.padding(top = 12.dp),
             )
 
-            Text(
-                text = " Daftar",
-                color = Primary2,
-                fontWeight = FontWeight.Bold,
-                style = MaterialTheme.typography.bodySmall,
-                modifier = Modifier.clickable(
-                    enabled = !isLoading,
-                    onClick = onRegisterClick,
-                ),
+            Row(
+                modifier = Modifier.padding(top = 18.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center,
+            ) {
+                Text(
+                    text = "Belum punya akun?",
+                    color = Neutral500,
+                    style = MaterialTheme.typography.bodySmall,
+                )
+
+                Text(
+                    text = " Daftar",
+                    color = Primary2,
+                    fontWeight = FontWeight.Bold,
+                    style = MaterialTheme.typography.bodySmall,
+                    modifier = Modifier.clickable(
+                        enabled = !isLoading,
+                        onClick = onRegisterClick,
+                    ),
+                )
+            }
+
+            Spacer(modifier = Modifier.size(48.dp))
+
+            GuestAccessCard(
+                enabled = !isLoading,
+                onClick = onContinueAsGuestClick,
             )
         }
-
-        Spacer(modifier = Modifier.size(48.dp))
-
-        GuestAccessCard(
-            enabled = !isLoading,
-            onClick = onContinueAsGuestClick,
-        )
-
-        Spacer(modifier = Modifier.size(16.dp))
+        if (isLoading) {
+            LoginLoadingOverlay()
+        }
     }
 }
 
@@ -308,9 +313,53 @@ private fun LoginTextField(
             unfocusedContainerColor = White,
             disabledContainerColor = White,
         ),
-        shape = RoundedCornerShape(18.dp),
+        shape = RoundedCornerShape(12.dp),
         modifier = modifier.fillMaxWidth(),
     )
+}
+
+@Composable
+private fun GoogleLoginButton(
+    enabled: Boolean,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Surface(
+        modifier = modifier
+            .fillMaxWidth()
+            .clickable(
+                enabled = enabled,
+                onClick = onClick,
+            ),
+        shape = RoundedCornerShape(12.dp),
+        color = White,
+        border = BorderStroke(
+            width = 1.dp,
+            color = Color(0xFFE3EAF2),
+        ),
+        shadowElevation = 0.dp,
+    ) {
+        Row(
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 14.dp),
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Image(
+                painter = painterResource(id = R.drawable.ic_google),
+                contentDescription = null,
+                modifier = Modifier.size(20.dp),
+            )
+
+            Spacer(modifier = Modifier.size(10.dp))
+
+            Text(
+                text = "Masuk dengan Google",
+                color = Neutral700,
+                fontWeight = FontWeight.SemiBold,
+                style = MaterialTheme.typography.bodyMedium,
+            )
+        }
+    }
 }
 
 @Composable
@@ -337,7 +386,9 @@ private fun ErrorMessageBox(
 }
 
 @Composable
-private fun LoginLoadingDialog() {
+private fun LoginLoadingOverlay(
+    modifier: Modifier = Modifier,
+) {
     val composition by rememberLottieComposition(
         LottieCompositionSpec.RawRes(R.raw.loading)
     )
@@ -347,48 +398,38 @@ private fun LoginLoadingDialog() {
         iterations = LottieConstants.IterateForever,
     )
 
-    Dialog(
-        onDismissRequest = {}
+    Box(
+        modifier = modifier
+            .fillMaxSize()
+            .background(Color.Black.copy(alpha = 0.75f))
+            .clickable(
+                indication = null,
+                interactionSource = remember {
+                    androidx.compose.foundation.interaction.MutableInteractionSource()
+                },
+                onClick = {}
+            ),
+        contentAlignment = Alignment.Center,
     ) {
-        Card(
-            shape = RoundedCornerShape(26.dp),
-            colors = CardDefaults.cardColors(
-                containerColor = White,
-            ),
-            border = BorderStroke(
-                width = 1.dp,
-                color = Color(0xFFE3EAF2),
-            ),
-            elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(0.dp),
         ) {
-            Column(
-                modifier = Modifier.padding(24.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(10.dp),
-            ) {
-                LottieAnimation(
-                    composition = composition,
-                    progress = {
-                        progress
-                    },
-                    modifier = Modifier.size(110.dp),
-                )
+            LottieAnimation(
+                composition = composition,
+                progress = {
+                    progress
+                },
+                modifier = Modifier.size(160.dp),
+            )
 
-                Text(
-                    text = "Memproses Login",
-                    color = Neutral700,
-                    fontWeight = FontWeight.Bold,
-                    style = MaterialTheme.typography.titleMedium,
-                    textAlign = TextAlign.Center,
-                )
-
-                Text(
-                    text = "Mohon tunggu sebentar...",
-                    color = Neutral500,
-                    style = MaterialTheme.typography.bodySmall,
-                    textAlign = TextAlign.Center,
-                )
-            }
+            Text(
+                text = "Memproses Login",
+                color = White,
+                fontWeight = FontWeight.Bold,
+                style = MaterialTheme.typography.titleMedium,
+                textAlign = TextAlign.Center,
+            )
         }
     }
 }
@@ -461,4 +502,15 @@ private fun GuestAccessCard(
             )
         }
     }
+}
+
+@Preview(showBackground = true, showSystemUi = true)
+@Composable
+private fun LoginScreenPreview() {
+    LoginScreen(
+        onLoginClick = { _, _, _ -> },
+        onGoogleLoginClick = { _ -> },
+        onRegisterClick = {},
+        onContinueAsGuestClick = {},
+    )
 }

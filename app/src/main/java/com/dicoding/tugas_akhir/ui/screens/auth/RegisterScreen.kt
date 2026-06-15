@@ -1,18 +1,35 @@
 package com.dicoding.tugas_akhir.ui.screens.auth
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Email
+import androidx.compose.material.icons.outlined.Lock
+import androidx.compose.material.icons.outlined.Visibility
+import androidx.compose.material.icons.outlined.VisibilityOff
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -21,12 +38,21 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
+import com.airbnb.lottie.compose.LottieAnimation
+import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.LottieConstants
+import com.airbnb.lottie.compose.animateLottieCompositionAsState
+import com.airbnb.lottie.compose.rememberLottieComposition
 import com.dicoding.tugas_akhir.R
 import com.dicoding.tugas_akhir.ui.components.dialog.buttons.PrimaryButton
 import com.dicoding.tugas_akhir.ui.theme.Background
@@ -34,11 +60,12 @@ import com.dicoding.tugas_akhir.ui.theme.Error
 import com.dicoding.tugas_akhir.ui.theme.Neutral500
 import com.dicoding.tugas_akhir.ui.theme.Neutral700
 import com.dicoding.tugas_akhir.ui.theme.Primary2
+import com.dicoding.tugas_akhir.ui.theme.White
 
 @Composable
 fun RegisterScreen(
     onRegisterClick: (String, String, String, (String) -> Unit) -> Unit,
-    onLoginClick: () -> Unit
+    onLoginClick: () -> Unit,
 ) {
     var name by remember {
         mutableStateOf("")
@@ -56,30 +83,49 @@ fun RegisterScreen(
         mutableStateOf("")
     }
 
+    var passwordVisible by remember {
+        mutableStateOf(false)
+    }
+
+    var confirmPasswordVisible by remember {
+        mutableStateOf(false)
+    }
+
     var errorMessage by remember {
         mutableStateOf("")
+    }
+
+    var isLoading by remember {
+        mutableStateOf(false)
     }
 
     val isButtonEnabled =
         name.isNotBlank() &&
                 email.isNotBlank() &&
                 password.isNotBlank() &&
-                confirmPassword.isNotBlank()
+                confirmPassword.isNotBlank() &&
+                !isLoading
+
+    if (isLoading) {
+        RegisterLoadingDialog()
+    }
 
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(Background)
+            .verticalScroll(rememberScrollState())
             .padding(24.dp)
-            .navigationBarsPadding(),
-        horizontalAlignment = Alignment.CenterHorizontally
+            .navigationBarsPadding()
+            .imePadding(),
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Spacer(modifier = Modifier.weight(0.4f))
+        Spacer(modifier = Modifier.size(30.dp))
 
         Image(
             painter = painterResource(id = R.drawable.logo),
             contentDescription = null,
-            modifier = Modifier.size(82.dp)
+            modifier = Modifier.size(60.dp),
         )
 
         Text(
@@ -87,7 +133,7 @@ fun RegisterScreen(
             color = Neutral700,
             fontWeight = FontWeight.Bold,
             style = MaterialTheme.typography.headlineSmall,
-            modifier = Modifier.padding(top = 20.dp)
+            modifier = Modifier.padding(top = 22.dp),
         )
 
         Text(
@@ -95,101 +141,146 @@ fun RegisterScreen(
             color = Neutral500,
             style = MaterialTheme.typography.bodySmall,
             textAlign = TextAlign.Center,
-            modifier = Modifier.padding(top = 8.dp, bottom = 24.dp)
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 32.dp)
+                .padding(top = 8.dp, bottom = 28.dp),
+
         )
 
-        OutlinedTextField(
+        RegisterTextField(
             value = name,
             onValueChange = {
                 name = it
                 errorMessage = ""
             },
-            label = {
-                Text("Nama Lengkap")
+            label = "Nama Lengkap",
+            placeholder = "Masukkan nama lengkap",
+            leadingIcon = {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_person),
+                    contentDescription = null,
+                    tint = Primary2,
+                )
             },
-            placeholder = {
-                Text("Masukan Nama Lengkap")
-            },
-            singleLine = true,
-            modifier = Modifier.fillMaxWidth()
+            enabled = !isLoading,
         )
 
-        OutlinedTextField(
+        RegisterTextField(
             value = email,
             onValueChange = {
                 email = it
                 errorMessage = ""
             },
-            label = {
-                Text("Email")
+            label = "Email",
+            placeholder = "contoh@email.com",
+            leadingIcon = {
+                Icon(
+                    imageVector = Icons.Outlined.Email,
+                    contentDescription = null,
+                    tint = Primary2,
+                )
             },
-            placeholder = {
-                Text("Masukan Email")
-            },
-            singleLine = true,
-            keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Email
-            ),
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 12.dp)
+            keyboardType = KeyboardType.Email,
+            enabled = !isLoading,
+            modifier = Modifier.padding(top = 12.dp),
         )
 
-        OutlinedTextField(
+        RegisterTextField(
             value = password,
             onValueChange = {
                 password = it
                 errorMessage = ""
             },
-            label = {
-                Text("Password")
+            label = "Password",
+            placeholder = "Minimal 6 karakter",
+            leadingIcon = {
+                Icon(
+                    imageVector = Icons.Outlined.Lock,
+                    contentDescription = null,
+                    tint = Primary2,
+                )
             },
-            placeholder = {
-                Text("Masukan Password")
+            trailingIcon = {
+                IconButton(
+                    enabled = !isLoading,
+                    onClick = {
+                        passwordVisible = !passwordVisible
+                    }
+                ) {
+                    Icon(
+                        imageVector = if (passwordVisible) {
+                            Icons.Outlined.VisibilityOff
+                        } else {
+                            Icons.Outlined.Visibility
+                        },
+                        contentDescription = null,
+                        tint = Neutral500,
+                    )
+                }
             },
-            singleLine = true,
-            visualTransformation = PasswordVisualTransformation(),
-            keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Password
-            ),
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 12.dp)
+            keyboardType = KeyboardType.Password,
+            visualTransformation = if (passwordVisible) {
+                VisualTransformation.None
+            } else {
+                PasswordVisualTransformation()
+            },
+            enabled = !isLoading,
+            modifier = Modifier.padding(top = 12.dp),
         )
 
-        OutlinedTextField(
+        RegisterTextField(
             value = confirmPassword,
             onValueChange = {
                 confirmPassword = it
                 errorMessage = ""
             },
-            label = {
-                Text("Konfirmasi Password")
+            label = "Konfirmasi Password",
+            placeholder = "Ulangi password",
+            leadingIcon = {
+                Icon(
+                    imageVector = Icons.Outlined.Lock,
+                    contentDescription = null,
+                    tint = Primary2,
+                )
             },
-            placeholder = {
-                Text("Masukan Konfirmasi Password")
+            trailingIcon = {
+                IconButton(
+                    enabled = !isLoading,
+                    onClick = {
+                        confirmPasswordVisible = !confirmPasswordVisible
+                    }
+                ) {
+                    Icon(
+                        imageVector = if (confirmPasswordVisible) {
+                            Icons.Outlined.VisibilityOff
+                        } else {
+                            Icons.Outlined.Visibility
+                        },
+                        contentDescription = null,
+                        tint = Neutral500,
+                    )
+                }
             },
-            singleLine = true,
-            visualTransformation = PasswordVisualTransformation(),
-            keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Password
-            ),
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 12.dp)
+            keyboardType = KeyboardType.Password,
+            visualTransformation = if (confirmPasswordVisible) {
+                VisualTransformation.None
+            } else {
+                PasswordVisualTransformation()
+            },
+            enabled = !isLoading,
+            modifier = Modifier.padding(top = 12.dp),
         )
 
         if (errorMessage.isNotBlank()) {
-            Text(
-                text = errorMessage,
-                color = Error,
-                style = MaterialTheme.typography.bodySmall,
-                modifier = Modifier.padding(top = 8.dp)
+            ErrorMessageBox(
+                message = errorMessage,
+                modifier = Modifier.padding(top = 10.dp),
             )
         }
 
         PrimaryButton(
-            text = "Daftar",
+            text = if (isLoading) "Memproses..." else "Daftar",
             enabled = isButtonEnabled,
             onClick = {
                 if (password.length < 6) {
@@ -202,25 +293,163 @@ fun RegisterScreen(
                     return@PrimaryButton
                 }
 
+                isLoading = true
+                errorMessage = ""
+
                 onRegisterClick(name, email, password) { message ->
+                    isLoading = false
                     errorMessage = message
                 }
             },
-            modifier = Modifier.padding(top = 18.dp)
+            modifier = Modifier.padding(top = 18.dp),
         )
 
         Text(
             text = "Sudah punya akun? Masuk",
             color = Primary2,
-            fontWeight = FontWeight.SemiBold,
+            fontWeight = FontWeight.Bold,
             style = MaterialTheme.typography.bodySmall,
             modifier = Modifier
                 .padding(top = 24.dp)
-                .clickable {
-                    onLoginClick()
-                }
+                .clickable(
+                    enabled = !isLoading,
+                    onClick = onLoginClick,
+                ),
         )
 
-        Spacer(modifier = Modifier.weight(1f))
+        Spacer(modifier = Modifier.size(24.dp))
     }
+}
+
+@Composable
+private fun RegisterTextField(
+    value: String,
+    onValueChange: (String) -> Unit,
+    label: String,
+    placeholder: String,
+    leadingIcon: @Composable () -> Unit,
+    modifier: Modifier = Modifier,
+    trailingIcon: @Composable (() -> Unit)? = null,
+    keyboardType: KeyboardType = KeyboardType.Text,
+    visualTransformation: VisualTransformation = VisualTransformation.None,
+    enabled: Boolean = true,
+) {
+    OutlinedTextField(
+        value = value,
+        onValueChange = onValueChange,
+        enabled = enabled,
+        label = {
+            Text(label)
+        },
+        placeholder = {
+            Text(placeholder)
+        },
+        singleLine = true,
+        leadingIcon = leadingIcon,
+        trailingIcon = trailingIcon,
+        visualTransformation = visualTransformation,
+        keyboardOptions = KeyboardOptions(
+            keyboardType = keyboardType,
+        ),
+        colors = OutlinedTextFieldDefaults.colors(
+            focusedBorderColor = Primary2,
+            unfocusedBorderColor = Color(0xFFE3EAF2),
+            focusedLabelColor = Primary2,
+            cursorColor = Primary2,
+            focusedContainerColor = White,
+            unfocusedContainerColor = White,
+            disabledContainerColor = White,
+        ),
+        shape = RoundedCornerShape(18.dp),
+        modifier = modifier.fillMaxWidth(),
+    )
+}
+
+@Composable
+private fun ErrorMessageBox(
+    message: String,
+    modifier: Modifier = Modifier,
+) {
+    Surface(
+        modifier = modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(14.dp),
+        color = Color(0xFFFFEBEE),
+        border = BorderStroke(
+            width = 1.dp,
+            color = Color(0xFFFFCDD2),
+        ),
+    ) {
+        Text(
+            text = message,
+            color = Error,
+            style = MaterialTheme.typography.bodySmall,
+            modifier = Modifier.padding(12.dp),
+        )
+    }
+}
+
+@Composable
+private fun RegisterLoadingDialog() {
+    val composition by rememberLottieComposition(
+        LottieCompositionSpec.RawRes(R.raw.loading)
+    )
+
+    val progress by animateLottieCompositionAsState(
+        composition = composition,
+        iterations = LottieConstants.IterateForever,
+    )
+
+    Dialog(
+        onDismissRequest = {}
+    ) {
+        Card(
+            shape = RoundedCornerShape(26.dp),
+            colors = CardDefaults.cardColors(
+                containerColor = White,
+            ),
+            border = BorderStroke(
+                width = 1.dp,
+                color = Color(0xFFE3EAF2),
+            ),
+            elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
+        ) {
+            Column(
+                modifier = Modifier.padding(24.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(10.dp),
+            ) {
+                LottieAnimation(
+                    composition = composition,
+                    progress = {
+                        progress
+                    },
+                    modifier = Modifier.size(110.dp),
+                )
+
+                Text(
+                    text = "Membuat Akun",
+                    color = Neutral700,
+                    fontWeight = FontWeight.Bold,
+                    style = MaterialTheme.typography.titleMedium,
+                    textAlign = TextAlign.Center,
+                )
+
+                Text(
+                    text = "Mohon tunggu sebentar...",
+                    color = Neutral500,
+                    style = MaterialTheme.typography.bodySmall,
+                    textAlign = TextAlign.Center,
+                )
+            }
+        }
+    }
+}
+
+@Preview(showBackground = true, showSystemUi = true)
+@Composable
+private fun RegisterScreenPreview() {
+    RegisterScreen(
+        onRegisterClick = { _, _, _, _ -> },
+        onLoginClick = {},
+    )
 }
