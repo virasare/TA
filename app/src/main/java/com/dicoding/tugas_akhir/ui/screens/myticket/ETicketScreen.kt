@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -19,10 +20,10 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -32,6 +33,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -52,7 +54,6 @@ private val Primary2 = Color(0xFF1976D2)
 private val Primary3 = Color(0xFFE8F2FD)
 private val Neutral100 = Color(0xFFF3F4F6)
 private val Neutral200 = Color(0xFFE5E7EB)
-private val Neutral300 = Color(0xFFD1D5DB)
 private val Neutral500 = Color(0xFF6B7280)
 private val Neutral700 = Color(0xFF374151)
 private val Success = Color(0xFF16A34A)
@@ -132,7 +133,7 @@ private fun ETicketContent(
             .testTag("e_ticket_screen"),
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
-        ETicketMainCard(ticket = ticket)
+        ETicketBoardingPassCard(ticket = ticket)
 
         PassengerListCard(ticket = ticket)
 
@@ -153,7 +154,7 @@ private fun ETicketContent(
 }
 
 @Composable
-private fun ETicketMainCard(
+private fun ETicketBoardingPassCard(
     ticket: ETicket,
     modifier: Modifier = Modifier,
 ) {
@@ -169,154 +170,131 @@ private fun ETicketMainCard(
         ),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
     ) {
-        Column(
-            modifier = Modifier.padding(20.dp),
-            verticalArrangement = Arrangement.spacedBy(18.dp),
-        ) {
-            Row(
+        Column {
+            Surface(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.Top,
+                color = Primary2,
             ) {
                 Column(
-                    verticalArrangement = Arrangement.spacedBy(5.dp),
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier.padding(20.dp),
+                    verticalArrangement = Arrangement.spacedBy(18.dp),
                 ) {
-                    Text(
-                        text = "E-Ticket Kapal",
-                        color = Black,
-                        style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.Bold,
-                    )
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.Top,
+                    ) {
+                        Column(
+                            modifier = Modifier.weight(1f),
+                            verticalArrangement = Arrangement.spacedBy(5.dp),
+                        ) {
+                            Text(
+                                text = "E-Ticket Kapal",
+                                color = White,
+                                style = MaterialTheme.typography.titleLarge,
+                                fontWeight = FontWeight.Bold,
+                            )
 
-                    Text(
-                        text = "Kode Booking: ${ticket.bookingCode}",
-                        color = Neutral500,
-                        style = MaterialTheme.typography.bodySmall,
-                    )
+                            Text(
+                                text = "Kode Booking: ${ticket.bookingCode}",
+                                color = White.copy(alpha = 0.82f),
+                                style = MaterialTheme.typography.bodySmall,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                            )
+                        }
+
+                        ETicketStatusPill(status = ticket.status)
+                    }
+
+                    RouteHeroSection(ticket = ticket)
                 }
-
-                ETicketStatusPill(status = ticket.status)
             }
 
-            RouteSection(ticket = ticket)
-
-            QrTicketSection(ticket = ticket)
-
-            SoftDivider()
-
             Column(
-                verticalArrangement = Arrangement.spacedBy(14.dp),
+                modifier = Modifier.padding(18.dp),
+                verticalArrangement = Arrangement.spacedBy(18.dp),
             ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp),
-                ) {
-                    TicketInfoItem(
-                        title = "Kapal",
-                        value = ticket.shipName,
-                        modifier = Modifier.weight(1f),
-                    )
+                QrTicketSection(ticket = ticket)
 
-                    TicketInfoItem(
-                        title = "Kelas",
-                        value = ticket.ticketClassName,
-                        modifier = Modifier.weight(1f),
-                    )
-                }
+                TicketPerforationDivider()
 
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp),
-                ) {
-                    TicketInfoItem(
-                        title = "Tanggal",
-                        value = DateFormatter.formatDate(ticket.departureDate),
-                        modifier = Modifier.weight(1f),
-                    )
-
-                    TicketInfoItem(
-                        title = "Jam Berangkat",
-                        value = ticket.departureTime,
-                        modifier = Modifier.weight(1f),
-                    )
-                }
+                TicketDetailGrid(ticket = ticket)
             }
         }
     }
 }
 
 @Composable
-private fun RouteSection(
+private fun RouteHeroSection(
     ticket: ETicket,
     modifier: Modifier = Modifier,
 ) {
     Surface(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(24.dp),
-        color = Primary3,
+        color = White.copy(alpha = 0.14f),
         border = BorderStroke(
             width = 1.dp,
-            color = Color(0xFFD7EAFE),
+            color = White.copy(alpha = 0.18f),
         ),
     ) {
         Row(
-            modifier = Modifier.padding(18.dp),
+            modifier = Modifier.padding(16.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Column(
-                horizontalAlignment = Alignment.Start,
                 modifier = Modifier.weight(1f),
-                verticalArrangement = Arrangement.spacedBy(5.dp),
+                verticalArrangement = Arrangement.spacedBy(4.dp),
             ) {
                 Text(
                     text = ticket.origin,
-                    color = Primary2,
+                    color = White,
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
                 )
 
                 Text(
                     text = "Pelabuhan asal",
-                    color = Neutral500,
-                    style = MaterialTheme.typography.bodySmall,
+                    color = White.copy(alpha = 0.76f),
+                    style = MaterialTheme.typography.labelSmall,
                 )
             }
 
             Surface(
                 shape = CircleShape,
                 color = White,
-                border = BorderStroke(
-                    width = 1.dp,
-                    color = Neutral200,
-                ),
             ) {
                 Text(
                     text = "→",
-                    modifier = Modifier.padding(horizontal = 13.dp, vertical = 9.dp),
+                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
                     color = Primary2,
-                    style = MaterialTheme.typography.titleMedium,
+                    style = MaterialTheme.typography.titleSmall,
                     fontWeight = FontWeight.Bold,
                 )
             }
 
             Column(
-                horizontalAlignment = Alignment.End,
                 modifier = Modifier.weight(1f),
-                verticalArrangement = Arrangement.spacedBy(5.dp),
+                horizontalAlignment = Alignment.End,
+                verticalArrangement = Arrangement.spacedBy(4.dp),
             ) {
                 Text(
                     text = ticket.destination,
-                    color = Primary2,
+                    color = White,
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
                 )
 
                 Text(
                     text = "Pelabuhan tujuan",
-                    color = Neutral500,
-                    style = MaterialTheme.typography.bodySmall,
+                    color = White.copy(alpha = 0.76f),
+                    style = MaterialTheme.typography.labelSmall,
                 )
             }
         }
@@ -328,51 +306,91 @@ private fun QrTicketSection(
     ticket: ETicket,
     modifier: Modifier = Modifier,
 ) {
-    Surface(
+    Column(
         modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(24.dp),
-        color = White,
-        border = BorderStroke(
-            width = 1.dp,
-            color = Neutral200,
-        ),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(14.dp),
     ) {
-        Column(
-            modifier = Modifier.padding(18.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(12.dp),
+        Surface(
+            shape = RoundedCornerShape(26.dp),
+            color = Neutral100,
+            border = BorderStroke(
+                width = 1.dp,
+                color = Neutral200,
+            ),
         ) {
-            Surface(
-                shape = RoundedCornerShape(22.dp),
-                color = Neutral100,
-                border = BorderStroke(
-                    width = 1.dp,
-                    color = Neutral200,
-                ),
+            Box(
+                modifier = Modifier.padding(18.dp),
+                contentAlignment = Alignment.Center,
             ) {
-                Box(
-                    modifier = Modifier.padding(14.dp),
-                    contentAlignment = Alignment.Center,
-                ) {
-                    FakeQrCode(
-                        value = ticket.qrCode,
-                    )
-                }
+                FakeQrCode(
+                    value = ticket.qrCode,
+                )
             }
+        }
 
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(5.dp),
+        ) {
             Text(
-                text = "Tunjukkan QR ini saat check-in di pelabuhan",
-                color = Neutral700,
-                style = MaterialTheme.typography.bodyMedium,
-                fontWeight = FontWeight.SemiBold,
+                text = "Scan QR saat check-in",
+                color = Black,
+                style = MaterialTheme.typography.titleSmall,
+                fontWeight = FontWeight.Bold,
                 textAlign = TextAlign.Center,
             )
 
             Text(
-                text = "Pastikan layar cukup terang agar QR mudah dipindai.",
+                text = "Tunjukkan kode ini kepada petugas pelabuhan. Pastikan layar cukup terang.",
                 color = Neutral500,
                 style = MaterialTheme.typography.bodySmall,
                 textAlign = TextAlign.Center,
+            )
+        }
+    }
+}
+
+@Composable
+private fun TicketDetailGrid(
+    ticket: ETicket,
+    modifier: Modifier = Modifier,
+) {
+    Column(
+        modifier = modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(12.dp),
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+        ) {
+            TicketInfoItem(
+                title = "Kapal",
+                value = ticket.shipName,
+                modifier = Modifier.weight(1f),
+            )
+
+            TicketInfoItem(
+                title = "Kelas",
+                value = ticket.ticketClassName,
+                modifier = Modifier.weight(1f),
+            )
+        }
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+        ) {
+            TicketInfoItem(
+                title = "Tanggal",
+                value = DateFormatter.formatDate(ticket.departureDate),
+                modifier = Modifier.weight(1f),
+            )
+
+            TicketInfoItem(
+                title = "Jam",
+                value = ticket.departureTime,
+                modifier = Modifier.weight(1f),
             )
         }
     }
@@ -396,7 +414,8 @@ private fun TicketInfoItem(
             Text(
                 text = title,
                 color = Neutral500,
-                style = MaterialTheme.typography.bodySmall,
+                style = MaterialTheme.typography.labelSmall,
+                maxLines = 1,
             )
 
             Text(
@@ -404,6 +423,8 @@ private fun TicketInfoItem(
                 color = Black,
                 style = MaterialTheme.typography.bodyMedium,
                 fontWeight = FontWeight.SemiBold,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
             )
         }
     }
@@ -432,7 +453,7 @@ private fun PassengerListCard(
         ) {
             SectionHeader(
                 title = "Data Penumpang",
-                description = "${ticket.passengers.size} penumpang terdaftar pada e-ticket ini.",
+                description = "${ticket.passengers.size} penumpang terdaftar pada tiket ini.",
             )
 
             ticket.passengers.forEachIndexed { index, passenger ->
@@ -441,29 +462,47 @@ private fun PassengerListCard(
                     shape = RoundedCornerShape(18.dp),
                     color = Neutral100,
                 ) {
-                    Column(
+                    Row(
                         modifier = Modifier.padding(14.dp),
-                        verticalArrangement = Arrangement.spacedBy(5.dp),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp),
+                        verticalAlignment = Alignment.CenterVertically,
                     ) {
-                        Text(
-                            text = "Penumpang ${index + 1}",
-                            color = Primary2,
-                            style = MaterialTheme.typography.labelMedium,
-                            fontWeight = FontWeight.Bold,
-                        )
+                        Surface(
+                            modifier = Modifier.size(36.dp),
+                            shape = CircleShape,
+                            color = Primary3,
+                        ) {
+                            Box(
+                                contentAlignment = Alignment.Center,
+                            ) {
+                                Text(
+                                    text = "${index + 1}",
+                                    color = Primary2,
+                                    style = MaterialTheme.typography.labelMedium,
+                                    fontWeight = FontWeight.Bold,
+                                )
+                            }
+                        }
 
-                        Text(
-                            text = passenger.fullName,
-                            color = Black,
-                            style = MaterialTheme.typography.bodyMedium,
-                            fontWeight = FontWeight.SemiBold,
-                        )
+                        Column(
+                            modifier = Modifier.weight(1f),
+                            verticalArrangement = Arrangement.spacedBy(4.dp),
+                        ) {
+                            Text(
+                                text = passenger.fullName,
+                                color = Black,
+                                style = MaterialTheme.typography.bodyMedium,
+                                fontWeight = FontWeight.SemiBold,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                            )
 
-                        Text(
-                            text = "NIK: ${maskNik(passenger.nik)}",
-                            color = Neutral500,
-                            style = MaterialTheme.typography.bodySmall,
-                        )
+                            Text(
+                                text = "NIK: ${maskNik(passenger.nik)}",
+                                color = Neutral500,
+                                style = MaterialTheme.typography.bodySmall,
+                            )
+                        }
                     }
                 }
             }
@@ -496,7 +535,7 @@ private fun ManageTicketCard(
         ) {
             SectionHeader(
                 title = "Kelola Tiket",
-                description = "Gunakan menu ini jika kamu ingin mengajukan refund atau mengubah jadwal keberangkatan.",
+                description = "Gunakan menu ini untuk mengajukan refund atau mengubah jadwal keberangkatan.",
             )
 
             Row(
@@ -507,7 +546,9 @@ private fun ManageTicketCard(
                     onClick = {
                         onRefundClick(bookingId)
                     },
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier
+                        .weight(1f)
+                        .height(48.dp),
                     colors = ButtonDefaults.outlinedButtonColors(
                         contentColor = Danger,
                     ),
@@ -527,12 +568,15 @@ private fun ManageTicketCard(
                     onClick = {
                         onRescheduleClick(bookingId)
                     },
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier
+                        .weight(1f)
+                        .height(48.dp),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = Primary2,
                         contentColor = White,
                     ),
                     shape = RoundedCornerShape(16.dp),
+                    elevation = ButtonDefaults.buttonElevation(defaultElevation = 0.dp),
                 ) {
                     Text(
                         text = "Reschedule",
@@ -567,7 +611,7 @@ private fun BoardingInfoCard(
         ) {
             SectionHeader(
                 title = "Informasi Keberangkatan",
-                description = "Periksa terminal dan gate sebelum menuju pelabuhan.",
+                description = "Periksa terminal dan gate sebelum berangkat.",
             )
 
             BoardingInfoRow(
@@ -585,7 +629,7 @@ private fun BoardingInfoCard(
                 value = ticket.issuedAt,
             )
 
-            SoftDivider()
+            TicketPerforationDivider()
 
             Text(
                 text = ticket.note,
@@ -684,18 +728,35 @@ private fun BoardingInfoRow(
 }
 
 @Composable
-private fun SoftDivider(
+private fun TicketPerforationDivider(
     modifier: Modifier = Modifier,
 ) {
-    Box(
-        modifier = modifier
-            .fillMaxWidth()
-            .height(1.dp)
-            .padding(horizontal = 2.dp),
+    Row(
+        modifier = modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         Surface(
-            modifier = Modifier.fillMaxSize(),
-            color = Neutral200,
+            modifier = Modifier.size(10.dp),
+            shape = CircleShape,
+            color = Background,
+        ) {}
+
+        Box(
+            modifier = Modifier
+                .weight(1f)
+                .height(1.dp)
+                .padding(horizontal = 6.dp),
+        ) {
+            Surface(
+                modifier = Modifier.fillMaxSize(),
+                color = Neutral200,
+            ) {}
+        }
+
+        Surface(
+            modifier = Modifier.size(10.dp),
+            shape = CircleShape,
+            color = Background,
         ) {}
     }
 }
@@ -746,6 +807,7 @@ private fun ETicketStatusPill(
             color = contentColor,
             style = MaterialTheme.typography.labelSmall,
             fontWeight = FontWeight.SemiBold,
+            maxLines = 1,
         )
     }
 }
