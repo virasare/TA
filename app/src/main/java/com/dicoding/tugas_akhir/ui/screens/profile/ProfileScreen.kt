@@ -87,8 +87,23 @@ fun ProfileScreen(
         }
 
         is AuthUiState.Authenticated -> {
+            val user = (authUiState as AuthUiState.Authenticated).user
+
+            val displayProfile = profile.copy(
+                uid = user.uid,
+                name = profile.name.ifBlank {
+                    user.name.orEmpty()
+                },
+                email = profile.email.ifBlank {
+                    user.email.orEmpty()
+                },
+                photoUri = profile.photoUri.ifBlank {
+                    user.photoUrl.orEmpty()
+                },
+            )
+
             ProfileContent(
-                profile = profile,
+                profile = displayProfile,
                 onEditProfileClick = onEditProfileClick,
                 onPassengerDataClick = onPassengerDataClick,
                 onSettingsClick = onSettingsClick,

@@ -16,32 +16,38 @@ class ProfileDataStore private constructor(
     private val context: Context,
 ) {
 
-    val profileFlow: Flow<UserProfile> = context.profileDataStore.data.map { preferences ->
-        UserProfile(
-            name = preferences[NAME_KEY].orEmpty(),
-            email = preferences[EMAIL_KEY].orEmpty(),
-            phoneNumber = preferences[PHONE_KEY].orEmpty(),
-            address = preferences[ADDRESS_KEY].orEmpty(),
-            photoUri = preferences[PHOTO_URI_KEY].orEmpty(),
-        )
+    fun getProfile(uid: String): Flow<UserProfile> {
+        return context.profileDataStore.data.map { preferences ->
+            UserProfile(
+                uid = uid,
+                name = preferences[nameKey(uid)].orEmpty(),
+                email = preferences[emailKey(uid)].orEmpty(),
+                phoneNumber = preferences[phoneKey(uid)].orEmpty(),
+                address = preferences[addressKey(uid)].orEmpty(),
+                photoUri = preferences[photoUriKey(uid)].orEmpty(),
+            )
+        }
     }
 
-    suspend fun saveProfile(profile: UserProfile) {
+    suspend fun saveProfile(
+        uid: String,
+        profile: UserProfile,
+    ) {
         context.profileDataStore.edit { preferences ->
-            preferences[NAME_KEY] = profile.name
-            preferences[EMAIL_KEY] = profile.email
-            preferences[PHONE_KEY] = profile.phoneNumber
-            preferences[ADDRESS_KEY] = profile.address
-            preferences[PHOTO_URI_KEY] = profile.photoUri
+            preferences[nameKey(uid)] = profile.name
+            preferences[emailKey(uid)] = profile.email
+            preferences[phoneKey(uid)] = profile.phoneNumber
+            preferences[addressKey(uid)] = profile.address
+            preferences[photoUriKey(uid)] = profile.photoUri
         }
     }
 
     companion object {
-        private val NAME_KEY = stringPreferencesKey("name")
-        private val EMAIL_KEY = stringPreferencesKey("email")
-        private val PHONE_KEY = stringPreferencesKey("phone")
-        private val ADDRESS_KEY = stringPreferencesKey("address")
-        private val PHOTO_URI_KEY = stringPreferencesKey("photo_uri")
+        private fun nameKey(uid: String) = stringPreferencesKey("profile_${uid}_name")
+        private fun emailKey(uid: String) = stringPreferencesKey("profile_${uid}_email")
+        private fun phoneKey(uid: String) = stringPreferencesKey("profile_${uid}_phone")
+        private fun addressKey(uid: String) = stringPreferencesKey("profile_${uid}_address")
+        private fun photoUriKey(uid: String) = stringPreferencesKey("profile_${uid}_photo_uri")
 
         @Volatile
         private var INSTANCE: ProfileDataStore? = null

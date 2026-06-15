@@ -30,6 +30,7 @@ import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -66,6 +67,7 @@ fun LoginScreen(
     onGoogleLoginClick: ((String) -> Unit) -> Unit,
     onRegisterClick: () -> Unit,
     onContinueAsGuestClick: () -> Unit,
+    registerSuccessMessage: String? = null,
 ) {
     var email by remember {
         mutableStateOf("")
@@ -81,6 +83,16 @@ fun LoginScreen(
 
     var errorMessage by remember {
         mutableStateOf("")
+    }
+
+    var successMessage by remember {
+        mutableStateOf(registerSuccessMessage.orEmpty())
+    }
+
+    LaunchedEffect(registerSuccessMessage) {
+        if (!registerSuccessMessage.isNullOrBlank()) {
+            successMessage = registerSuccessMessage
+        }
     }
 
     var isLoading by remember {
@@ -131,11 +143,19 @@ fun LoginScreen(
                     .padding(top = 8.dp, bottom = 28.dp),
             )
 
+            if (successMessage.isNotBlank()) {
+                SuccessMessageBox(
+                    message = successMessage,
+                    modifier = Modifier.padding(bottom = 12.dp),
+                )
+            }
+
             LoginTextField(
                 value = email,
                 onValueChange = {
                     email = it
                     errorMessage = ""
+                    successMessage = ""
                 },
                 label = "Email",
                 placeholder = "contoh@email.com",
@@ -155,6 +175,7 @@ fun LoginScreen(
                 onValueChange = {
                     password = it
                     errorMessage = ""
+                    successMessage = ""
                 },
                 label = "Password",
                 placeholder = "Masukkan password",
@@ -208,6 +229,7 @@ fun LoginScreen(
                 onClick = {
                     isLoading = true
                     errorMessage = ""
+                    successMessage = ""
 
                     onLoginClick(email, password) { message ->
                         isLoading = false
@@ -379,6 +401,29 @@ private fun ErrorMessageBox(
         Text(
             text = message,
             color = Error,
+            style = MaterialTheme.typography.bodySmall,
+            modifier = Modifier.padding(12.dp),
+        )
+    }
+}
+
+@Composable
+private fun SuccessMessageBox(
+    message: String,
+    modifier: Modifier = Modifier,
+) {
+    Surface(
+        modifier = modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(14.dp),
+        color = Color(0xFFE8F5E9),
+        border = BorderStroke(
+            width = 1.dp,
+            color = Color(0xFFC8E6C9),
+        ),
+    ) {
+        Text(
+            text = message,
+            color = Color(0xFF2E7D32),
             style = MaterialTheme.typography.bodySmall,
             modifier = Modifier.padding(12.dp),
         )

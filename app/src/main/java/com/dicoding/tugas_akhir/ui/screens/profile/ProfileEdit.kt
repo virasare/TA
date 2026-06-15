@@ -28,7 +28,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -60,6 +59,7 @@ import com.dicoding.tugas_akhir.ui.viewmodel.ViewModelFactory
 fun EditProfileScreen(
     initialName: String = "",
     initialEmail: String = "",
+    initialPhotoUrl: String = "",
     onSaveClick: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: ProfileViewModel = viewModel(
@@ -69,6 +69,14 @@ fun EditProfileScreen(
     val context = LocalContext.current
     val profile by viewModel.profile.collectAsStateWithLifecycle()
     val isSaved by viewModel.isSaved.collectAsStateWithLifecycle()
+
+    LaunchedEffect(initialName, initialEmail, initialPhotoUrl) {
+        viewModel.setInitialProfileIfEmpty(
+            name = initialName,
+            email = initialEmail,
+            photoUri = initialPhotoUrl,
+        )
+    }
 
     var showPhotoSheet by remember { mutableStateOf(false) }
     var showSavedDialog by remember { mutableStateOf(false) }

@@ -3,6 +3,7 @@ package com.dicoding.tugas_akhir.data.repository
 import com.dicoding.tugas_akhir.data.local.datastore.ProfileDataStore
 import com.dicoding.tugas_akhir.domain.model.UserProfile
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 
 class ProfileRepository private constructor(
@@ -11,27 +12,36 @@ class ProfileRepository private constructor(
 ) {
 
     fun getProfile(): Flow<UserProfile> {
-        return profileDataStore.profileFlow.map { localProfile ->
-            val firebaseUser = authRepository.getCurrentUser()
+        val firebaseUser = authRepository.getCurrentUser()
 
+        if (firebaseUser == null) {
+            return flowOf(UserProfile())
+        }
+
+        return profileDataStore.getProfile(firebaseUser.uid).map { localProfile ->
             UserProfile(
+                uid = firebaseUser.uid,
                 name = localProfile.name.ifBlank {
-                    firebaseUser?.name.orEmpty()
+                    firebaseUser.name.orEmpty()
                 },
                 email = localProfile.email.ifBlank {
-                    firebaseUser?.email.orEmpty()
+                    firebaseUser.email.orEmpty()
                 },
                 phoneNumber = localProfile.phoneNumber,
                 address = localProfile.address,
                 photoUri = localProfile.photoUri.ifBlank {
-                    firebaseUser?.photoUrl.orEmpty()
+                    firebaseUser.photoUrl.orEmpty()
                 },
             )
         }
     }
 
     suspend fun saveProfile(profile: UserProfile) {
-        profileDataStore.saveProfile(profile)
+        val firebaseUser = authRepository.getCurrentUser() ?: return
+        profileDataStore.saveProfile(
+            uid = firebaseUser.uid,
+            profile = profile.copy(uid = firebaseUser.uid),
+        )
     }
 
     companion object {

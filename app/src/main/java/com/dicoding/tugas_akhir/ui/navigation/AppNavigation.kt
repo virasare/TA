@@ -24,7 +24,6 @@ import com.dicoding.tugas_akhir.data.dummy.PassengerData
 import com.dicoding.tugas_akhir.data.dummy.Port
 import com.dicoding.tugas_akhir.data.dummy.ShipSchedule
 import com.dicoding.tugas_akhir.data.dummy.TicketClassOption
-import com.dicoding.tugas_akhir.data.dummy.dummyNotifications
 import com.dicoding.tugas_akhir.data.dummy.dummyPorts
 import com.dicoding.tugas_akhir.data.dummy.popularRoutes
 import com.dicoding.tugas_akhir.domain.model.NotificationType
@@ -34,7 +33,6 @@ import com.dicoding.tugas_akhir.ui.components.dialog.navigation.AppTopBar
 import com.dicoding.tugas_akhir.ui.screens.auth.AuthRequiredScreen
 import com.dicoding.tugas_akhir.ui.screens.auth.LoginScreen
 import com.dicoding.tugas_akhir.ui.screens.auth.RegisterScreen
-import com.dicoding.tugas_akhir.ui.screens.auth.signInWithGoogle
 import com.dicoding.tugas_akhir.ui.screens.booking.BookingSummaryScreen
 import com.dicoding.tugas_akhir.ui.screens.booking.PassengerFormScreen
 import com.dicoding.tugas_akhir.ui.screens.booking.SelectTicketScreen
@@ -64,8 +62,6 @@ import com.dicoding.tugas_akhir.ui.screens.schedule.ScheduleScreen
 import com.dicoding.tugas_akhir.ui.screens.splash.SplashScreen
 import com.dicoding.tugas_akhir.ui.theme.Background
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.UserProfileChangeRequest
-import kotlinx.coroutines.launch
 import com.dicoding.tugas_akhir.ui.screens.profile.ProfileLanguageScreen
 import com.dicoding.tugas_akhir.ui.screens.profile.ProfileSecurityScreen
 import com.dicoding.tugas_akhir.ui.screens.profile.ProfileThemeScreen
@@ -74,14 +70,26 @@ import com.dicoding.tugas_akhir.ui.viewmodel.ViewModelFactory
 import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Build
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.res.stringResource
 import androidx.core.content.ContextCompat
+import androidx.credentials.CredentialManager
 import com.dicoding.tugas_akhir.ui.notification.AppSystemNotification
 import com.dicoding.tugas_akhir.ui.screens.ticket.RefundScreen
 import com.dicoding.tugas_akhir.ui.screens.ticket.RescheduleScreen
 import com.dicoding.tugas_akhir.ui.screens.ticket.ManageTicketSuccessScreen
+import com.dicoding.tugas_akhir.ui.viewmodel.AuthViewModel
+import androidx.credentials.GetCredentialRequest
+import androidx.credentials.exceptions.GetCredentialException
+import androidx.credentials.exceptions.NoCredentialException
+import com.dicoding.tugas_akhir.R
+import com.dicoding.tugas_akhir.ui.state.AuthUiState
+import com.google.android.libraries.identity.googleid.GetGoogleIdOption
+import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
+import kotlinx.coroutines.launch
 
 @Composable
 fun AppNavigation() {
@@ -89,12 +97,28 @@ fun AppNavigation() {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
 
-    val context = LocalContext.current
-
     val notificationPermissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission(),
         onResult = {}
     )
+
+    val context = LocalContext.current
+    val factory = ViewModelFactory.getInstance()
+
+    val webClientId = stringResource(
+        id = R.string.default_web_client_id
+    )
+
+    val authViewModel: AuthViewModel = viewModel(
+        factory = factory
+    )
+
+    val credentialManager = remember {
+        CredentialManager.create(context)
+    }
+
+    val authUiState by authViewModel.authUiState.collectAsStateWithLifecycle()
+    val isLoggedIn = authUiState is AuthUiState.Authenticated
 
     LaunchedEffect(Unit) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -134,8 +158,8 @@ fun AppNavigation() {
         mutableStateOf(prefs.getBoolean("has_seen_onboarding", false))
     }
 
-    var isLoggedIn by remember {
-        mutableStateOf(auth.currentUser != null)
+    var isSplashFinished by remember {
+        mutableStateOf(false)
     }
 
     var pendingProtectedRoute by remember {
@@ -193,7 +217,8 @@ fun AppNavigation() {
         Screens.Profile
     )
 
-    val showBottomBar = currentRoute != null &&
+    val showBottomBar = isSplashFinished &&
+            currentRoute != null &&
             currentRoute in bottomBarRoutes
 
     val showTopBar = currentRoute != null &&
@@ -204,24 +229,53 @@ fun AppNavigation() {
             currentRoute !in hideTopBarRoutes
 
     fun navigateAfterAuthSuccess() {
-        val targetRoute = pendingProtectedRoute ?: Screens.Home
-        val fromProtectedRoute = pendingProtectedRoute != null
-
         pendingProtectedRoute = null
 
-        navController.navigate(targetRoute) {
-            popUpTo(
-                if (fromProtectedRoute) {
-                    Screens.AuthRequired
-                } else {
-                    Screens.Login
-                }
-            ) {
+        navController.navigate(Screens.Home) {
+            popUpTo(Screens.Login) {
                 inclusive = true
             }
 
             launchSingleTop = true
         }
+    }
+
+    fun navigateToLoginFromGuest() {
+        pendingProtectedRoute = null
+
+        navController.navigate(Screens.Login) {
+            popUpTo(Screens.Home) {
+                inclusive = false
+            }
+
+            launchSingleTop = true
+        }
+    }
+
+    suspend fun getGoogleIdToken(
+        filterByAuthorizedAccounts: Boolean,
+    ): String {
+        val googleIdOption = GetGoogleIdOption.Builder()
+            .setFilterByAuthorizedAccounts(filterByAuthorizedAccounts)
+            .setServerClientId(webClientId)
+            .setAutoSelectEnabled(false)
+            .build()
+
+        val request = GetCredentialRequest.Builder()
+            .addCredentialOption(googleIdOption)
+            .build()
+
+        val result = credentialManager.getCredential(
+            context = context,
+            request = request,
+        )
+
+        val credential = result.credential
+
+        val googleIdTokenCredential = GoogleIdTokenCredential
+            .createFrom(credential.data)
+
+        return googleIdTokenCredential.idToken
     }
 
     var selectedETicketData by remember {
@@ -271,7 +325,7 @@ fun AppNavigation() {
                     unreadNotificationCount = unreadNotificationCount,
                     onItemClick = { item ->
                         if (!isLoggedIn && item.route in protectedRoutes) {
-                            pendingProtectedRoute = item.route
+                            pendingProtectedRoute = null
 
                             navController.navigate(Screens.AuthRequired) {
                                 launchSingleTop = true
@@ -303,6 +357,8 @@ fun AppNavigation() {
                             Screens.Onboarding
                         }
 
+                        isSplashFinished = true
+
                         navController.navigate(nextRoute) {
                             popUpTo(Screens.Splash) {
                                 inclusive = true
@@ -331,64 +387,105 @@ fun AppNavigation() {
             }
 
             composable(Screens.Login) {
+                val registerSuccessMessage = navController.currentBackStackEntry
+                    ?.savedStateHandle
+                    ?.get<String>("register_success_message")
+
+                LaunchedEffect(registerSuccessMessage) {
+                    if (!registerSuccessMessage.isNullOrBlank()) {
+                        navController.currentBackStackEntry
+                            ?.savedStateHandle
+                            ?.remove<String>("register_success_message")
+                    }
+                }
+
                 LoginScreen(
-                    onContinueAsGuestClick = {
-                        navController.navigate(Screens.Home) {
-                            popUpTo(Screens.Login) {
-                                inclusive = true
-                            }
-                            launchSingleTop = true
-                        }
-                    },
-                    onGoogleLoginClick = {
-                        scope.launch {
-                            signInWithGoogle(
-                                context = context,
-                                scope = scope,
-                                auth = auth,
-                                onSuccess = {
-                                    isLoggedIn = true
-                                    navigateAfterAuthSuccess()
-                                },
-                                onError = {
-                                    // Nanti bisa kita tampilkan snackbar/toast.
-                                }
-                            )
-                        }
-                    },
-                    onLoginClick = { email, password, onError ->
-                        auth.signInWithEmailAndPassword(email, password)
-                            .addOnSuccessListener {
-                                isLoggedIn = true
+                    registerSuccessMessage = registerSuccessMessage,
+                    onLoginClick = { email, password, showError ->
+                        authViewModel.loginWithEmail(
+                            email = email,
+                            password = password,
+                            onSuccess = {
+                                Toast.makeText(
+                                    context,
+                                    "Berhasil masuk. Selamat datang!",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+
                                 navigateAfterAuthSuccess()
+                            },
+                            onError = { message: String ->
+                                showError(message)
                             }
-                            .addOnFailureListener { exception ->
-                                onError(exception.message ?: "Login gagal")
+                        )
+                    },
+                    onGoogleLoginClick = { showError ->
+                        scope.launch {
+                            try {
+                                val idToken = try {
+                                    getGoogleIdToken(
+                                        filterByAuthorizedAccounts = true,
+                                    )
+                                } catch (exception: NoCredentialException) {
+                                    getGoogleIdToken(
+                                        filterByAuthorizedAccounts = false,
+                                    )
+                                }
+
+                                authViewModel.loginWithGoogle(
+                                    idToken = idToken,
+                                    onSuccess = {
+                                        Toast.makeText(
+                                            context,
+                                            "Berhasil masuk dengan Google.",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+
+                                        navigateAfterAuthSuccess()
+                                    },
+                                    onError = { message ->
+                                        showError(message)
+                                    },
+                                )
+                            } catch (exception: GetCredentialException) {
+                                showError("Login Google dibatalkan atau gagal. Silakan coba lagi.")
+                            } catch (exception: Exception) {
+                                showError(
+                                    exception.message ?: "Login Google gagal. Silakan coba lagi."
+                                )
                             }
+                        }
                     },
                     onRegisterClick = {
                         navController.navigate(Screens.Register)
+                    },
+                    onContinueAsGuestClick = {
+                        navController.navigate(Screens.Home)
                     }
                 )
             }
 
             composable(Screens.Register) {
                 RegisterScreen(
-                    onRegisterClick = { name, email, password, onError ->
-                        auth.createUserWithEmailAndPassword(email, password)
-                            .addOnSuccessListener {
-                                val profileUpdates = UserProfileChangeRequest.Builder()
-                                    .setDisplayName(name)
-                                    .build()
+                    onRegisterClick = { name, email, password, showError ->
+                        authViewModel.registerWithEmail(
+                            name = name,
+                            email = email,
+                            password = password,
+                            onSuccess = {
+                                navController.previousBackStackEntry
+                                    ?.savedStateHandle
+                                    ?.set(
+                                        "register_success_message",
+                                        "Akun berhasil terdaftar. Silakan login untuk masuk."
+                                    )
 
-                                auth.currentUser?.updateProfile(profileUpdates)
-
-                                isLoggedIn = true
-                                navigateAfterAuthSuccess()
+                                navController.popBackStack()
+                            },
+                            onError = { message ->
+                                showError(message)
                             }
-                            .addOnFailureListener { exception ->
-                                onError(exception.message ?: "Daftar akun gagal")
-                            }
+                        )
                     },
                     onLoginClick = {
                         navController.popBackStack()
@@ -399,9 +496,7 @@ fun AppNavigation() {
             composable(Screens.AuthRequired) {
                 AuthRequiredScreen(
                     onLoginClick = {
-                        navController.navigate(Screens.Login) {
-                            launchSingleTop = true
-                        }
+                        navigateToLoginFromGuest()
                     },
                     onBackClick = {
                         pendingProtectedRoute = null
@@ -1079,10 +1174,18 @@ fun AppNavigation() {
                             navController.navigate(Screens.ProfileSecurity)
                         },
                         onLogoutSuccess = {
-                            navController.navigate(Screens.Home) {
+                            Toast.makeText(
+                                context,
+                                "Akun berhasil logout.",
+                                Toast.LENGTH_SHORT
+                            ).show()
+
+                            navController.navigate(Screens.Login) {
                                 popUpTo(Screens.Home) {
                                     inclusive = true
                                 }
+
+                                launchSingleTop = true
                             }
                         },
                     )
@@ -1090,16 +1193,19 @@ fun AppNavigation() {
             }
 
             composable(Screens.ProfileEdit) {
-                val user = auth.currentUser
+                val user = (authUiState as? AuthUiState.Authenticated)?.user
 
                 EditProfileScreen(
-                    initialName = user?.displayName ?: "Vira Sare",
-                    initialEmail = user?.email ?: "virasare@gmail.com",
+                    initialName = user?.name.orEmpty(),
+                    initialEmail = user?.email.orEmpty(),
+                    initialPhotoUrl = user?.photoUrl.orEmpty(),
                     onSaveClick = {
                         navController.popBackStack()
                     }
                 )
             }
+
+
 
             composable(Screens.ProfilePassengerData) {
                 AuthGate(

@@ -25,10 +25,30 @@ class ProfileViewModel(
 
     private fun loadProfile() {
         viewModelScope.launch {
-            profileRepository.getProfile().collect { profile ->
-                _profile.value = profile
+            profileRepository.getProfile().collect { savedProfile ->
+                _profile.value = savedProfile
             }
         }
+    }
+
+    fun setInitialProfileIfEmpty(
+        name: String,
+        email: String,
+        photoUri: String,
+    ) {
+        val currentProfile = _profile.value
+
+        _profile.value = currentProfile.copy(
+            name = currentProfile.name.ifBlank {
+                name
+            },
+            email = currentProfile.email.ifBlank {
+                email
+            },
+            photoUri = currentProfile.photoUri.ifBlank {
+                photoUri
+            },
+        )
     }
 
     fun updateName(value: String) {

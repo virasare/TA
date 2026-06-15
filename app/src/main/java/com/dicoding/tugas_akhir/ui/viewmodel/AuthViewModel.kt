@@ -32,6 +32,50 @@ class AuthViewModel(
         }
     }
 
+    fun loginWithEmail(
+        email: String,
+        password: String,
+        onSuccess: () -> Unit,
+        onError: (String) -> Unit,
+    ) {
+        authRepository.loginWithEmail(
+            email = email,
+            password = password,
+            onSuccess = onSuccess,
+            onError = onError,
+        )
+    }
+
+    fun registerWithEmail(
+        name: String,
+        email: String,
+        password: String,
+        onSuccess: () -> Unit,
+        onError: (String) -> Unit,
+    ) {
+        authRepository.registerWithEmail(
+            name = name,
+            email = email,
+            password = password,
+            onSuccess = onSuccess,
+            onError = onError,
+        )
+    }
+
+    fun loginWithGoogle(
+        idToken: String,
+        onSuccess: () -> Unit,
+        onError: (String) -> Unit,
+    ) {
+        authRepository.loginWithGoogle(
+            idToken = idToken,
+            onSuccess = onSuccess,
+            onError = onError,
+        )
+    }
+
+    fun getCurrentUser() = authRepository.getCurrentUser()
+
     fun isLoggedIn(): Boolean {
         return authRepository.isLoggedIn()
     }
