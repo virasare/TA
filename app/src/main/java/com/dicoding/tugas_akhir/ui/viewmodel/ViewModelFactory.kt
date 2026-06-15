@@ -39,6 +39,12 @@ class ViewModelFactory private constructor(
             return BookingViewModel(bookingRepository) as T
         }
 
+        if (modelClass.isAssignableFrom(BookingPassengerFormViewModel::class.java)) {
+            return BookingPassengerFormViewModel(
+                savedPassengerRepository = savedPassengerRepository,
+            ) as T
+        }
+
         if (modelClass.isAssignableFrom(PaymentViewModel::class.java)) {
             return PaymentViewModel(paymentRepository) as T
         }
@@ -56,7 +62,9 @@ class ViewModelFactory private constructor(
         }
 
         if (modelClass.isAssignableFrom(SavedPassengerViewModel::class.java)) {
-            return SavedPassengerViewModel(savedPassengerRepository) as T
+            return SavedPassengerViewModel(
+                repository = savedPassengerRepository,
+            ) as T
         }
 
         if (modelClass.isAssignableFrom(NotificationViewModel::class.java)) {

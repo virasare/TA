@@ -19,6 +19,8 @@ import com.dicoding.tugas_akhir.domain.model.Passenger
 import com.dicoding.tugas_akhir.domain.model.Payment
 import com.dicoding.tugas_akhir.domain.model.PaymentMethod
 import com.dicoding.tugas_akhir.domain.model.ShipSchedule
+import com.dicoding.tugas_akhir.data.local.room.entity.SavedPassengerEntity
+import com.dicoding.tugas_akhir.domain.model.SavedPassenger
 
 object DataMapper {
 
@@ -269,5 +271,30 @@ object DataMapper {
         } catch (exception: Exception) {
             NotificationType.INFO
         }
+    }
+
+    fun mapSavedPassengerEntityToDomain(
+        input: SavedPassengerEntity,
+    ): SavedPassenger {
+        return SavedPassenger(
+            id = input.id,
+            fullName = input.fullName,
+            nik = input.nik,
+            phoneNumber = input.phoneNumber,
+            gender = input.gender,
+        )
+    }
+
+    fun mapSavedPassengerDomainToEntity(
+        input: SavedPassenger,
+    ): SavedPassengerEntity {
+        return SavedPassengerEntity(
+            id = input.id,
+            fullName = input.fullName,
+            nik = input.nik,
+            phoneNumber = input.phoneNumber,
+            gender = input.gender,
+            createdAtMillis = System.currentTimeMillis(),
+        )
     }
 }

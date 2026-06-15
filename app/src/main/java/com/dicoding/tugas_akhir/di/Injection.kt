@@ -3,7 +3,6 @@ package com.dicoding.tugas_akhir.di
 import com.dicoding.tugas_akhir.TugasAkhirApplication
 import com.dicoding.tugas_akhir.data.local.LocalDataSource
 import com.dicoding.tugas_akhir.data.local.datastore.ProfileDataStore
-import com.dicoding.tugas_akhir.data.local.datastore.SavedPassengerDataStore
 import com.dicoding.tugas_akhir.data.local.datastore.SettingsDataStore
 import com.dicoding.tugas_akhir.data.local.room.AppDatabase
 import com.dicoding.tugas_akhir.data.remote.datasource.FakeRemoteDataSource
@@ -95,15 +94,11 @@ object Injection {
         )
     }
 
-    private fun provideSavedPassengerDataStore(): SavedPassengerDataStore {
-        return SavedPassengerDataStore.getInstance(
-            context = TugasAkhirApplication.instance,
-        )
-    }
-
     fun provideSavedPassengerRepository(): SavedPassengerRepository {
+        val database = provideAppDatabase()
+
         return SavedPassengerRepository.getInstance(
-            dataStore = provideSavedPassengerDataStore(),
+            savedPassengerDao = database.savedPassengerDao(),
         )
     }
 

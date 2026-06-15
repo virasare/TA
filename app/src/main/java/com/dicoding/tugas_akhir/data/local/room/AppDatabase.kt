@@ -11,6 +11,8 @@ import com.dicoding.tugas_akhir.data.local.room.entity.BookingEntity
 import com.dicoding.tugas_akhir.data.local.room.entity.NotificationEntity
 import com.dicoding.tugas_akhir.data.local.room.entity.PassengerEntity
 import com.dicoding.tugas_akhir.data.local.room.entity.PaymentEntity
+import com.dicoding.tugas_akhir.data.local.room.dao.SavedPassengerDao
+import com.dicoding.tugas_akhir.data.local.room.entity.SavedPassengerEntity
 
 @Database(
     entities = [
@@ -18,6 +20,7 @@ import com.dicoding.tugas_akhir.data.local.room.entity.PaymentEntity
         PassengerEntity::class,
         PaymentEntity::class,
         NotificationEntity::class,
+        SavedPassengerEntity::class,
     ],
     version = 2,
     exportSchema = false,
@@ -29,6 +32,8 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun paymentDao(): PaymentDao
 
     abstract fun notificationDao(): NotificationDao
+
+    abstract fun savedPassengerDao(): SavedPassengerDao
 
     companion object {
         @Volatile

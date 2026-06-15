@@ -1,27 +1,39 @@
 package com.dicoding.tugas_akhir.data.repository
 
-import com.dicoding.tugas_akhir.data.local.datastore.SavedPassengerDataStore
+import com.dicoding.tugas_akhir.data.local.room.dao.SavedPassengerDao
+import com.dicoding.tugas_akhir.data.mapper.DataMapper
 import com.dicoding.tugas_akhir.domain.model.SavedPassenger
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 
 class SavedPassengerRepository private constructor(
-    private val dataStore: SavedPassengerDataStore,
+    private val savedPassengerDao: SavedPassengerDao,
 ) {
 
     fun getSavedPassengers(): Flow<List<SavedPassenger>> {
-        return dataStore.passengersFlow
+        return savedPassengerDao.getSavedPassengers().map { entities ->
+            entities.map {
+                DataMapper.mapSavedPassengerEntityToDomain(it)
+            }
+        }
     }
 
     suspend fun getSavedPassengerById(id: String): SavedPassenger? {
-        return dataStore.getPassengerById(id)
+        return savedPassengerDao.getSavedPassengerById(id)?.let {
+            DataMapper.mapSavedPassengerEntityToDomain(it)
+        }
     }
 
     suspend fun savePassenger(passenger: SavedPassenger) {
-        dataStore.savePassenger(passenger)
+        savedPassengerDao.insertSavedPassenger(
+            DataMapper.mapSavedPassengerDomainToEntity(passenger)
+        )
     }
 
     suspend fun deletePassenger(passenger: SavedPassenger) {
-        dataStore.deletePassenger(passenger)
+        savedPassengerDao.deleteSavedPassenger(
+            DataMapper.mapSavedPassengerDomainToEntity(passenger)
+        )
     }
 
     companion object {
@@ -29,10 +41,10 @@ class SavedPassengerRepository private constructor(
         private var INSTANCE: SavedPassengerRepository? = null
 
         fun getInstance(
-            dataStore: SavedPassengerDataStore,
+            savedPassengerDao: SavedPassengerDao,
         ): SavedPassengerRepository {
             return INSTANCE ?: synchronized(this) {
-                val instance = SavedPassengerRepository(dataStore)
+                val instance = SavedPassengerRepository(savedPassengerDao)
                 INSTANCE = instance
                 instance
             }
