@@ -38,6 +38,8 @@ import androidx.compose.ui.unit.dp
 import com.dicoding.tugas_akhir.domain.model.AppNotification
 import com.dicoding.tugas_akhir.domain.model.NotificationType
 import com.dicoding.tugas_akhir.ui.theme.Primary2
+import androidx.compose.material3.FilterChipDefaults
+import androidx.compose.material3.TextButton
 
 @Composable
 fun NotificationSummaryCard(
@@ -123,6 +125,8 @@ fun NotificationFilterSection(
     onMarkAllAsRead: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val colors = MaterialTheme.colorScheme
+
     Row(
         modifier = modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -136,19 +140,27 @@ fun NotificationFilterSection(
                     selected = selectedFilter == filter,
                     onClick = { onFilterSelected(filter) },
                     label = { Text(filter.label) },
+                    colors = FilterChipDefaults.filterChipColors(
+                        containerColor = colors.surface,
+                        labelColor = colors.onSurfaceVariant,
+                        selectedContainerColor = colors.primaryContainer,
+                        selectedLabelColor = colors.onPrimaryContainer,
+                    ),
+                    border = FilterChipDefaults.filterChipBorder(
+                        enabled = true,
+                        selected = selectedFilter == filter,
+                        borderColor = colors.outlineVariant,
+                        selectedBorderColor = colors.primary,
+                    ),
                 )
             }
         }
 
-        Text(
-            text = "Tandai semua",
-            style = MaterialTheme.typography.labelMedium,
-            color = MaterialTheme.colorScheme.primary,
-            fontWeight = FontWeight.SemiBold,
-            modifier = Modifier.clickable {
-                onMarkAllAsRead()
-            },
-        )
+        TextButton(
+            onClick = onMarkAllAsRead,
+        ) {
+            Text("Tandai semua")
+        }
     }
 }
 
@@ -160,58 +172,50 @@ fun AppNotificationCard(
     modifier: Modifier = Modifier,
 ) {
     val icon = notification.type.toIcon()
-    val color = notification.type.toColor()
+    val accentColor = notification.type.toColor()
+    val colors = MaterialTheme.colorScheme
 
-    Card(
+    val rowBackground = if (notification.isRead) {
+        Color.Transparent
+    } else {
+        colors.primaryContainer.copy(alpha = 0.32f)
+    }
+
+    Column(
         modifier = modifier
             .fillMaxWidth()
-            .clickable {
-                onClick()
-            },
-        shape = RoundedCornerShape(22.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = if (notification.isRead) {
-                Color.White
-            } else {
-                Color(0xFFF3F9FF)
-            },
-        ),
-        border = BorderStroke(
-            width = 1.dp,
-            color = if (notification.isRead) {
-                Color(0xFFE3EAF2)
-            } else {
-                Color(0xFFB7DBFF)
-            },
-        ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+            .background(
+                color = rowBackground,
+                shape = RoundedCornerShape(18.dp),
+            )
+            .clickable { onClick() },
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
+                .padding(horizontal = 12.dp, vertical = 14.dp),
             horizontalArrangement = Arrangement.spacedBy(14.dp),
             verticalAlignment = Alignment.Top,
         ) {
             Box(
                 modifier = Modifier
-                    .size(44.dp)
+                    .size(42.dp)
                     .background(
-                        color = color.copy(alpha = 0.12f),
-                        shape = RoundedCornerShape(16.dp),
+                        color = accentColor.copy(alpha = 0.14f),
+                        shape = RoundedCornerShape(14.dp),
                     ),
                 contentAlignment = Alignment.Center,
             ) {
                 Icon(
                     imageVector = icon,
                     contentDescription = null,
-                    tint = color,
+                    tint = accentColor,
                 )
             }
 
             Column(
                 modifier = Modifier.weight(1f),
-                verticalArrangement = Arrangement.spacedBy(6.dp),
+                verticalArrangement = Arrangement.spacedBy(5.dp),
             ) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -220,19 +224,19 @@ fun AppNotificationCard(
                     Text(
                         text = notification.title,
                         style = MaterialTheme.typography.titleSmall,
-                        fontWeight = FontWeight.Bold,
-                        color = Color(0xFF102A43),
+                        fontWeight = FontWeight.SemiBold,
+                        color = colors.onSurface,
                         modifier = Modifier.weight(1f),
                     )
 
                     if (!notification.isRead) {
                         Box(
                             modifier = Modifier
-                                .size(9.dp)
+                                .size(8.dp)
                                 .background(
-                                    color = Color(0xFF1976D2),
+                                    color = colors.primary,
                                     shape = CircleShape,
-                                )
+                                ),
                         )
                     }
                 }
@@ -240,40 +244,32 @@ fun AppNotificationCard(
                 Text(
                     text = notification.message,
                     style = MaterialTheme.typography.bodySmall,
-                    color = Color(0xFF627D98),
+                    color = colors.onSurfaceVariant,
                 )
 
-                HorizontalDivider(
-                    color = Color(0xFFE9EEF5),
-                    modifier = Modifier.padding(top = 2.dp),
+                Text(
+                    text = formatNotificationTime(notification.createdAt),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = colors.onSurfaceVariant.copy(alpha = 0.78f),
                 )
+            }
 
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Text(
-                        text = formatNotificationTime(notification.createdAt),
-                        style = MaterialTheme.typography.labelSmall,
-                        color = Color(0xFF829AB1),
-                    )
-
-                    Spacer(modifier = Modifier.weight(1f))
-
-                    IconButton(
-                        onClick = onDeleteClick,
-                        modifier = Modifier.size(32.dp),
-                    ) {
-                        Icon(
-                            imageVector = Icons.Outlined.DeleteOutline,
-                            contentDescription = "Hapus notifikasi",
-                            tint = Color(0xFFD32F2F),
-                            modifier = Modifier.size(18.dp),
-                        )
-                    }
-                }
+            IconButton(
+                onClick = onDeleteClick,
+                modifier = Modifier.size(34.dp),
+            ) {
+                Icon(
+                    imageVector = Icons.Outlined.DeleteOutline,
+                    contentDescription = "Hapus notifikasi",
+                    tint = colors.error,
+                    modifier = Modifier.size(18.dp),
+                )
             }
         }
+
+        HorizontalDivider(
+            color = colors.outlineVariant.copy(alpha = 0.72f),
+        )
     }
 }
 

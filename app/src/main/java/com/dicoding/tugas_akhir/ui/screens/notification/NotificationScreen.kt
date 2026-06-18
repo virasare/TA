@@ -26,7 +26,6 @@ import com.dicoding.tugas_akhir.ui.components.notification.AppNotificationCard
 import com.dicoding.tugas_akhir.ui.components.notification.NotificationCardPlaceholder
 import com.dicoding.tugas_akhir.ui.components.notification.NotificationFilter
 import com.dicoding.tugas_akhir.ui.components.notification.NotificationFilterSection
-import com.dicoding.tugas_akhir.ui.components.notification.NotificationSummaryCard
 import com.dicoding.tugas_akhir.ui.viewmodel.NotificationViewModel
 import com.dicoding.tugas_akhir.ui.viewmodel.ViewModelFactory
 
