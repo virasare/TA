@@ -673,16 +673,20 @@ fun StepCard(
     description: String = "",
     text: String = "",
 ) {
+    val colors = MaterialTheme.colorScheme
     val displayedDescription = description.ifBlank { text }
 
     Card(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = colors.surface,
+        ),
         border = BorderStroke(
             width = 1.dp,
-            color = MaterialTheme.colorScheme.outlineVariant,
+            color = colors.outlineVariant,
         ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
     ) {
         Row(
             modifier = Modifier.padding(16.dp),
@@ -693,13 +697,13 @@ fun StepCard(
                 modifier = Modifier
                     .size(32.dp)
                     .clip(CircleShape)
-                    .background(MaterialTheme.colorScheme.primary),
+                    .background(Primary2),
                 contentAlignment = Alignment.Center,
             ) {
                 Text(
                     text = number.toString(),
                     style = MaterialTheme.typography.titleSmall,
-                    color = MaterialTheme.colorScheme.onPrimary,
+                    color = Color.White,
                     fontWeight = FontWeight.Bold,
                 )
             }
@@ -712,6 +716,8 @@ fun StepCard(
                     Text(
                         text = title,
                         style = MaterialTheme.typography.titleSmall,
+                        color = colors.onSurface,
+                        fontWeight = FontWeight.SemiBold,
                     )
                 }
 
@@ -719,7 +725,7 @@ fun StepCard(
                     Text(
                         text = displayedDescription,
                         style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        color = colors.onSurfaceVariant,
                     )
                 }
             }
