@@ -24,6 +24,10 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import com.dicoding.tugas_akhir.ui.theme.Neutral300
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.material3.CircularProgressIndicator
 
 enum class PrimaryButtonVariant {
     Blue,
@@ -37,6 +41,7 @@ fun PrimaryButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
+    isLoading: Boolean = false,
     variant: PrimaryButtonVariant = PrimaryButtonVariant.Blue,
     leadingIcon: ImageVector? = null
 ) {
@@ -48,7 +53,7 @@ fun PrimaryButton(
 
     Button(
         onClick = onClick,
-        enabled = enabled,
+        enabled = enabled && !isLoading,
         modifier = modifier
             .fillMaxWidth()
             .height(48.dp),
@@ -60,16 +65,34 @@ fun PrimaryButton(
         colors = ButtonDefaults.buttonColors(
             containerColor = containerColor,
             contentColor = White,
-            disabledContainerColor = Neutral200,
-            disabledContentColor = Neutral300
+            disabledContainerColor = if (isLoading) {
+                containerColor.copy(alpha = 0.72f)
+            } else {
+                Neutral200
+            },
+            disabledContentColor = if (isLoading) {
+                White
+            } else {
+                Neutral300
+            }
         )
     ) {
-        if (leadingIcon != null) {
+        if (isLoading) {
+            CircularProgressIndicator(
+                modifier = Modifier.size(18.dp),
+                strokeWidth = 2.dp,
+                color = White,
+            )
+
+            Spacer(modifier = Modifier.width(8.dp))
+        } else if (leadingIcon != null) {
             Icon(
                 imageVector = leadingIcon,
                 contentDescription = null,
                 tint = Color.Unspecified
             )
+
+            Spacer(modifier = Modifier.width(8.dp))
         }
 
         Text(

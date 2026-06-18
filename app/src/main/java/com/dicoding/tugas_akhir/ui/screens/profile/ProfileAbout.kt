@@ -31,7 +31,7 @@ fun ProfileAboutScreen(
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background),
         contentPadding = PaddingValues(16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp),
+        verticalArrangement = Arrangement.spacedBy(18.dp),
     ) {
         item {
             InfoNote(
@@ -44,13 +44,13 @@ fun ProfileAboutScreen(
             StaticInfoSection(title = strings.information) {
                 StaticInfoItem(
                     title = strings.appVersion,
-                    subtitle = "Release build",
+                    subtitle = "Versi 1.0.0",
                     icon = Icons.Outlined.Verified,
                 )
 
                 StaticInfoItem(
                     title = strings.platform,
-                    subtitle = "Jetpack Compose",
+                    subtitle = "Android - Jetpack Compose",
                     icon = Icons.Outlined.Android,
                 )
 
@@ -65,26 +65,26 @@ fun ProfileAboutScreen(
         item {
             StaticInfoSection(title = strings.mainFeature) {
                 StaticInfoItem(
-                    title = "Cari Jadwal Kapal",
-                    subtitle = "Mencari jadwal berdasarkan pelabuhan asal, tujuan, dan tanggal.",
+                    title = "Pencarian Jadwal",
+                    subtitle = "Mencari jadwal kapal berdasarkan pelabuhan asal, tujuan, dan tanggal keberangkatan.",
                     icon = Icons.Outlined.CheckCircle,
                 )
 
                 StaticInfoItem(
-                    title = "Booking dan Pembayaran",
-                    subtitle = "Melakukan pemesanan tiket dan melihat instruksi pembayaran.",
+                    title = "Booking Tiket",
+                    subtitle = "Memesan tiket kapal dan mengisi data penumpang dengan lebih cepat.",
+                    icon = Icons.Outlined.CheckCircle,
+                )
+
+                StaticInfoItem(
+                    title = "Pembayaran",
+                    subtitle = "Menampilkan metode pembayaran serta instruksi sesuai pilihan pengguna.",
                     icon = Icons.Outlined.CheckCircle,
                 )
 
                 StaticInfoItem(
                     title = "E-Ticket",
-                    subtitle = "Menampilkan tiket digital setelah pembayaran berhasil.",
-                    icon = Icons.Outlined.CheckCircle,
-                )
-
-                StaticInfoItem(
-                    title = "Data Penumpang",
-                    subtitle = "Menyimpan data penumpang untuk mempercepat proses booking.",
+                    subtitle = "Menampilkan tiket digital setelah pembayaran berhasil dikonfirmasi.",
                     icon = Icons.Outlined.CheckCircle,
                 )
             }
@@ -92,7 +92,7 @@ fun ProfileAboutScreen(
 
         item {
             InfoNote(
-                title = strings.information,
+                title = "Catatan",
                 text = strings.dataNote,
             )
         }

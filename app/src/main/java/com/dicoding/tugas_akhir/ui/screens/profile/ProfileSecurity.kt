@@ -16,6 +16,12 @@ import com.dicoding.tugas_akhir.ui.components.profile.InfoNote
 import com.dicoding.tugas_akhir.ui.localization.LocalAppStrings
 import com.dicoding.tugas_akhir.ui.components.profile.StaticInfoItem
 import com.dicoding.tugas_akhir.ui.components.profile.StaticInfoSection
+import androidx.compose.material.icons.outlined.Devices
+import androidx.compose.material.icons.outlined.Key
+import androidx.compose.material.icons.outlined.PrivacyTip
+import androidx.compose.material3.MaterialTheme
+import com.dicoding.tugas_akhir.ui.components.profile.ProfileFormCard
+import com.dicoding.tugas_akhir.ui.components.profile.StepCard
 
 @Composable
 fun ProfileSecurityScreen(
@@ -26,9 +32,9 @@ fun ProfileSecurityScreen(
     LazyColumn(
         modifier = modifier
             .fillMaxSize()
-            .background(androidx.compose.material3.MaterialTheme.colorScheme.background),
+            .background(MaterialTheme.colorScheme.background),
         contentPadding = PaddingValues(16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp),
+        verticalArrangement = Arrangement.spacedBy(18.dp),
     ) {
         item {
             InfoNote(
@@ -38,7 +44,7 @@ fun ProfileSecurityScreen(
         }
 
         item {
-            StaticInfoSection(title = strings.security) {
+            StaticInfoSection(title = "Status Akun") {
                 StaticInfoItem(
                     title = strings.loginStatus,
                     subtitle = strings.accountActive,
@@ -60,9 +66,55 @@ fun ProfileSecurityScreen(
         }
 
         item {
-            InfoNote(
+            StaticInfoSection(title = "Perlindungan Data") {
+                StaticInfoItem(
+                    title = "Data Penumpang",
+                    subtitle = "Gunakan data penumpang hanya untuk kebutuhan pemesanan tiket.",
+                    icon = Icons.Outlined.PrivacyTip,
+                )
+
+                StaticInfoItem(
+                    title = "Kode Pembayaran",
+                    subtitle = "Jangan bagikan kode pembayaran atau bukti transaksi ke orang lain.",
+                    icon = Icons.Outlined.Key,
+                )
+
+                StaticInfoItem(
+                    title = "Perangkat Bersama",
+                    subtitle = "Logout setelah menggunakan aplikasi di perangkat yang bukan milik pribadi.",
+                    icon = Icons.Outlined.Devices,
+                )
+            }
+        }
+
+        item {
+            ProfileFormCard(
                 title = "Tips Keamanan",
-                text = "Gunakan akun pribadi, jangan bagikan e-ticket atau kode pembayaran, dan selalu logout jika memakai perangkat bersama.",
+            ) {
+                StepCard(
+                    number = 1,
+                    title = "Gunakan akun pribadi",
+                    description = "Masuk menggunakan akun yang hanya kamu gunakan sendiri.",
+                )
+
+                StepCard(
+                    number = 2,
+                    title = "Periksa detail transaksi",
+                    description = "Pastikan nama kapal, tanggal, rute, dan nominal pembayaran sudah benar.",
+                )
+
+                StepCard(
+                    number = 3,
+                    title = "Simpan e-ticket dengan aman",
+                    description = "E-ticket berisi informasi perjalanan yang sebaiknya tidak dibagikan sembarangan.",
+                )
+            }
+        }
+
+        item {
+            InfoNote(
+                title = "Peringatan",
+                text = "Aplikasi tidak pernah meminta password, PIN, atau kode OTP melalui chat pribadi.",
             )
         }
     }

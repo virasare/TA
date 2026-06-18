@@ -133,6 +133,7 @@ fun PassengerFormScreen(
     if (showSavedPassengerSheet) {
         SavedPassengerPickerSheet(
             passengers = savedPassengerUiState.savedPassengers,
+            isLoading = savedPassengerUiState.isSavedPassengerLoading,
             onPassengerClick = { passenger ->
                 viewModel.updatePassengerFullName(selectedPassengerIndex, passenger.fullName)
                 viewModel.updatePassengerNik(selectedPassengerIndex, passenger.nik)
@@ -229,6 +230,7 @@ fun PassengerFormScreen(
             item {
                 SavedPassengerBookingActionCard(
                     savedPassengerCount = savedPassengerUiState.savedPassengers.size,
+                    isLoading = savedPassengerUiState.isSavedPassengerLoading,
                     onPickSavedPassengerClick = {
                         showSavedPassengerSheet = true
                     },

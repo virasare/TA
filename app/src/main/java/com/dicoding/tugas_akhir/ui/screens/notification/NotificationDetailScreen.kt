@@ -44,6 +44,9 @@ import com.dicoding.tugas_akhir.ui.viewmodel.ViewModelFactory
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import androidx.compose.foundation.layout.height
+import com.dicoding.tugas_akhir.ui.components.loading.shimmerEffect
+import com.dicoding.tugas_akhir.ui.components.lottie.LottieStateView
 
 @Composable
 fun NotificationDetailScreen(
@@ -55,6 +58,8 @@ fun NotificationDetailScreen(
 ) {
     val notifications by viewModel.notifications.collectAsStateWithLifecycle()
 
+    val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
+
     val notification = notifications.find {
         it.id == notificationId
     }
@@ -63,15 +68,25 @@ fun NotificationDetailScreen(
         viewModel.markAsRead(notificationId)
     }
 
-    if (notification == null) {
-        NotificationNotFound(
-            modifier = modifier,
-        )
-    } else {
-        NotificationDetailContent(
-            notification = notification,
-            modifier = modifier,
-        )
+    when {
+        isLoading -> {
+            NotificationDetailPlaceholder(
+                modifier = modifier,
+            )
+        }
+
+        notification == null -> {
+            NotificationNotFound(
+                modifier = modifier,
+            )
+        }
+
+        else -> {
+            NotificationDetailContent(
+                notification = notification,
+                modifier = modifier,
+            )
+        }
     }
 }
 
@@ -166,6 +181,119 @@ private fun NotificationDetailContent(
 }
 
 @Composable
+private fun NotificationDetailPlaceholder(
+    modifier: Modifier = Modifier,
+) {
+    LazyColumn(
+        modifier = modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background),
+        contentPadding = PaddingValues(16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
+    ) {
+        item {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(
+                        color = MaterialTheme.colorScheme.surface,
+                        shape = RoundedCornerShape(26.dp),
+                    )
+                    .padding(20.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+            ) {
+                Box(
+                    modifier = Modifier
+                        .size(72.dp)
+                        .shimmerEffect(cornerRadius = 36),
+                )
+
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth(0.72f)
+                        .height(22.dp)
+                        .shimmerEffect(),
+                )
+
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(14.dp)
+                        .shimmerEffect(),
+                )
+
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth(0.86f)
+                        .height(14.dp)
+                        .shimmerEffect(),
+                )
+
+                HorizontalDivider(
+                    color = MaterialTheme.colorScheme.outlineVariant,
+                )
+
+                repeat(3) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth(0.38f)
+                                .height(14.dp)
+                                .shimmerEffect(),
+                        )
+
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth(0.42f)
+                                .height(14.dp)
+                                .shimmerEffect(),
+                        )
+                    }
+                }
+            }
+        }
+
+        item {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(
+                        color = MaterialTheme.colorScheme.surfaceVariant,
+                        shape = RoundedCornerShape(18.dp),
+                    )
+                    .padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(10.dp),
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth(0.42f)
+                        .height(16.dp)
+                        .shimmerEffect(),
+                )
+
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(13.dp)
+                        .shimmerEffect(),
+                )
+
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth(0.78f)
+                        .height(13.dp)
+                        .shimmerEffect(),
+                )
+            }
+        }
+    }
+}
+
+@Composable
 private fun NotificationDetailRow(
     title: String,
     value: String,
@@ -205,10 +333,10 @@ private fun NotificationNotFound(
             .padding(24.dp),
         contentAlignment = Alignment.Center,
     ) {
-        Text(
-            text = "Notifikasi tidak ditemukan",
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        LottieStateView(
+            animationFile = "empty.json",
+            title = "Notifikasi tidak ditemukan",
+            message = "Data notifikasi mungkin sudah dihapus atau belum tersedia.",
         )
     }
 }

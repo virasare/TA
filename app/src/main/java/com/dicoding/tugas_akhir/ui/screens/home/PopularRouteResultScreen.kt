@@ -91,7 +91,7 @@ fun PopularRouteResultScreen(
         if (schedules.isEmpty()) {
             item {
                 LottieStateView(
-                    animationFile = "empty.json",
+                    animationFile = "empty_schedule.json",
                     title = "Jadwal belum tersedia",
                     message = "Belum ada jadwal untuk rute ${popularRoute.route}.",
                 )

@@ -967,7 +967,7 @@ fun StaticInfoItem(
             Icon(
                 imageVector = icon,
                 contentDescription = null,
-                tint = MaterialTheme.colorScheme.primary,
+                tint = Primary2,
             )
         }
 
@@ -979,7 +979,7 @@ fun StaticInfoItem(
                 text = title,
                 style = MaterialTheme.typography.titleSmall,
                 fontWeight = FontWeight.SemiBold,
-                color = MaterialTheme.colorScheme.onBackground,
+                color = MaterialTheme.colorScheme.onSurface,
             )
 
             Text(

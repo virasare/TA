@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import java.util.UUID
+import kotlinx.coroutines.delay
 
 class BookingPassengerFormViewModel(
     private val savedPassengerRepository: SavedPassengerRepository,
@@ -25,8 +26,11 @@ class BookingPassengerFormViewModel(
     private fun observeSavedPassengers() {
         viewModelScope.launch {
             savedPassengerRepository.getSavedPassengers().collect { passengers ->
+                delay(300L)
+
                 _uiState.value = _uiState.value.copy(
                     savedPassengers = passengers,
+                    isSavedPassengerLoading = false,
                 )
             }
         }
@@ -205,6 +209,7 @@ data class BookingPassengerFormUiState(
     val savedPassengers: List<SavedPassenger> = emptyList(),
     val selectedPassengerIndex: Int? = null,
     val isSavedPassengerSheetVisible: Boolean = false,
+    val isSavedPassengerLoading: Boolean = true,
 ) {
     val isFormValid: Boolean
         get() = passengers.isNotEmpty() && passengers.all { it.isValid }

@@ -28,10 +28,16 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.dicoding.tugas_akhir.domain.model.SavedPassenger
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.size
+import androidx.compose.ui.draw.clip
+import com.dicoding.tugas_akhir.ui.components.loading.shimmerEffect
 
 @Composable
 fun SavedPassengerBookingActionCard(
     savedPassengerCount: Int,
+    isLoading: Boolean = false,
     onPickSavedPassengerClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -58,29 +64,45 @@ fun SavedPassengerBookingActionCard(
                 modifier = Modifier.weight(1f),
                 verticalArrangement = Arrangement.spacedBy(3.dp),
             ) {
-                Text(
-                    text = "Data Penumpang Tersimpan",
-                    style = MaterialTheme.typography.titleSmall,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onSurface,
-                )
+                if (isLoading) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth(0.72f)
+                            .height(16.dp)
+                            .shimmerEffect(),
+                    )
 
-                Text(
-                    text = if (savedPassengerCount > 0) {
-                        "Pilih data yang sudah tersimpan agar form terisi otomatis."
-                    } else {
-                        "Belum ada data tersimpan di profil."
-                    },
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth(0.9f)
+                            .height(13.dp)
+                            .shimmerEffect(),
+                    )
+                } else {
+                    Text(
+                        text = "Data Penumpang Tersimpan",
+                        style = MaterialTheme.typography.titleSmall,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onSurface,
+                    )
+
+                    Text(
+                        text = if (savedPassengerCount > 0) {
+                            "Pilih data yang sudah tersimpan agar form terisi otomatis."
+                        } else {
+                            "Belum ada data tersimpan di profil."
+                        },
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
             }
 
             OutlinedButton(
                 onClick = onPickSavedPassengerClick,
-                enabled = savedPassengerCount > 0,
+                enabled = !isLoading && savedPassengerCount > 0,
             ) {
-                Text("Ambil Data")
+                Text(if (isLoading) "Memuat" else "Ambil Data")
             }
         }
     }
@@ -143,6 +165,7 @@ fun SavePassengerDataCheckboxCard(
 @Composable
 fun SavedPassengerPickerSheet(
     passengers: List<SavedPassenger>,
+    isLoading: Boolean = false,
     onPassengerClick: (SavedPassenger) -> Unit,
     onDismiss: () -> Unit,
 ) {
@@ -169,13 +192,19 @@ fun SavedPassengerPickerSheet(
                 color = Color(0xFF627D98),
             )
 
-            passengers.forEach { passenger ->
-                SavedPassengerOptionCard(
-                    passenger = passenger,
-                    onClick = {
-                        onPassengerClick(passenger)
-                    },
-                )
+            if (isLoading) {
+                repeat(3) {
+                    SavedPassengerOptionPlaceholder()
+                }
+            } else {
+                passengers.forEach { passenger ->
+                    SavedPassengerOptionCard(
+                        passenger = passenger,
+                        onClick = {
+                            onPassengerClick(passenger)
+                        },
+                    )
+                }
             }
         }
     }
@@ -246,6 +275,62 @@ private fun SavedPassengerOptionCard(
                     text = passenger.phoneNumber,
                     style = MaterialTheme.typography.labelMedium,
                     color = Color(0xFF829AB1),
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun SavedPassengerOptionPlaceholder(
+    modifier: Modifier = Modifier,
+) {
+    Card(
+        modifier = modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(18.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface,
+        ),
+        border = BorderStroke(
+            width = 1.dp,
+            color = MaterialTheme.colorScheme.outlineVariant,
+        ),
+    ) {
+        Row(
+            modifier = Modifier.padding(14.dp),
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(42.dp)
+                    .clip(RoundedCornerShape(14.dp))
+                    .shimmerEffect(),
+            )
+
+            Column(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth(0.65f)
+                        .height(15.dp)
+                        .shimmerEffect(),
+                )
+
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth(0.82f)
+                        .height(12.dp)
+                        .shimmerEffect(),
+                )
+
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth(0.48f)
+                        .height(11.dp)
+                        .shimmerEffect(),
                 )
             }
         }

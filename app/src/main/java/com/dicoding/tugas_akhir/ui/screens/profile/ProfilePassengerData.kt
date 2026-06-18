@@ -13,7 +13,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -25,6 +24,8 @@ import com.dicoding.tugas_akhir.ui.components.profile.PassengerDataCard
 import com.dicoding.tugas_akhir.ui.components.lottie.LottieStateView
 import com.dicoding.tugas_akhir.ui.viewmodel.SavedPassengerViewModel
 import com.dicoding.tugas_akhir.ui.viewmodel.ViewModelFactory
+import androidx.compose.material3.MaterialTheme
+import com.dicoding.tugas_akhir.ui.components.loading.PassengerDataPlaceholder
 
 @Composable
 fun PassengerDataScreen(
@@ -36,6 +37,8 @@ fun PassengerDataScreen(
     ),
 ) {
     val passengers by viewModel.passengers.collectAsStateWithLifecycle()
+    val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
+
     var selectedDeletePassenger by remember { mutableStateOf<SavedPassenger?>(null) }
 
     if (selectedDeletePassenger != null) {
@@ -59,7 +62,7 @@ fun PassengerDataScreen(
     LazyColumn(
         modifier = modifier
             .fillMaxSize()
-            .background(Color(0xFFF7FAFC))
+            .background(MaterialTheme.colorScheme.background)
             .navigationBarsPadding(),
         contentPadding = PaddingValues(16.dp),
         verticalArrangement = Arrangement.spacedBy(14.dp),
@@ -76,7 +79,11 @@ fun PassengerDataScreen(
             )
         }
 
-        if (passengers.isEmpty()) {
+        if (isLoading) {
+            item {
+                PassengerDataPlaceholder()
+            }
+        } else if (passengers.isEmpty()) {
             item {
                 LottieStateView(
                     animationFile = "empty.json",

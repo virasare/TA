@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -17,7 +18,6 @@ import androidx.compose.ui.unit.dp
 import com.dicoding.tugas_akhir.ui.components.dialog.buttons.PrimaryButton
 import com.dicoding.tugas_akhir.ui.components.ticket.ManageTicketInfoCard
 import com.dicoding.tugas_akhir.ui.components.ticket.RefundReasonCard
-import com.dicoding.tugas_akhir.ui.theme.Background
 import com.dicoding.tugas_akhir.ui.components.dialog.ConfirmActionDialog
 
 @Composable
@@ -38,6 +38,10 @@ fun RefundScreen(
         mutableStateOf(false)
     }
 
+    var isSubmitting by remember {
+        mutableStateOf(false)
+    }
+
     val isValid = selectedReason.isNotBlank() &&
             (selectedReason != "Alasan lain" || customReason.isNotBlank())
 
@@ -48,6 +52,7 @@ fun RefundScreen(
             confirmText = "Ya, ajukan",
             onConfirm = {
                 showRefundConfirm = false
+                isSubmitting = true
                 onSubmitClick(bookingId)
             },
             onDismiss = {
@@ -59,7 +64,7 @@ fun RefundScreen(
     Column(
         modifier = modifier
             .fillMaxSize()
-            .background(Background),
+            .background(MaterialTheme.colorScheme.background),
     ) {
         LazyColumn(
             modifier = Modifier.weight(1f),
@@ -88,13 +93,13 @@ fun RefundScreen(
         }
 
         PrimaryButton(
-            text = "Ajukan Refund",
+            text = if (isSubmitting) "Mengajukan Refund..." else "Ajukan Refund",
             onClick = {
                 showRefundConfirm = true
             },
-            enabled = isValid,
-            modifier = Modifier
-                .navigationBarsPadding()
+            enabled = isValid && !isSubmitting,
+            isLoading = isSubmitting,
+            modifier = Modifier.navigationBarsPadding()
         )
     }
 }

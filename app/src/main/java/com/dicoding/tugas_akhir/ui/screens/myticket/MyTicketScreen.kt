@@ -104,7 +104,7 @@ fun MyTicketScreen(
             is MyTicketUiState.Error -> {
                 item {
                     LottieStateView(
-                        animationFile = "error_connection.json",
+                        animationFile = "no_internet.json",
                         title = "Terjadi Kesalahan",
                         message = state.message,
                     )

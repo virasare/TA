@@ -250,52 +250,19 @@ private fun EmptyScheduleState(
 
 @Composable
 private fun ErrorScheduleState(
-    message: String
+    message: String,
 ) {
     Box(
         modifier = Modifier
             .fillMaxSize()
             .padding(24.dp),
-        contentAlignment = Alignment.Center
+        contentAlignment = Alignment.Center,
     ) {
-        Surface(
-            color = White,
-            shape = MaterialTheme.shapes.large,
-            border = BorderStroke(1.dp, Neutral200)
-        ) {
-            Column(
-                modifier = Modifier.padding(24.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                Surface(
-                    color = Primary3,
-                    shape = RoundedCornerShape(16.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.Outlined.WarningAmber,
-                        contentDescription = null,
-                        tint = Primary2,
-                        modifier = Modifier.padding(18.dp)
-                    )
-                }
-
-                Text(
-                    text = "Gagal memuat jadwal",
-                    color = Neutral700,
-                    fontWeight = FontWeight.Bold,
-                    style = MaterialTheme.typography.titleMedium,
-                    textAlign = TextAlign.Center
-                )
-
-                Text(
-                    text = message,
-                    color = Neutral500,
-                    style = MaterialTheme.typography.bodyMedium,
-                    textAlign = TextAlign.Center
-                )
-            }
-        }
+        LottieStateView(
+            animationFile = "no_internet.json",
+            title = "Gagal memuat jadwal",
+            message = message,
+        )
     }
 }
 

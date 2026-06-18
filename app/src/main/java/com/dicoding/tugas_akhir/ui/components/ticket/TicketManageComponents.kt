@@ -28,11 +28,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.dicoding.tugas_akhir.ui.theme.Neutral500
-import com.dicoding.tugas_akhir.ui.theme.Neutral700
 import com.dicoding.tugas_akhir.ui.theme.Primary2
-import com.dicoding.tugas_akhir.ui.theme.Primary3
-import com.dicoding.tugas_akhir.ui.theme.White
 
 @Composable
 fun ManageTicketInfoCard(
@@ -40,13 +36,18 @@ fun ManageTicketInfoCard(
     description: String,
     modifier: Modifier = Modifier,
 ) {
+    val colors = MaterialTheme.colorScheme
+
     Card(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(20.dp),
         colors = CardDefaults.cardColors(
-            containerColor = Primary3,
+            containerColor = colors.primaryContainer.copy(alpha = 0.55f),
         ),
-        border = BorderStroke(1.dp, Color(0xFFD7E9FF)),
+        border = BorderStroke(
+            width = 1.dp,
+            color = colors.outlineVariant,
+        ),
     ) {
         Row(
             modifier = Modifier.padding(16.dp),
@@ -56,7 +57,7 @@ fun ManageTicketInfoCard(
             Icon(
                 imageVector = Icons.Outlined.Info,
                 contentDescription = null,
-                tint = Primary2,
+                tint = colors.primary,
             )
 
             Column(
@@ -66,13 +67,13 @@ fun ManageTicketInfoCard(
                     text = title,
                     style = MaterialTheme.typography.titleSmall,
                     fontWeight = FontWeight.Bold,
-                    color = Neutral700,
+                    color = colors.onSurface,
                 )
 
                 Text(
                     text = description,
                     style = MaterialTheme.typography.bodySmall,
-                    color = Neutral500,
+                    color = colors.onSurfaceVariant,
                 )
             }
         }
@@ -98,8 +99,8 @@ fun RefundReasonCard(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(22.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        border = BorderStroke(1.dp, Color(0xFFE3EAF2)),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
     ) {
         Column(
             modifier = Modifier.padding(18.dp),
@@ -119,11 +120,11 @@ fun RefundReasonCard(
                     text = "Alasan Refund",
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
-                    color = Neutral700,
+                    color = MaterialTheme.colorScheme.onSurface,
                 )
             }
 
-            HorizontalDivider(color = Color(0xFFE9EEF5))
+            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
 
             reasons.forEach { reason ->
                 Row(
@@ -144,7 +145,7 @@ fun RefundReasonCard(
                     Text(
                         text = reason,
                         style = MaterialTheme.typography.bodyMedium,
-                        color = Neutral700,
+                        color = MaterialTheme.colorScheme.onSurface,
                     )
                 }
             }
@@ -160,10 +161,14 @@ fun RefundReasonCard(
                     minLines = 3,
                     shape = RoundedCornerShape(16.dp),
                     colors = TextFieldDefaults.colors(
-                        focusedContainerColor = Color(0xFFF7FAFC),
-                        unfocusedContainerColor = Color(0xFFF7FAFC),
+                        focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                        unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
                         focusedIndicatorColor = Color.Transparent,
                         unfocusedIndicatorColor = Color.Transparent,
+                        focusedTextColor = MaterialTheme.colorScheme.onSurface,
+                        unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
+                        focusedPlaceholderColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                        unfocusedPlaceholderColor = MaterialTheme.colorScheme.onSurfaceVariant,
                     ),
                 )
             }
@@ -205,8 +210,8 @@ fun RescheduleOptionCard(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(22.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        border = BorderStroke(1.dp, Color(0xFFE3EAF2)),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
     ) {
         Column(
             modifier = Modifier.padding(18.dp),
@@ -226,11 +231,11 @@ fun RescheduleOptionCard(
                     text = "Pilih Jadwal Baru",
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
-                    color = Neutral700,
+                    color = MaterialTheme.colorScheme.onSurface,
                 )
             }
 
-            HorizontalDivider(color = Color(0xFFE9EEF5))
+            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
 
             schedules.forEach { schedule ->
                 Row(
@@ -257,19 +262,19 @@ fun RescheduleOptionCard(
                             text = schedule.shipName,
                             style = MaterialTheme.typography.bodyLarge,
                             fontWeight = FontWeight.Bold,
-                            color = Neutral700,
+                            color = MaterialTheme.colorScheme.onSurface,
                         )
 
                         Text(
                             text = schedule.route,
                             style = MaterialTheme.typography.bodySmall,
-                            color = Neutral500,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
 
                         Text(
                             text = "${schedule.date}, ${schedule.time}",
                             style = MaterialTheme.typography.labelMedium,
-                            color = Primary2,
+                            color = MaterialTheme.colorScheme.primary,
                             fontWeight = FontWeight.SemiBold,
                         )
                     }
@@ -289,8 +294,8 @@ fun ManageTicketSuccessCard(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(28.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        border = BorderStroke(1.dp, Color(0xFFE3EAF2)),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
     ) {
         Column(
             modifier = Modifier.padding(22.dp),
@@ -307,13 +312,13 @@ fun ManageTicketSuccessCard(
                 text = title,
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold,
-                color = Neutral700,
+                color = MaterialTheme.colorScheme.onSurface,
             )
 
             Text(
                 text = description,
                 style = MaterialTheme.typography.bodyMedium,
-                color = Neutral500,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
     }

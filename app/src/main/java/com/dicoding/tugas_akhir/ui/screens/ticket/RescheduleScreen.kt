@@ -34,6 +34,10 @@ fun RescheduleScreen(
         mutableStateOf(false)
     }
 
+    var isSubmitting by remember {
+        mutableStateOf(false)
+    }
+
     if (showRescheduleConfirm) {
         ConfirmActionDialog(
             title = "Ajukan reschedule?",
@@ -41,6 +45,7 @@ fun RescheduleScreen(
             confirmText = "Ya, ajukan",
             onConfirm = {
                 showRescheduleConfirm = false
+                isSubmitting = true
                 onSubmitClick(bookingId)
             },
             onDismiss = {
@@ -77,13 +82,13 @@ fun RescheduleScreen(
         }
 
         PrimaryButton(
-            text = "Ajukan Reschedule",
+            text = if (isSubmitting) "Mengajukan Reschedule..." else "Ajukan Reschedule",
             onClick = {
                 showRescheduleConfirm = true
             },
-            enabled = selectedScheduleId.isNotBlank(),
-            modifier = Modifier
-                .navigationBarsPadding()
+            enabled = selectedScheduleId.isNotBlank() && !isSubmitting,
+            isLoading = isSubmitting,
+            modifier = Modifier.navigationBarsPadding()
         )
     }
 }

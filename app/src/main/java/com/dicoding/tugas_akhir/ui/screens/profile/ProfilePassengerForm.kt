@@ -48,6 +48,7 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import androidx.compose.material3.ButtonDefaults
+import com.dicoding.tugas_akhir.ui.components.loading.PassengerFormPlaceholder
 
 @Composable
 fun PassengerProfileFormScreen(
@@ -60,6 +61,8 @@ fun PassengerProfileFormScreen(
 ) {
     val formState by viewModel.formState.collectAsStateWithLifecycle()
 
+    val isFormLoading by viewModel.isFormLoading.collectAsStateWithLifecycle()
+
     LaunchedEffect(passengerId) {
         if (passengerId.isNullOrBlank()) {
             viewModel.resetForm()
@@ -68,10 +71,19 @@ fun PassengerProfileFormScreen(
         }
     }
 
+    if (!passengerId.isNullOrBlank() && isFormLoading) {
+        PassengerFormPlaceholder(
+            modifier = modifier
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.background),
+        )
+        return
+    }
+
     Column(
         modifier = modifier
             .fillMaxSize()
-            .background(Color(0xFFF7FAFC))
+            .background(MaterialTheme.colorScheme.background)
     ) {
         LazyColumn(
             modifier = Modifier.weight(1f),

@@ -1,7 +1,6 @@
 package com.dicoding.tugas_akhir.ui.screens.profile
 
 import android.Manifest
-import android.graphics.Bitmap
 import android.net.Uri
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -58,6 +57,7 @@ import com.dicoding.tugas_akhir.ui.components.profile.ProfileTextField
 import com.dicoding.tugas_akhir.ui.theme.Primary2
 import com.dicoding.tugas_akhir.ui.viewmodel.ProfileViewModel
 import com.dicoding.tugas_akhir.ui.viewmodel.ViewModelFactory
+import com.dicoding.tugas_akhir.ui.components.loading.EditProfilePlaceholder
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -74,6 +74,8 @@ fun EditProfileScreen(
     val context = LocalContext.current
     val profile by viewModel.profile.collectAsStateWithLifecycle()
     val isSaved by viewModel.isSaved.collectAsStateWithLifecycle()
+
+    val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
 
     LaunchedEffect(initialName, initialEmail, initialPhotoUrl) {
         viewModel.setInitialProfileIfEmpty(
@@ -252,10 +254,19 @@ fun EditProfileScreen(
         )
     }
 
+    if (isLoading) {
+        EditProfilePlaceholder(
+            modifier = modifier
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.background),
+        )
+        return
+    }
+
     Column(
         modifier = modifier
             .fillMaxSize()
-            .background(Color(0xFFF7FAFC)),
+            .background(MaterialTheme.colorScheme.background),
     ) {
         LazyColumn(
             modifier = Modifier.weight(1f),

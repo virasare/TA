@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.delay
 
 class ProfileViewModel(
     private val profileRepository: ProfileRepository,
@@ -15,6 +16,9 @@ class ProfileViewModel(
 
     private val _profile = MutableStateFlow(UserProfile())
     val profile: StateFlow<UserProfile> = _profile.asStateFlow()
+
+    private val _isLoading = MutableStateFlow(true)
+    val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
 
     private val _isSaved = MutableStateFlow(false)
     val isSaved: StateFlow<Boolean> = _isSaved.asStateFlow()
@@ -25,8 +29,12 @@ class ProfileViewModel(
 
     private fun loadProfile() {
         viewModelScope.launch {
+            _isLoading.value = true
+
             profileRepository.getProfile().collect { savedProfile ->
                 _profile.value = savedProfile
+                delay(350L)
+                _isLoading.value = false
             }
         }
     }

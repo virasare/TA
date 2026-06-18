@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import java.util.UUID
+import kotlinx.coroutines.delay
 
 class SavedPassengerViewModel(
     private val repository: SavedPassengerRepository,
@@ -20,30 +21,47 @@ class SavedPassengerViewModel(
     private val _formState = MutableStateFlow(SavedPassengerFormState())
     val formState: StateFlow<SavedPassengerFormState> = _formState.asStateFlow()
 
+    private val _isLoading = MutableStateFlow(true)
+    val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
+
+    private val _isFormLoading = MutableStateFlow(false)
+    val isFormLoading: StateFlow<Boolean> = _isFormLoading.asStateFlow()
+
     init {
         loadPassengers()
     }
 
     private fun loadPassengers() {
         viewModelScope.launch {
+            _isLoading.value = true
+
             repository.getSavedPassengers().collect { passengers ->
                 _passengers.value = passengers
+                delay(350L)
+                _isLoading.value = false
             }
         }
     }
 
     fun loadPassengerForEdit(id: String) {
         viewModelScope.launch {
-            val passenger = repository.getSavedPassengerById(id) ?: return@launch
+            _isFormLoading.value = true
 
-            _formState.value = SavedPassengerFormState(
-                id = passenger.id,
-                fullName = passenger.fullName,
-                nik = passenger.nik,
-                phoneNumber = passenger.phoneNumber,
-                birthDate = passenger.birthDate,
-                gender = passenger.gender,
-            )
+            val passenger = repository.getSavedPassengerById(id)
+
+            if (passenger != null) {
+                _formState.value = SavedPassengerFormState(
+                    id = passenger.id,
+                    fullName = passenger.fullName,
+                    nik = passenger.nik,
+                    phoneNumber = passenger.phoneNumber,
+                    birthDate = passenger.birthDate,
+                    gender = passenger.gender,
+                )
+            }
+
+            delay(300L)
+            _isFormLoading.value = false
         }
     }
 
