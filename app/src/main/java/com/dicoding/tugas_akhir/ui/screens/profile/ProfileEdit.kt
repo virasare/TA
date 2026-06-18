@@ -1,8 +1,12 @@
+@file:Suppress("DEPRECATION")
+
 package com.dicoding.tugas_akhir.ui.screens.profile
 
 import android.Manifest
 import android.content.Intent
+import android.graphics.Bitmap
 import android.net.Uri
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
@@ -44,6 +48,10 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.canhub.cropper.CropImageContract
+import com.canhub.cropper.CropImageContractOptions
+import com.canhub.cropper.CropImageOptions
+import com.canhub.cropper.CropImageView
 import com.dicoding.tugas_akhir.core.utils.ImagePickerUtils
 import com.dicoding.tugas_akhir.ui.components.profile.AvatarPreview
 import com.dicoding.tugas_akhir.ui.components.profile.BottomActionButton
@@ -82,14 +90,68 @@ fun EditProfileScreen(
     var showSavedDialog by remember { mutableStateOf(false) }
     var cameraUri by remember { mutableStateOf<Uri?>(null) }
 
+//    val cropImageLauncher = rememberLauncherForActivityResult(
+//        contract = CropImageContract(),
+//    ) { result ->
+//        if (result.isSuccessful) {
+//            val croppedUri = result.uriContent
+//
+//            if (croppedUri != null) {
+//                viewModel.updatePhotoUri(croppedUri.toString())
+//
+//                Toast.makeText(
+//                    context,
+//                    "Foto berhasil dipilih. Jangan lupa simpan perubahan.",
+//                    Toast.LENGTH_SHORT,
+//                ).show()
+//            } else {
+//                Toast.makeText(
+//                    context,
+//                    "Foto hasil crop kosong. Silakan coba lagi.",
+//                    Toast.LENGTH_SHORT,
+//                ).show()
+//            }
+//        } else {
+//            Toast.makeText(
+//                context,
+//                result.error?.message ?: "Gagal memotong foto. Silakan coba lagi.",
+//                Toast.LENGTH_LONG,
+//            ).show()
+//        }
+//    }
+//
+//    fun launchCropPhoto(sourceUri: Uri) {
+//        try {
+//            cropImageLauncher.launch(
+//                CropImageContractOptions(
+//                    uri = sourceUri,
+//                    cropImageOptions = CropImageOptions(
+//                        guidelines = CropImageView.Guidelines.ON,
+//                        cropShape = CropImageView.CropShape.OVAL,
+//                        fixAspectRatio = true,
+//                        aspectRatioX = 1,
+//                        aspectRatioY = 1,
+//                        outputCompressFormat = Bitmap.CompressFormat.JPEG,
+//                        outputCompressQuality = 90,
+//                        allowRotation = true,
+//                        allowFlipping = true,
+//                    ),
+//                ),
+//            )
+//        } catch (exception: Exception) {
+//            Toast.makeText(
+//                context,
+//                exception.message ?: "Crop foto gagal dibuka.",
+//                Toast.LENGTH_LONG,
+//            ).show()
+//        }
+//    }
+
     val galleryLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.OpenDocument(),
+        contract = ActivityResultContracts.GetContent(),
     ) { uri ->
         if (uri != null) {
-            context.contentResolver.takePersistableUriPermission(
-                uri,
-                Intent.FLAG_GRANT_READ_URI_PERMISSION,
-            )
+//            launchCropPhoto(uri)
             viewModel.updatePhotoUri(uri.toString())
         }
     }
@@ -99,8 +161,15 @@ fun EditProfileScreen(
     ) { success ->
         if (success) {
             cameraUri?.let { uri ->
+//                launchCropPhoto(uri)
                 viewModel.updatePhotoUri(uri.toString())
             }
+        } else {
+            Toast.makeText(
+                context,
+                "Pengambilan foto dibatalkan.",
+                Toast.LENGTH_SHORT,
+            ).show()
         }
     }
 
@@ -155,7 +224,7 @@ fun EditProfileScreen(
                     icon = Icons.Outlined.PhotoLibrary,
                     onClick = {
                         showPhotoSheet = false
-                        galleryLauncher.launch(arrayOf("image/*"))
+                        galleryLauncher.launch("image/*")
                     },
                 )
 

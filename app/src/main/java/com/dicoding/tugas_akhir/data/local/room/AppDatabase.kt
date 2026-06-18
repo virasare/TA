@@ -22,7 +22,7 @@ import com.dicoding.tugas_akhir.data.local.room.entity.SavedPassengerEntity
         NotificationEntity::class,
         SavedPassengerEntity::class,
     ],
-    version = 2,
+    version = 3,
     exportSchema = false,
 )
 abstract class AppDatabase : RoomDatabase() {

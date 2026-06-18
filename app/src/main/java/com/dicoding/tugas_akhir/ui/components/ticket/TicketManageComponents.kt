@@ -97,7 +97,7 @@ fun RefundReasonCard(
     Card(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(22.dp),
-        colors = CardDefaults.cardColors(containerColor = White),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         border = BorderStroke(1.dp, Color(0xFFE3EAF2)),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
     ) {
@@ -204,7 +204,7 @@ fun RescheduleOptionCard(
     Card(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(22.dp),
-        colors = CardDefaults.cardColors(containerColor = White),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         border = BorderStroke(1.dp, Color(0xFFE3EAF2)),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
     ) {
@@ -288,7 +288,7 @@ fun ManageTicketSuccessCard(
     Card(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(28.dp),
-        colors = CardDefaults.cardColors(containerColor = White),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         border = BorderStroke(1.dp, Color(0xFFE3EAF2)),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
     ) {

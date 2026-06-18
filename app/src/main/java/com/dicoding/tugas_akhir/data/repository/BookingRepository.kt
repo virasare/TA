@@ -72,6 +72,42 @@ class BookingRepository private constructor(
         emit(Resource.Error(exception.message ?: "Gagal mengambil detail pesanan"))
     }
 
+    suspend fun submitRefund(
+        bookingId: String,
+    ): Booking {
+        return updateBookingStatus(
+            bookingId = bookingId,
+            status = "Refund Diproses",
+        )
+    }
+
+    suspend fun submitReschedule(
+        bookingId: String,
+    ): Booking {
+        return updateBookingStatus(
+            bookingId = bookingId,
+            status = "Reschedule Diproses",
+        )
+    }
+
+    private suspend fun updateBookingStatus(
+        bookingId: String,
+        status: String,
+    ): Booking {
+        val currentBooking = localDataSource.getBookingById(bookingId)
+            ?: throw IllegalArgumentException("Pesanan tidak ditemukan")
+
+        localDataSource.updateBookingStatus(
+            bookingId = bookingId,
+            status = status,
+        )
+
+        val updatedBooking = localDataSource.getBookingById(bookingId)
+            ?: currentBooking
+
+        return DataMapper.mapBookingWithPassengersToDomain(updatedBooking)
+    }
+
     companion object {
         @Volatile
         private var INSTANCE: BookingRepository? = null

@@ -59,7 +59,6 @@ import com.dicoding.tugas_akhir.ui.screens.profile.ProfileScreen
 import com.dicoding.tugas_akhir.ui.screens.profile.SettingsScreen
 import com.dicoding.tugas_akhir.ui.screens.schedule.ScheduleDetailScreen
 import com.dicoding.tugas_akhir.ui.screens.schedule.ScheduleScreen
-import com.dicoding.tugas_akhir.ui.screens.splash.SplashScreen
 import com.dicoding.tugas_akhir.ui.theme.Background
 import com.google.firebase.auth.FirebaseAuth
 import com.dicoding.tugas_akhir.ui.screens.profile.ProfileLanguageScreen
@@ -89,10 +88,13 @@ import com.dicoding.tugas_akhir.R
 import com.dicoding.tugas_akhir.ui.state.AuthUiState
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import com.dicoding.tugas_akhir.ui.viewmodel.BookingViewModel
 
 @Composable
 fun AppNavigation() {
+
     val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
@@ -110,6 +112,10 @@ fun AppNavigation() {
     )
 
     val authViewModel: AuthViewModel = viewModel(
+        factory = factory
+    )
+
+    val bookingViewModel: BookingViewModel = viewModel(
         factory = factory
     )
 
@@ -158,7 +164,7 @@ fun AppNavigation() {
         mutableStateOf(prefs.getBoolean("has_seen_onboarding", false))
     }
 
-    var isSplashFinished by remember {
+    var hasPassedSplash by remember {
         mutableStateOf(false)
     }
 
@@ -217,8 +223,20 @@ fun AppNavigation() {
         Screens.Profile
     )
 
-    val showBottomBar = isSplashFinished &&
-            currentRoute != null &&
+    LaunchedEffect(currentRoute) {
+        if (currentRoute == Screens.Splash) {
+            hasPassedSplash = false
+        } else if (!hasPassedSplash) {
+            delay(300)
+            hasPassedSplash = true
+        }
+    }
+
+//    val showBottomBar = hasPassedSplash &&
+//            currentRoute != null &&
+//            currentRoute in bottomBarRoutes
+
+    val showBottomBar = currentRoute != null &&
             currentRoute in bottomBarRoutes
 
     val showTopBar = currentRoute != null &&
@@ -300,6 +318,12 @@ fun AppNavigation() {
         )
     }
 
+    val startDestination = if (hasSeenOnboarding) {
+        Screens.Home
+    } else {
+        Screens.Onboarding
+    }
+
     Scaffold(
         containerColor = Background,
         topBar = {
@@ -345,28 +369,26 @@ fun AppNavigation() {
     ) { innerPadding ->
         NavHost(
             navController = navController,
-            startDestination = Screens.Splash,
+            startDestination = startDestination,
             modifier = Modifier.padding(innerPadding)
         ) {
-            composable(Screens.Splash) {
-                SplashScreen(
-                    onSplashFinished = {
-                        val nextRoute = if (hasSeenOnboarding) {
-                            Screens.Home
-                        } else {
-                            Screens.Onboarding
-                        }
-
-                        isSplashFinished = true
-
-                        navController.navigate(nextRoute) {
-                            popUpTo(Screens.Splash) {
-                                inclusive = true
-                            }
-                        }
-                    }
-                )
-            }
+//            composable(Screens.Splash) {
+//                SplashScreen(
+//                    onSplashFinished = {
+//                        val nextRoute = if (hasSeenOnboarding) {
+//                            Screens.Home
+//                        } else {
+//                            Screens.Onboarding
+//                        }
+//
+//                        navController.navigate(nextRoute) {
+//                            popUpTo(Screens.Splash) {
+//                                inclusive = true
+//                            }
+//                        }
+//                    }
+//                )
+//            }
 
             composable(Screens.Onboarding) {
                 OnboardingScreen(
@@ -1002,14 +1024,22 @@ fun AppNavigation() {
                     RefundScreen(
                         bookingId = bookingId,
                         onSubmitClick = { selectedBookingId ->
-                            pushNotification(
-                                title = "Refund Diproses",
-                                message = "Pengajuan refund tiket berhasil dikirim dan sedang diproses.",
-                                type = NotificationType.INFO,
-                            )
+                            bookingViewModel.submitRefund(
+                                bookingId = selectedBookingId,
+                                onSuccess = {
+                                    pushNotification(
+                                        title = "Refund Diproses",
+                                        message = "Pengajuan refund tiket berhasil dikirim dan sedang diproses.",
+                                        type = NotificationType.INFO,
+                                    )
 
-                            navController.navigate(
-                                Screens.refundSuccess(selectedBookingId)
+                                    navController.navigate(
+                                        Screens.refundSuccess(selectedBookingId)
+                                    )
+                                },
+                                onError = { message ->
+                                    Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+                                },
                             )
                         }
                     )
@@ -1037,14 +1067,22 @@ fun AppNavigation() {
                     RescheduleScreen(
                         bookingId = bookingId,
                         onSubmitClick = { selectedBookingId ->
-                            pushNotification(
-                                title = "Reschedule Berhasil Diajukan",
-                                message = "Pengajuan reschedule tiket berhasil dikirim dan sedang diproses.",
-                                type = NotificationType.INFO,
-                            )
+                            bookingViewModel.submitReschedule(
+                                bookingId = selectedBookingId,
+                                onSuccess = {
+                                    pushNotification(
+                                        title = "Reschedule Diproses",
+                                        message = "Pengajuan reschedule tiket berhasil dikirim dan sedang diproses.",
+                                        type = NotificationType.INFO,
+                                    )
 
-                            navController.navigate(
-                                Screens.rescheduleSuccess(selectedBookingId)
+                                    navController.navigate(
+                                        Screens.rescheduleSuccess(selectedBookingId)
+                                    )
+                                },
+                                onError = { message ->
+                                    Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+                                },
                             )
                         }
                     )

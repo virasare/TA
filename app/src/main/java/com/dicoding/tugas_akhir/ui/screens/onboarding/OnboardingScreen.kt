@@ -1,5 +1,17 @@
 package com.dicoding.tugas_akhir.ui.screens.onboarding
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.SizeTransform
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -12,16 +24,19 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Surface
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -38,38 +53,45 @@ import com.dicoding.tugas_akhir.ui.theme.Primary2
 private data class OnboardingItem(
     val title: String,
     val description: String,
-    val imageRes: Int
+    val imageRes: Int,
 )
 
 @Composable
 fun OnboardingScreen(
-    onFinishClick: () -> Unit
+    onFinishClick: () -> Unit,
 ) {
     val items = listOf(
         OnboardingItem(
             title = "Cari Jadwal Kapal",
             description = "Temukan jadwal kapal berdasarkan rute keberangkatan dan tujuan.",
-            imageRes = R.drawable.onboarding1
+            imageRes = R.drawable.onboarding1,
         ),
         OnboardingItem(
             title = "Pesan dan Bayar Tiket",
             description = "Pilih jadwal, isi data penumpang, dan lakukan pembayaran dengan metode yang tersedia.",
-            imageRes = R.drawable.onboarding2
+            imageRes = R.drawable.onboarding2,
         ),
         OnboardingItem(
             title = "Pantau Status Tiket",
             description = "Lihat tiket, status pembayaran, serta pengajuan refund dan reschedule dengan lebih jelas.",
-            imageRes = R.drawable.onboarding3
-        )
+            imageRes = R.drawable.onboarding3,
+        ),
     )
 
     var currentPage by remember {
         mutableIntStateOf(0)
     }
 
-    val item = items[currentPage]
+    var contentVisible by remember {
+        mutableStateOf(false)
+    }
+
     val isFirstPage = currentPage == 0
     val isLastPage = currentPage == items.lastIndex
+
+    LaunchedEffect(Unit) {
+        contentVisible = true
+    }
 
     Column(
         modifier = Modifier
@@ -77,44 +99,102 @@ fun OnboardingScreen(
             .background(Background)
             .padding(24.dp)
             .navigationBarsPadding(),
-        horizontalAlignment = Alignment.CenterHorizontally
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Spacer(modifier = Modifier.weight(1f))
 
-        Text(
-            text = item.title,
-            color = Neutral700,
-            fontWeight = FontWeight.Bold,
-            style = MaterialTheme.typography.titleLarge,
-            textAlign = TextAlign.Center
-        )
+        AnimatedVisibility(
+            visible = contentVisible,
+            enter = fadeIn(
+                animationSpec = tween(500),
+            ) + slideInVertically(
+                animationSpec = tween(500),
+                initialOffsetY = { it / 4 },
+            ),
+        ) {
+            AnimatedContent(
+                targetState = currentPage,
+                transitionSpec = {
+                    val direction = if (targetState > initialState) 1 else -1
 
-        Image(
-            painter = painterResource(id = item.imageRes),
-            contentDescription = null,
-            modifier = Modifier
-                .padding(top = 36.dp, bottom = 28.dp)
-                .size(220.dp)
-        )
+                    (
+                            slideInHorizontally(
+                                animationSpec = tween(
+                                    durationMillis = 350,
+                                    easing = FastOutSlowInEasing,
+                                ),
+                                initialOffsetX = { fullWidth -> fullWidth * direction },
+                            ) + fadeIn(
+                                animationSpec = tween(350),
+                            )
+                            ).togetherWith(
+                            slideOutHorizontally(
+                                animationSpec = tween(
+                                    durationMillis = 250,
+                                    easing = FastOutSlowInEasing,
+                                ),
+                                targetOffsetX = { fullWidth -> -fullWidth * direction },
+                            ) + fadeOut(
+                                animationSpec = tween(250),
+                            )
+                        ).using(
+                            SizeTransform(clip = false)
+                        )
+                },
+                label = "onboardingContent",
+            ) { page ->
+                val item = items[page]
 
-        Text(
-            text = item.description,
-            color = Neutral500,
-            style = MaterialTheme.typography.bodyMedium,
-            textAlign = TextAlign.Center,
-            modifier = Modifier.padding(horizontal = 12.dp)
-        )
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
+                    Text(
+                        text = item.title,
+                        color = Neutral700,
+                        fontWeight = FontWeight.Bold,
+                        style = MaterialTheme.typography.titleLarge,
+                        textAlign = TextAlign.Center,
+                    )
+
+                    Image(
+                        painter = painterResource(id = item.imageRes),
+                        contentDescription = null,
+                        modifier = Modifier
+                            .padding(top = 36.dp, bottom = 28.dp)
+                            .size(220.dp)
+                            .scale(1f),
+                    )
+
+                    Text(
+                        text = item.description,
+                        color = Neutral500,
+                        style = MaterialTheme.typography.bodyMedium,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.padding(horizontal = 12.dp),
+                    )
+                }
+            }
+        }
 
         Row(
             modifier = Modifier.padding(top = 36.dp),
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             items.forEachIndexed { index, _ ->
+                val indicatorWidth by animateDpAsState(
+                    targetValue = if (index == currentPage) 36.dp else 16.dp,
+                    animationSpec = tween(
+                        durationMillis = 250,
+                        easing = FastOutSlowInEasing,
+                    ),
+                    label = "indicatorWidth",
+                )
+
                 Surface(
-                    modifier = Modifier.size(width = 36.dp, height = 4.dp),
+                    modifier = Modifier.size(width = indicatorWidth, height = 4.dp),
                     shape = RoundedCornerShape(50.dp),
                     color = if (index <= currentPage) Primary2 else Neutral200,
-                    content = {}
+                    content = {},
                 )
             }
         }
@@ -123,13 +203,13 @@ fun OnboardingScreen(
 
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             if (isFirstPage) {
                 SecondaryButton(
                     text = "Lewati",
                     onClick = onFinishClick,
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f),
                 )
             } else {
                 SecondaryButton(
@@ -137,7 +217,7 @@ fun OnboardingScreen(
                     onClick = {
                         currentPage--
                     },
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f),
                 )
             }
 
@@ -150,7 +230,7 @@ fun OnboardingScreen(
                         currentPage++
                     }
                 },
-                modifier = Modifier.weight(1f)
+                modifier = Modifier.weight(1f),
             )
         }
     }

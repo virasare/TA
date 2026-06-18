@@ -64,6 +64,8 @@ import androidx.compose.runtime.remember
 import com.dicoding.tugas_akhir.ui.components.booking.SavedPassengerBookingActionCard
 import com.dicoding.tugas_akhir.ui.components.booking.SavedPassengerPickerSheet
 import com.dicoding.tugas_akhir.ui.viewmodel.BookingPassengerFormViewModel
+import com.dicoding.tugas_akhir.ui.components.dialog.ConfirmActionDialog
+import com.dicoding.tugas_akhir.ui.components.booking.SavePassengerDataCheckboxCard
 
 @Composable
 fun PassengerFormScreen(
@@ -87,6 +89,10 @@ fun PassengerFormScreen(
     val savedPassengerUiState by savedPassengerViewModel.uiState.collectAsStateWithLifecycle()
 
     var showSavedPassengerSheet by rememberSaveable {
+        mutableStateOf(false)
+    }
+
+    var showCreateBookingConfirm by remember {
         mutableStateOf(false)
     }
 
@@ -131,6 +137,7 @@ fun PassengerFormScreen(
                 viewModel.updatePassengerFullName(selectedPassengerIndex, passenger.fullName)
                 viewModel.updatePassengerNik(selectedPassengerIndex, passenger.nik)
                 viewModel.updatePassengerPhoneNumber(selectedPassengerIndex, passenger.phoneNumber)
+                viewModel.updatePassengerBirthDate(selectedPassengerIndex, passenger.birthDate)
                 viewModel.updatePassengerGender(selectedPassengerIndex, passenger.gender)
 
                 showSavedPassengerSheet = false
@@ -141,10 +148,42 @@ fun PassengerFormScreen(
         )
     }
 
+    if (showCreateBookingConfirm) {
+        ConfirmActionDialog(
+            title = "Buat pesanan?",
+            message = "Pastikan semua data penumpang sudah benar sebelum melanjutkan ke ringkasan booking.",
+            confirmText = "Ya, buat pesanan",
+            onConfirm = {
+                showCreateBookingConfirm = false
+
+                val shouldSaveCurrentPassenger =
+                    savePassengerCheckedMap[selectedPassengerIndex] ?: false
+
+                if (shouldSaveCurrentPassenger && currentForm.isValid) {
+                    savedPassengerViewModel.savePassengerFromBooking(
+                        fullName = currentForm.fullName,
+                        nik = currentForm.nik,
+                        phoneNumber = currentForm.phoneNumber,
+                        birthDate = currentForm.birthDate,
+                        gender = currentForm.gender,
+                    )
+                }
+
+                viewModel.createBooking(
+                    scheduleId = scheduleId,
+                    ticketClassId = ticketClassId,
+                )
+            },
+            onDismiss = {
+                showCreateBookingConfirm = false
+            },
+        )
+    }
+
     Column(
         modifier = modifier
             .fillMaxSize()
-            .background(Background)
+            .background(MaterialTheme.colorScheme.background)
             .testTag("passenger_form_screen")
     ) {
         LazyColumn(
@@ -190,12 +229,8 @@ fun PassengerFormScreen(
             item {
                 SavedPassengerBookingActionCard(
                     savedPassengerCount = savedPassengerUiState.savedPassengers.size,
-                    saveToPassengerData = savePassengerCheckedMap[selectedPassengerIndex] ?: false,
                     onPickSavedPassengerClick = {
                         showSavedPassengerSheet = true
-                    },
-                    onSaveCheckedChange = { checked ->
-                        savePassengerCheckedMap[selectedPassengerIndex] = checked
                     },
                 )
             }
@@ -219,6 +254,15 @@ fun PassengerFormScreen(
                     onGenderChange = { value ->
                         viewModel.updatePassengerGender(selectedPassengerIndex, value)
                     }
+                )
+            }
+
+            item {
+                SavePassengerDataCheckboxCard(
+                    saveToPassengerData = savePassengerCheckedMap[selectedPassengerIndex] ?: false,
+                    onSaveCheckedChange = { checked ->
+                        savePassengerCheckedMap[selectedPassengerIndex] = checked
+                    },
                 )
             }
 
@@ -248,24 +292,23 @@ fun PassengerFormScreen(
                 isCurrentFormValid && !isLoading
             },
             onContinueClick = {
-                val shouldSaveCurrentPassenger = savePassengerCheckedMap[selectedPassengerIndex] ?: false
-
-                if (shouldSaveCurrentPassenger && currentForm.isValid) {
-                    savedPassengerViewModel.savePassengerFromBooking(
-                        fullName = currentForm.fullName,
-                        nik = currentForm.nik,
-                        phoneNumber = currentForm.phoneNumber,
-                        gender = currentForm.gender,
-                    )
-                }
-
                 if (!isLastPassenger) {
+                    val shouldSaveCurrentPassenger =
+                        savePassengerCheckedMap[selectedPassengerIndex] ?: false
+
+                    if (shouldSaveCurrentPassenger && currentForm.isValid) {
+                        savedPassengerViewModel.savePassengerFromBooking(
+                            fullName = currentForm.fullName,
+                            nik = currentForm.nik,
+                            phoneNumber = currentForm.phoneNumber,
+                            birthDate = currentForm.birthDate,
+                            gender = currentForm.gender,
+                        )
+                    }
+
                     selectedPassengerIndex += 1
                 } else {
-                    viewModel.createBooking(
-                        scheduleId = scheduleId,
-                        ticketClassId = ticketClassId
-                    )
+                    showCreateBookingConfirm = true
                 }
             }
         )

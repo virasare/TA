@@ -12,6 +12,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalView
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.WindowCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -22,10 +23,24 @@ import com.dicoding.tugas_akhir.ui.navigation.AppNavigation
 import com.dicoding.tugas_akhir.ui.theme.Tugas_AkhirTheme
 import com.dicoding.tugas_akhir.ui.viewmodel.SettingsViewModel
 import com.dicoding.tugas_akhir.ui.viewmodel.ViewModelFactory
+import android.animation.Animator
+import android.animation.AnimatorListenerAdapter
+import android.animation.AnimatorSet
+import android.animation.ObjectAnimator
+import android.animation.PropertyValuesHolder
+import android.view.View
+import android.view.animation.PathInterpolator
+import androidx.core.splashscreen.SplashScreenViewProvider
 
 class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        val splashScreen = installSplashScreen()
+
+        splashScreen.setOnExitAnimationListener { splashScreenViewProvider ->
+            playSplashExitAnimation(splashScreenViewProvider)
+        }
+
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
@@ -72,6 +87,36 @@ class MainActivity : ComponentActivity() {
                     AppNavigation()
                 }
             }
+        }
+    }
+
+    private fun playSplashExitAnimation(
+        splashScreenViewProvider: SplashScreenViewProvider,
+    ) {
+        val iconAnimation = ObjectAnimator.ofPropertyValuesHolder(
+            splashScreenViewProvider.iconView,
+            PropertyValuesHolder.ofFloat(View.SCALE_X, 1f, 0.86f),
+            PropertyValuesHolder.ofFloat(View.SCALE_Y, 1f, 0.86f),
+            PropertyValuesHolder.ofFloat(View.ALPHA, 1f, 0f),
+        )
+
+        val splashFade = ObjectAnimator.ofFloat(
+            splashScreenViewProvider.view,
+            View.ALPHA,
+            1f,
+            0f,
+        )
+
+        AnimatorSet().apply {
+            playTogether(iconAnimation, splashFade)
+            duration = 320L
+            interpolator = PathInterpolator(0.2f, 0f, 0f, 1f)
+            addListener(object : AnimatorListenerAdapter() {
+                override fun onAnimationEnd(animation: Animator) {
+                    splashScreenViewProvider.remove()
+                }
+            })
+            start()
         }
     }
 }

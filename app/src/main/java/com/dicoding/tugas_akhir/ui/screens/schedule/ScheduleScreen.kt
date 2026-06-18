@@ -42,7 +42,6 @@ import com.dicoding.tugas_akhir.ui.components.dialog.filters.ScheduleFilter
 import com.dicoding.tugas_akhir.ui.components.dialog.filters.ScheduleFilterSection
 import com.dicoding.tugas_akhir.ui.components.loading.ScheduleListPlaceholder
 import com.dicoding.tugas_akhir.ui.state.ScheduleUiState
-import com.dicoding.tugas_akhir.ui.theme.Background
 import com.dicoding.tugas_akhir.ui.theme.Neutral200
 import com.dicoding.tugas_akhir.ui.theme.Neutral500
 import com.dicoding.tugas_akhir.ui.theme.Neutral700
@@ -101,7 +100,7 @@ private fun ScheduleScreenContent(
     Column(
         modifier = modifier
             .fillMaxSize()
-            .background(Background)
+            .background(MaterialTheme.colorScheme.background)
             .testTag("schedule_screen")
     ) {
         ScheduleHeader(

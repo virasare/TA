@@ -146,7 +146,7 @@ private fun ScheduleDetailContent(
     Column(
         modifier = modifier
             .fillMaxSize()
-            .background(Background)
+            .background(MaterialTheme.colorScheme.background)
     ) {
         LazyColumn(
             modifier = Modifier.weight(1f),
@@ -233,7 +233,7 @@ private fun ScheduleDetailLoadingState(
     Box(
         modifier = modifier
             .fillMaxSize()
-            .background(Background)
+            .background(MaterialTheme.colorScheme.background)
     ) {
         ScheduleDetailPlaceholder(
             modifier = Modifier.fillMaxSize()
@@ -271,9 +271,9 @@ private fun ScheduleDetailHeroCard(
                 .background(
                     brush = Brush.linearGradient(
                         colors = listOf(
-                            Primary3,
-                            White,
-                            White
+                            MaterialTheme.colorScheme.primaryContainer,
+                            MaterialTheme.colorScheme.background,
+                            MaterialTheme.colorScheme.background
                         )
                     )
                 )

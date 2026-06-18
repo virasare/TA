@@ -90,6 +90,13 @@ fun PassengerProfileFormScreen(
                         keyboardType = KeyboardType.Phone,
                     )
 
+                    ProfileTextField(
+                        label = "Tanggal Lahir",
+                        value = formState.birthDate,
+                        onValueChange = viewModel::updateBirthDate,
+                        placeholder = "Contoh: 28-08-2003",
+                    )
+
                     ChoiceSection(
                         title = "Jenis Kelamin",
                         options = listOf("Perempuan", "Laki-laki"),

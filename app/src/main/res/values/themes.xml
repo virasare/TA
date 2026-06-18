@@ -2,4 +2,15 @@
 <resources>
 
     <style name="Theme.Tugas_Akhir" parent="android:Theme.Material.Light.NoActionBar" />
+
+    <style name="Theme.TugasAkhir.Starting" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/Primary_1</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/splash_logo_inset</item>
+        <item name="windowSplashScreenIconBackgroundColor">@android:color/transparent</item>
+        <item name="postSplashScreenTheme">@style/Theme.Tugas_Akhir</item>
+
+        <item name="android:statusBarColor">@color/Primary_1</item>
+        <item name="android:navigationBarColor">@color/Primary_1</item>
+        <item name="android:windowLightStatusBar">false</item>
+    </style>
 </resources>

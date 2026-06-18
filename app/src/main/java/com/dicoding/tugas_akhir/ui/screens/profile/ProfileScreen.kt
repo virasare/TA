@@ -16,8 +16,8 @@ import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.People
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.icons.outlined.Shield
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
@@ -29,6 +29,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.dicoding.tugas_akhir.domain.model.UserProfile
@@ -41,6 +42,21 @@ import com.dicoding.tugas_akhir.ui.state.AuthUiState
 import com.dicoding.tugas_akhir.ui.viewmodel.AuthViewModel
 import com.dicoding.tugas_akhir.ui.viewmodel.ProfileViewModel
 import com.dicoding.tugas_akhir.ui.viewmodel.ViewModelFactory
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
+import com.dicoding.tugas_akhir.ui.theme.Error
+import com.dicoding.tugas_akhir.ui.theme.Neutral500
+import com.dicoding.tugas_akhir.ui.theme.Neutral700
+import com.dicoding.tugas_akhir.ui.theme.Primary2
+import com.dicoding.tugas_akhir.ui.theme.White
 
 @Composable
 fun ProfileScreen(
@@ -213,7 +229,7 @@ private fun ProfileContent(
             onClick = onLogoutClick,
             modifier = Modifier.fillMaxWidth(),
         ) {
-            androidx.compose.material3.Icon(
+            Icon(
                 imageVector = Icons.AutoMirrored.Outlined.Logout,
                 contentDescription = null,
                 tint = colors.error,
@@ -233,29 +249,91 @@ private fun LogoutConfirmationDialog(
     onDismiss: () -> Unit,
     onConfirm: () -> Unit,
 ) {
-    val strings = LocalAppStrings.current
-
-    AlertDialog(
+    Dialog(
         onDismissRequest = onDismiss,
-        title = {
-            Text(strings.logoutDialogTitle)
-        },
-        text = {
-            Text(strings.logoutDialogMessage)
-        },
-        confirmButton = {
-            Button(
-                onClick = onConfirm,
+    ) {
+        Card(
+            shape = androidx.compose.foundation.shape.RoundedCornerShape(26.dp),
+            colors = CardDefaults.cardColors(
+                containerColor = White,
+            ),
+            border = BorderStroke(
+                width = 1.dp,
+                color = Color(0xFFE3EAF2),
+            ),
+            elevation = CardDefaults.cardElevation(
+                defaultElevation = 8.dp,
+            ),
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(22.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(14.dp),
             ) {
-                Text(strings.logout)
+                Box(
+                    modifier = Modifier
+                        .size(62.dp)
+                        .background(
+                            color = Color(0xFFFFEBEE),
+                            shape = CircleShape,
+                        ),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Outlined.Logout,
+                        contentDescription = null,
+                        tint = Error,
+                        modifier = Modifier.size(30.dp),
+                    )
+                }
+
+                Text(
+                    text = "Keluar dari Akun?",
+                    color = Neutral700,
+                    fontWeight = FontWeight.Bold,
+                    style = MaterialTheme.typography.titleMedium,
+                )
+
+                Text(
+                    text = "Kamu perlu login kembali untuk mengakses profil, tiket, dan notifikasi perjalanan.",
+                    color = Neutral500,
+                    style = MaterialTheme.typography.bodySmall,
+                    textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                    modifier = Modifier.padding(horizontal = 4.dp),
+                )
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 8.dp),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                ) {
+                    OutlinedButton(
+                        onClick = onDismiss,
+                        modifier = Modifier.weight(1f),
+                        shape = androidx.compose.foundation.shape.RoundedCornerShape(14.dp),
+                    ) {
+                        Text(
+                            text = "Batal",
+                            color = Primary2,
+                            fontWeight = FontWeight.SemiBold,
+                        )
+                    }
+
+                    Button(
+                        onClick = onConfirm,
+                        modifier = Modifier.weight(1f),
+                        shape = androidx.compose.foundation.shape.RoundedCornerShape(14.dp),
+                    ) {
+                        Text(
+                            text = "Keluar",
+                            fontWeight = FontWeight.SemiBold,
+                        )
+                    }
+                }
             }
-        },
-        dismissButton = {
-            OutlinedButton(
-                onClick = onDismiss,
-            ) {
-                Text(strings.cancel)
-            }
-        },
-    )
+        }
+    }
 }

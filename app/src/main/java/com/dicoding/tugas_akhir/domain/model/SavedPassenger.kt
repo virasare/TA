@@ -5,5 +5,6 @@ data class SavedPassenger(
     val fullName: String,
     val nik: String,
     val phoneNumber: String,
+    val birthDate: String = "",
     val gender: String,
 )

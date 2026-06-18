@@ -69,12 +69,12 @@ fun AppBottomNavigationBar(
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .background(White)
+            .background(MaterialTheme.colorScheme.surface)
             .padding(horizontal = 16.dp)
     ) {
         NavigationBar(
             modifier = Modifier.fillMaxWidth(),
-            containerColor = White
+            containerColor = MaterialTheme.colorScheme.surface
         ) {
             bottomNavItems.forEach { item ->
                 val selected = currentRoute == item.route

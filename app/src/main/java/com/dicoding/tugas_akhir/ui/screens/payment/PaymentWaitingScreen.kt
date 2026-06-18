@@ -19,7 +19,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.AccessTime
-import androidx.compose.material.icons.outlined.ArrowBack
 import androidx.compose.material.icons.outlined.CheckCircle
 import androidx.compose.material.icons.outlined.ContentCopy
 import androidx.compose.material.icons.outlined.ErrorOutline
@@ -29,7 +28,6 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
@@ -44,14 +42,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.tv.material3.OutlinedButtonDefaults
 import com.dicoding.tugas_akhir.core.utils.PriceFormatter
 import com.dicoding.tugas_akhir.domain.model.Payment
 import com.dicoding.tugas_akhir.ui.components.loading.PaymentWaitingPlaceholder
 import com.dicoding.tugas_akhir.ui.components.lottie.LottieStateView
 import com.dicoding.tugas_akhir.ui.state.PaymentActionUiState
 import com.dicoding.tugas_akhir.ui.state.PaymentDetailUiState
-import com.dicoding.tugas_akhir.ui.theme.Background
 import com.dicoding.tugas_akhir.ui.theme.Neutral200
 import com.dicoding.tugas_akhir.ui.theme.Neutral500
 import com.dicoding.tugas_akhir.ui.theme.Neutral700
@@ -92,7 +88,7 @@ fun PaymentWaitingScreen(
             Box(
                 modifier = modifier
                     .fillMaxSize()
-                    .background(Background),
+                    .background(MaterialTheme.colorScheme.background),
             ) {
                 PaymentWaitingPlaceholder(
                     modifier = Modifier.fillMaxSize(),
@@ -119,7 +115,7 @@ fun PaymentWaitingScreen(
             Box(
                 modifier = modifier
                     .fillMaxSize()
-                    .background(Background),
+                    .background(MaterialTheme.colorScheme.background),
             ) {
                 LottieStateView(
                     animationFile = "no_internet.json",
@@ -144,7 +140,7 @@ private fun PaymentWaitingContent(
     Column(
         modifier = modifier
             .fillMaxSize()
-            .background(Background)
+            .background(MaterialTheme.colorScheme.background)
             .testTag("payment_waiting_screen"),
     ) {
         LazyColumn(

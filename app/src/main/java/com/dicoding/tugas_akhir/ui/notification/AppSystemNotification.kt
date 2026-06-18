@@ -12,6 +12,7 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import com.dicoding.tugas_akhir.R
+import android.graphics.BitmapFactory
 
 object AppSystemNotification {
 
@@ -82,7 +83,7 @@ object AppSystemNotification {
         )
 
         val notification = NotificationCompat.Builder(context, CHANNEL_ID)
-            .setSmallIcon(R.mipmap.ic_launcher)
+            .setSmallIcon(R.drawable.ic_logo_foreground)
             .setContentTitle(title)
             .setContentText(message)
             .setStyle(
@@ -93,6 +94,7 @@ object AppSystemNotification {
             .setDefaults(NotificationCompat.DEFAULT_ALL)
             .setAutoCancel(true)
             .setContentIntent(pendingIntent)
+            .setLargeIcon(BitmapFactory.decodeResource(context.resources, R.mipmap.ic_logo))
             .build()
 
         NotificationManagerCompat.from(context).notify(

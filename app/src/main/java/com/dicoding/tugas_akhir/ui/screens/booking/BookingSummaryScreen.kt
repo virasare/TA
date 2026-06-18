@@ -114,7 +114,7 @@ private fun BookingSummaryContent(
     Column(
         modifier = modifier
             .fillMaxSize()
-            .background(Background)
+            .background(MaterialTheme.colorScheme.background)
             .testTag("booking_summary_screen")
     ) {
         LazyColumn(

@@ -180,6 +180,36 @@ class BookingViewModel(
         }
     }
 
+    fun submitRefund(
+        bookingId: String,
+        onSuccess: () -> Unit,
+        onError: (String) -> Unit,
+    ) {
+        viewModelScope.launch {
+            try {
+                bookingRepository.submitRefund(bookingId)
+                onSuccess()
+            } catch (exception: Exception) {
+                onError(exception.message ?: "Gagal mengajukan refund")
+            }
+        }
+    }
+
+    fun submitReschedule(
+        bookingId: String,
+        onSuccess: () -> Unit,
+        onError: (String) -> Unit,
+    ) {
+        viewModelScope.launch {
+            try {
+                bookingRepository.submitReschedule(bookingId)
+                onSuccess()
+            } catch (exception: Exception) {
+                onError(exception.message ?: "Gagal mengajukan reschedule")
+            }
+        }
+    }
+
     fun resetCreateBookingState() {
         _createBookingUiState.value = CreateBookingUiState.Idle
     }

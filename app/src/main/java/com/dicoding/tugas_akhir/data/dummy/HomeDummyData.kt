@@ -16,26 +16,24 @@ data class PopularRoute(
 )
 
 val dummyPorts = listOf(
-    Port(
-        name = "Pelabuhan Ende",
-        city = "Ende"
-    ),
-    Port(
-        name = "Pelabuhan Tenau Kupang",
-        city = "Kupang"
-    ),
-    Port(
-        name = "Pelabuhan Labuan Bajo",
-        city = "Labuan Bajo"
-    ),
-    Port(
-        name = "Pelabuhan Benoa",
-        city = "Bali"
-    ),
-    Port(
-        name = "Pelabuhan Tanjung Perak",
-        city = "Surabaya"
-    )
+    Port("Pelabuhan Tanjung Perak", "Surabaya"),
+    Port("Pelabuhan Benoa", "Denpasar"),
+    Port("Pelabuhan Gilimanuk", "Jembrana"),
+    Port("Pelabuhan Ketapang", "Banyuwangi"),
+    Port("Pelabuhan Makassar", "Makassar"),
+    Port("Pelabuhan Soekarno-Hatta", "Makassar"),
+    Port("Pelabuhan Tenau", "Kupang"),
+    Port("Pelabuhan Ende", "Ende"),
+    Port("Pelabuhan Maumere", "Maumere"),
+    Port("Pelabuhan Labuan Bajo", "Labuan Bajo"),
+    Port("Pelabuhan Lembar", "Lombok Barat"),
+    Port("Pelabuhan Kayangan", "Lombok Timur"),
+    Port("Pelabuhan Balikpapan", "Balikpapan"),
+    Port("Pelabuhan Samarinda", "Samarinda"),
+    Port("Pelabuhan Bitung", "Bitung"),
+    Port("Pelabuhan Ambon", "Ambon"),
+    Port("Pelabuhan Sorong", "Sorong"),
+    Port("Pelabuhan Jayapura", "Jayapura"),
 )
 
 val popularRoutes = listOf(

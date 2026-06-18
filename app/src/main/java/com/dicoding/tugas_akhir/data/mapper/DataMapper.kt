@@ -281,6 +281,7 @@ object DataMapper {
             fullName = input.fullName,
             nik = input.nik,
             phoneNumber = input.phoneNumber,
+            birthDate = input.birthDate,
             gender = input.gender,
         )
     }
@@ -293,6 +294,7 @@ object DataMapper {
             fullName = input.fullName,
             nik = input.nik,
             phoneNumber = input.phoneNumber,
+            birthDate = input.birthDate,
             gender = input.gender,
             createdAtMillis = System.currentTimeMillis(),
         )

@@ -68,17 +68,13 @@ fun NotificationScreen(
                 ),
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
-            NotificationSummaryCard(
-                unreadCount = unreadCount,
-                onMarkAllAsRead = {
-                    viewModel.markAllAsRead()
-                },
-            )
-
             NotificationFilterSection(
                 selectedFilter = selectedFilter,
                 onFilterSelected = { filter ->
                     selectedFilter = filter
+                },
+                onMarkAllAsRead = {
+                    viewModel.markAllAsRead()
                 },
             )
         }

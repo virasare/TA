@@ -91,7 +91,7 @@ fun ETicketScreen(
             BookingSummaryPlaceholder(
                 modifier = modifier
                     .fillMaxSize()
-                    .background(Background)
+                    .background(MaterialTheme.colorScheme.background)
             )
         }
 
@@ -127,7 +127,7 @@ private fun ETicketContent(
     Column(
         modifier = modifier
             .fillMaxSize()
-            .background(Background)
+            .background(MaterialTheme.colorScheme.background)
             .verticalScroll(rememberScrollState())
             .padding(horizontal = 16.dp, vertical = 12.dp)
             .testTag("e_ticket_screen"),

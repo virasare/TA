@@ -77,7 +77,7 @@ fun MyTicketCard(
             ),
         shape = RoundedCornerShape(26.dp),
         colors = CardDefaults.cardColors(
-            containerColor = White,
+            containerColor = MaterialTheme.colorScheme.surface,
         ),
         border = BorderStroke(
             width = 1.dp,
@@ -413,6 +413,16 @@ private fun TicketStatusPill(
         status.equals("Selesai", ignoreCase = true) -> {
             backgroundColor = Neutral200
             contentColor = Neutral500
+        }
+
+        status.equals("Refund Diproses", ignoreCase = true) -> {
+            backgroundColor = WarningLight
+            contentColor = Warning
+        }
+
+        status.equals("Reschedule Diproses", ignoreCase = true) -> {
+            backgroundColor = InfoLight
+            contentColor = Info
         }
 
         else -> {

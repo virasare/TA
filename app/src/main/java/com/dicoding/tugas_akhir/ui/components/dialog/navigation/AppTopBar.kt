@@ -29,11 +29,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
-import com.dicoding.tugas_akhir.ui.theme.Background
 import com.dicoding.tugas_akhir.ui.theme.Neutral700
 import androidx.compose.ui.tooling.preview.Preview
 import com.dicoding.tugas_akhir.ui.theme.Neutral500
-import com.dicoding.tugas_akhir.ui.theme.White
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -67,7 +65,7 @@ fun AppTopBar(
             }
         },
         colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-            containerColor = White,
+            containerColor = MaterialTheme.colorScheme.surface,
             titleContentColor = Neutral700,
             actionIconContentColor = Neutral700
         )
@@ -102,7 +100,7 @@ fun AppBackTopBar(
             }
         },
         colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = White,
+            containerColor = MaterialTheme.colorScheme.surface,
             titleContentColor = Neutral700,
             navigationIconContentColor = Neutral700
         )
@@ -119,7 +117,7 @@ fun AppSearchTopBar(
         modifier = modifier
             .fillMaxWidth()
             .height(64.dp)
-            .background(Background)
+            .background(MaterialTheme.colorScheme.background)
             .padding(horizontal = 20.dp, vertical = 6.dp),
         contentAlignment = Alignment.Center
     ) {
@@ -129,7 +127,7 @@ fun AppSearchTopBar(
                 .height(52.dp)
                 .clickable { onClick() },
             shape = RoundedCornerShape(12.dp),
-            color = White
+            color = MaterialTheme.colorScheme.surface
         ) {
             Row(
                 modifier = Modifier
@@ -140,7 +138,7 @@ fun AppSearchTopBar(
                 Icon(
                     imageVector = Icons.Outlined.Search,
                     contentDescription = "Cari",
-                    tint = Neutral500,
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.size(24.dp)
                 )
 
@@ -180,7 +178,7 @@ fun AppTopBarVariantsPreview() {
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .background(Background)
+            .background(MaterialTheme.colorScheme.background)
             .padding(vertical = 16.dp),
         verticalArrangement = Arrangement.spacedBy(20.dp)
     ) {

@@ -5,6 +5,7 @@ data class BookingPassengerInput(
     val fullName: String = "",
     val nik: String = "",
     val phoneNumber: String = "",
+    val birthDate: String = "",
     val gender: String = "Perempuan",
     val saveToPassengerData: Boolean = false,
 ) {
@@ -12,5 +13,6 @@ data class BookingPassengerInput(
         get() = fullName.isNotBlank() &&
                 nik.length == 16 &&
                 phoneNumber.length >= 10 &&
+                birthDate.isNotBlank() &&
                 gender.isNotBlank()
 }

@@ -65,7 +65,7 @@ fun ProfileHeaderCard(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(28.dp),
         colors = CardDefaults.cardColors(
-            containerColor = Color.White,
+            containerColor = MaterialTheme.colorScheme.surface,
         ),
         border = BorderStroke(
             width = 1.dp,
@@ -171,7 +171,7 @@ fun ProfileMenuCard(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(24.dp),
         colors = CardDefaults.cardColors(
-            containerColor = Color.White,
+            containerColor = MaterialTheme.colorScheme.surface,
         ),
         border = BorderStroke(
             width = 1.dp,
@@ -823,7 +823,7 @@ fun PassengerDataCard(
             color = Color(0xFFE3EAF2),
         ),
         colors = CardDefaults.cardColors(
-            containerColor = Color.White,
+            containerColor = MaterialTheme.colorScheme.surface,
         ),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
     ) {
@@ -871,11 +871,17 @@ fun PassengerDataCard(
                     color = Color(0xFF627D98),
                 )
 
-                if (birthDate.isNotBlank() || gender.isNotBlank()) {
+                if (birthDate.isNotBlank()) {
                     Text(
-                        text = listOf(birthDate, gender)
-                            .filter { it.isNotBlank() }
-                            .joinToString(" • "),
+                        text = "Tanggal lahir: $birthDate",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = Color(0xFF627D98),
+                    )
+                }
+
+                if (gender.isNotBlank()) {
+                    Text(
+                        text = "Jenis kelamin: $gender",
                         style = MaterialTheme.typography.bodySmall,
                         color = Color(0xFF627D98),
                     )

@@ -46,7 +46,6 @@ import com.dicoding.tugas_akhir.ui.components.loading.PaymentMethodListPlacehold
 import com.dicoding.tugas_akhir.ui.components.lottie.LottieStateView
 import com.dicoding.tugas_akhir.ui.state.CreatePaymentUiState
 import com.dicoding.tugas_akhir.ui.state.PaymentMethodUiState
-import com.dicoding.tugas_akhir.ui.theme.Background
 import com.dicoding.tugas_akhir.ui.theme.Neutral200
 import com.dicoding.tugas_akhir.ui.theme.Neutral500
 import com.dicoding.tugas_akhir.ui.theme.Neutral700
@@ -55,6 +54,10 @@ import com.dicoding.tugas_akhir.ui.theme.Primary3
 import com.dicoding.tugas_akhir.ui.theme.White
 import com.dicoding.tugas_akhir.ui.viewmodel.PaymentViewModel
 import com.dicoding.tugas_akhir.ui.viewmodel.ViewModelFactory
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import com.dicoding.tugas_akhir.ui.components.dialog.ConfirmActionDialog
 
 @Composable
 fun PaymentScreen(
@@ -69,6 +72,7 @@ fun PaymentScreen(
     val paymentMethodUiState by viewModel.paymentMethodUiState.collectAsStateWithLifecycle()
     val selectedPaymentMethod by viewModel.selectedPaymentMethod.collectAsStateWithLifecycle()
     val createPaymentUiState by viewModel.createPaymentUiState.collectAsStateWithLifecycle()
+    var showConfirmPayment by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         viewModel.loadPaymentMethods()
@@ -86,7 +90,7 @@ fun PaymentScreen(
     Column(
         modifier = modifier
             .fillMaxSize()
-            .background(Background)
+            .background(MaterialTheme.colorScheme.background)
             .testTag("payment_screen"),
     ) {
         LazyColumn(
@@ -160,7 +164,21 @@ fun PaymentScreen(
             selectedMethodName = selectedPaymentMethod?.name,
             createPaymentUiState = createPaymentUiState,
             onContinueClick = {
+                showConfirmPayment = true
+            },
+        )
+    }
+
+    if (showConfirmPayment) {
+        ConfirmActionDialog(
+            title = "Lanjut ke pembayaran?",
+            message = "Pastikan metode pembayaran sudah benar sebelum melanjutkan.",
+            onConfirm = {
+                showConfirmPayment = false
                 viewModel.createPayment(bookingId)
+            },
+            onDismiss = {
+                showConfirmPayment = false
             },
         )
     }
@@ -182,11 +200,11 @@ private fun PaymentHeaderCard(
             modifier = Modifier
                 .fillMaxWidth()
                 .background(
-                    Brush.linearGradient(
-                        listOf(
-                            Primary3,
-                            White,
-                            White,
+                    brush = Brush.linearGradient(
+                        colors = listOf(
+                            MaterialTheme.colorScheme.primaryContainer,
+                            MaterialTheme.colorScheme.background,
+                            MaterialTheme.colorScheme.background,
                         )
                     )
                 )

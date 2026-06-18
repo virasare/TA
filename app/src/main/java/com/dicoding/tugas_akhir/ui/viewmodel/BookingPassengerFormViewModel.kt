@@ -72,6 +72,12 @@ class BookingPassengerFormViewModel(
         }
     }
 
+    fun updateBirthDate(index: Int, value: String) {
+        updatePassenger(index) {
+            it.copy(birthDate = value)
+        }
+    }
+
     fun updateGender(index: Int, value: String) {
         updatePassenger(index) {
             it.copy(gender = value)
@@ -107,6 +113,7 @@ class BookingPassengerFormViewModel(
                 fullName = passenger.fullName,
                 nik = passenger.nik,
                 phoneNumber = passenger.phoneNumber,
+                birthDate = passenger.birthDate,
                 gender = passenger.gender,
                 saveToPassengerData = false,
             )
@@ -134,6 +141,7 @@ class BookingPassengerFormViewModel(
                             fullName = passenger.fullName,
                             nik = passenger.nik,
                             phoneNumber = passenger.phoneNumber,
+                            birthDate = passenger.birthDate,
                             gender = passenger.gender,
                         )
                     )
@@ -162,17 +170,18 @@ class BookingPassengerFormViewModel(
         fullName: String,
         nik: String,
         phoneNumber: String,
+        birthDate: String,
         gender: String,
     ) {
         if (
             fullName.isBlank() ||
             nik.length != 16 ||
             phoneNumber.length < 10 ||
+            birthDate.isBlank() ||
             gender.isBlank()
         ) {
             return
         }
-
         viewModelScope.launch {
             savedPassengerRepository.savePassenger(
                 SavedPassenger(
@@ -180,6 +189,7 @@ class BookingPassengerFormViewModel(
                     fullName = fullName,
                     nik = nik,
                     phoneNumber = phoneNumber,
+                    birthDate = birthDate,
                     gender = gender,
                 )
             )

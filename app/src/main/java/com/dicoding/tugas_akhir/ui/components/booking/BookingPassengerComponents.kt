@@ -32,8 +32,63 @@ import com.dicoding.tugas_akhir.domain.model.SavedPassenger
 @Composable
 fun SavedPassengerBookingActionCard(
     savedPassengerCount: Int,
-    saveToPassengerData: Boolean,
     onPickSavedPassengerClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Card(
+        modifier = modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(18.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface,
+        ),
+        border = BorderStroke(
+            width = 1.dp,
+            color = MaterialTheme.colorScheme.outlineVariant,
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+        ) {
+            Column(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(3.dp),
+            ) {
+                Text(
+                    text = "Data Penumpang Tersimpan",
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onSurface,
+                )
+
+                Text(
+                    text = if (savedPassengerCount > 0) {
+                        "Pilih data yang sudah tersimpan agar form terisi otomatis."
+                    } else {
+                        "Belum ada data tersimpan di profil."
+                    },
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+
+            OutlinedButton(
+                onClick = onPickSavedPassengerClick,
+                enabled = savedPassengerCount > 0,
+            ) {
+                Text("Ambil Data")
+            }
+        }
+    }
+}
+
+@Composable
+fun SavePassengerDataCheckboxCard(
+    saveToPassengerData: Boolean,
     onSaveCheckedChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -41,83 +96,44 @@ fun SavedPassengerBookingActionCard(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(18.dp),
         colors = CardDefaults.cardColors(
-            containerColor = Color.White,
+            containerColor = MaterialTheme.colorScheme.surface,
         ),
         border = BorderStroke(
             width = 1.dp,
-            color = Color(0xFFE3EAF2),
+            color = MaterialTheme.colorScheme.outlineVariant,
         ),
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
     ) {
-        Column(
-            modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable {
+                    onSaveCheckedChange(!saveToPassengerData)
+                }
+                .padding(14.dp),
+            verticalAlignment = Alignment.CenterVertically,
         ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
+            Checkbox(
+                checked = saveToPassengerData,
+                onCheckedChange = onSaveCheckedChange,
+            )
+
+            Column(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(2.dp),
             ) {
-                Column(
-                    modifier = Modifier.weight(1f),
-                    verticalArrangement = Arrangement.spacedBy(3.dp),
-                ) {
-                    Text(
-                        text = "Data Penumpang Tersimpan",
-                        style = MaterialTheme.typography.titleSmall,
-                        fontWeight = FontWeight.Bold,
-                        color = Color(0xFF102A43),
-                    )
-
-                    Text(
-                        text = if (savedPassengerCount > 0) {
-                            "Pilih data yang sudah tersimpan agar form terisi otomatis."
-                        } else {
-                            "Belum ada data tersimpan. Kamu bisa simpan data ini untuk booking berikutnya."
-                        },
-                        style = MaterialTheme.typography.bodySmall,
-                        color = Color(0xFF627D98),
-                    )
-                }
-
-                OutlinedButton(
-                    onClick = onPickSavedPassengerClick,
-                    enabled = savedPassengerCount > 0,
-                ) {
-                    Text("Ambil Data")
-                }
-            }
-
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable {
-                        onSaveCheckedChange(!saveToPassengerData)
-                    },
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Checkbox(
-                    checked = saveToPassengerData,
-                    onCheckedChange = onSaveCheckedChange,
+                Text(
+                    text = "Simpan data penumpang ini",
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = FontWeight.SemiBold,
+                    color = MaterialTheme.colorScheme.onSurface,
                 )
 
-                Column(
-                    modifier = Modifier.weight(1f),
-                    verticalArrangement = Arrangement.spacedBy(2.dp),
-                ) {
-                    Text(
-                        text = "Simpan data penumpang ini",
-                        style = MaterialTheme.typography.bodyMedium,
-                        fontWeight = FontWeight.SemiBold,
-                        color = Color(0xFF102A43),
-                    )
-
-                    Text(
-                        text = "Data akan muncul di Profil > Data Penumpang.",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = Color(0xFF627D98),
-                    )
-                }
+                Text(
+                    text = "Data akan muncul di Profil > Data Penumpang.",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
             }
         }
     }

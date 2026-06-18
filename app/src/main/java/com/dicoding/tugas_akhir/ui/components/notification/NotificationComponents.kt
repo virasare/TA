@@ -120,23 +120,35 @@ fun NotificationSummaryCard(
 fun NotificationFilterSection(
     selectedFilter: NotificationFilter,
     onFilterSelected: (NotificationFilter) -> Unit,
+    onMarkAllAsRead: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Row(
         modifier = modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically,
     ) {
-        NotificationFilter.entries.forEach { filter ->
-            FilterChip(
-                selected = selectedFilter == filter,
-                onClick = {
-                    onFilterSelected(filter)
-                },
-                label = {
-                    Text(filter.label)
-                },
-            )
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            NotificationFilter.entries.forEach { filter ->
+                FilterChip(
+                    selected = selectedFilter == filter,
+                    onClick = { onFilterSelected(filter) },
+                    label = { Text(filter.label) },
+                )
+            }
         }
+
+        Text(
+            text = "Tandai semua",
+            style = MaterialTheme.typography.labelMedium,
+            color = MaterialTheme.colorScheme.primary,
+            fontWeight = FontWeight.SemiBold,
+            modifier = Modifier.clickable {
+                onMarkAllAsRead()
+            },
+        )
     }
 }
 

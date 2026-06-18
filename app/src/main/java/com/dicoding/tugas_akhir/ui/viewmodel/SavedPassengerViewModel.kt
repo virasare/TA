@@ -41,6 +41,7 @@ class SavedPassengerViewModel(
                 fullName = passenger.fullName,
                 nik = passenger.nik,
                 phoneNumber = passenger.phoneNumber,
+                birthDate = passenger.birthDate,
                 gender = passenger.gender,
             )
         }
@@ -62,6 +63,10 @@ class SavedPassengerViewModel(
         )
     }
 
+    fun updateBirthDate(value: String) {
+        _formState.value = _formState.value.copy(birthDate = value)
+    }
+
     fun updateGender(value: String) {
         _formState.value = _formState.value.copy(gender = value)
     }
@@ -80,6 +85,7 @@ class SavedPassengerViewModel(
                     fullName = form.fullName,
                     nik = form.nik,
                     phoneNumber = form.phoneNumber,
+                    birthDate = form.birthDate,
                     gender = form.gender,
                 )
             )
@@ -105,11 +111,13 @@ data class SavedPassengerFormState(
     val fullName: String = "",
     val nik: String = "",
     val phoneNumber: String = "",
+    val birthDate: String = "",
     val gender: String = "Perempuan",
 ) {
     val isValid: Boolean
         get() = fullName.isNotBlank() &&
                 nik.length == 16 &&
                 phoneNumber.length >= 10 &&
+                birthDate.isNotBlank() &&
                 gender.isNotBlank()
 }

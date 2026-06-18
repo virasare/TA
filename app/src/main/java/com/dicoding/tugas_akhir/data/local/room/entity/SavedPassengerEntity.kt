@@ -10,6 +10,7 @@ data class SavedPassengerEntity(
     val fullName: String,
     val nik: String,
     val phoneNumber: String,
+    val birthDate: String = "",
     val gender: String,
     val createdAtMillis: Long,
 )

@@ -7,6 +7,7 @@ import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -33,11 +34,11 @@ fun Modifier.shimmerEffect(
     )
 
     val shimmerColors = listOf(
-        Color(0xFFF1F5F9),
-        Color(0xFFE9EEF5),
-        Color(0xFFF8FAFC),
-        Color(0xFFE9EEF5),
-        Color(0xFFF1F5F9),
+        MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.45f),
+        MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.35f),
+        MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.55f),
+        MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.35f),
+        MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.45f),
     )
 
     return this

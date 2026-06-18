@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -30,6 +31,7 @@ import com.dicoding.tugas_akhir.data.recomendation.findRecommendedSchedules
 import com.dicoding.tugas_akhir.ui.components.dialog.buttons.PrimaryButton
 import com.dicoding.tugas_akhir.ui.components.dialog.buttons.SecondaryButton
 import com.dicoding.tugas_akhir.ui.components.cards.ShipScheduleCard
+import com.dicoding.tugas_akhir.ui.components.lottie.LottieStateView
 import com.dicoding.tugas_akhir.ui.theme.Background
 import com.dicoding.tugas_akhir.ui.theme.Neutral500
 import com.dicoding.tugas_akhir.ui.theme.Neutral700
@@ -229,27 +231,25 @@ private fun SearchResultRecommendationContent(
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         item {
-            Column(
-                verticalArrangement = Arrangement.spacedBy(8.dp)
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .fillParentMaxHeight(0.45f),
+                contentAlignment = Alignment.Center,
             ) {
-                Text(
-                    text = "Jadwal belum tersedia",
-                    color = Neutral700,
-                    fontWeight = FontWeight.Bold,
-                    style = MaterialTheme.typography.titleLarge
-                )
-
-                Text(
-                    text = "Belum ada jadwal ${originPort.city} ke ${destinationPort.city} pada $selectedDate. Berikut rekomendasi kapal menuju ${destinationPort.city} dengan tanggal terdekat.",
-                    color = Neutral500,
-                    style = MaterialTheme.typography.bodyMedium
-                )
-
-                SecondaryButton(
-                    text = "Ubah Pencarian",
-                    onClick = onBackToHomeClick
+                LottieStateView(
+                    animationFile = "empty_schedule.json",
+                    title = "Jadwal belum tersedia",
+                    message = "Belum ada jadwal ${originPort.city} ke ${destinationPort.city} pada $selectedDate.",
                 )
             }
+        }
+
+        item {
+            SecondaryButton(
+                text = "Ubah Pencarian",
+                onClick = onBackToHomeClick,
+            )
         }
 
         item {

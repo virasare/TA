@@ -80,8 +80,12 @@ dependencies {
     implementation(libs.androidx.credentials.play.services.auth)
     implementation(libs.googleid)
 
+    implementation(libs.androidx.core.splashscreen)
+
     // Image loading
     implementation(libs.coil.compose)
+    implementation(libs.image.cropper)
+    implementation(libs.androidx.appcompat)
 
     // Lottie
     implementation(libs.lottie.compose)

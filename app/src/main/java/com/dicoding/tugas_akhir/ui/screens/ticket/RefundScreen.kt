@@ -18,6 +18,7 @@ import com.dicoding.tugas_akhir.ui.components.dialog.buttons.PrimaryButton
 import com.dicoding.tugas_akhir.ui.components.ticket.ManageTicketInfoCard
 import com.dicoding.tugas_akhir.ui.components.ticket.RefundReasonCard
 import com.dicoding.tugas_akhir.ui.theme.Background
+import com.dicoding.tugas_akhir.ui.components.dialog.ConfirmActionDialog
 
 @Composable
 fun RefundScreen(
@@ -33,8 +34,27 @@ fun RefundScreen(
         mutableStateOf("")
     }
 
+    var showRefundConfirm by remember {
+        mutableStateOf(false)
+    }
+
     val isValid = selectedReason.isNotBlank() &&
             (selectedReason != "Alasan lain" || customReason.isNotBlank())
+
+    if (showRefundConfirm) {
+        ConfirmActionDialog(
+            title = "Ajukan refund?",
+            message = "Pengajuan refund akan mengubah status tiket menjadi Refund Diproses.",
+            confirmText = "Ya, ajukan",
+            onConfirm = {
+                showRefundConfirm = false
+                onSubmitClick(bookingId)
+            },
+            onDismiss = {
+                showRefundConfirm = false
+            },
+        )
+    }
 
     Column(
         modifier = modifier
@@ -70,7 +90,7 @@ fun RefundScreen(
         PrimaryButton(
             text = "Ajukan Refund",
             onClick = {
-                onSubmitClick(bookingId)
+                showRefundConfirm = true
             },
             enabled = isValid,
             modifier = Modifier

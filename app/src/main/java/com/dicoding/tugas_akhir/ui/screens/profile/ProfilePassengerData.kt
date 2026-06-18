@@ -7,10 +7,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
-import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -22,6 +18,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.dicoding.tugas_akhir.domain.model.SavedPassenger
+import com.dicoding.tugas_akhir.ui.components.dialog.ConfirmActionDialog
 import com.dicoding.tugas_akhir.ui.components.profile.AddPassengerCard
 import com.dicoding.tugas_akhir.ui.components.profile.InfoNote
 import com.dicoding.tugas_akhir.ui.components.profile.PassengerDataCard
@@ -42,36 +39,19 @@ fun PassengerDataScreen(
     var selectedDeletePassenger by remember { mutableStateOf<SavedPassenger?>(null) }
 
     if (selectedDeletePassenger != null) {
-        AlertDialog(
-            onDismissRequest = {
+        ConfirmActionDialog(
+            title = "Hapus data penumpang?",
+            message = "Data penumpang yang dihapus tidak akan tampil lagi saat pemesanan.",
+            confirmText = "Hapus",
+            dismissText = "Batal",
+            onConfirm = {
+                selectedDeletePassenger?.let { passenger ->
+                    viewModel.deletePassenger(passenger)
+                }
                 selectedDeletePassenger = null
             },
-            title = {
-                Text("Hapus data penumpang?")
-            },
-            text = {
-                Text("Data penumpang yang dihapus tidak akan tampil lagi saat pemesanan.")
-            },
-            confirmButton = {
-                Button(
-                    onClick = {
-                        selectedDeletePassenger?.let { passenger ->
-                            viewModel.deletePassenger(passenger)
-                        }
-                        selectedDeletePassenger = null
-                    },
-                ) {
-                    Text("Hapus")
-                }
-            },
-            dismissButton = {
-                OutlinedButton(
-                    onClick = {
-                        selectedDeletePassenger = null
-                    },
-                ) {
-                    Text("Batal")
-                }
+            onDismiss = {
+                selectedDeletePassenger = null
             },
         )
     }
@@ -113,6 +93,7 @@ fun PassengerDataScreen(
                     title = passenger.fullName,
                     nik = passenger.nik,
                     phoneNumber = passenger.phoneNumber,
+                    birthDate = passenger.birthDate,
                     gender = passenger.gender,
                     onEditClick = {
                         onEditPassengerClick(passenger.id)

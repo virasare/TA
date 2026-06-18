@@ -18,6 +18,7 @@ import com.dicoding.tugas_akhir.ui.components.dialog.buttons.PrimaryButton
 import com.dicoding.tugas_akhir.ui.components.ticket.ManageTicketInfoCard
 import com.dicoding.tugas_akhir.ui.components.ticket.RescheduleOptionCard
 import com.dicoding.tugas_akhir.ui.theme.Background
+import com.dicoding.tugas_akhir.ui.components.dialog.ConfirmActionDialog
 
 @Composable
 fun RescheduleScreen(
@@ -27,6 +28,25 @@ fun RescheduleScreen(
 ) {
     var selectedScheduleId by remember {
         mutableStateOf("")
+    }
+
+    var showRescheduleConfirm by remember {
+        mutableStateOf(false)
+    }
+
+    if (showRescheduleConfirm) {
+        ConfirmActionDialog(
+            title = "Ajukan reschedule?",
+            message = "Pengajuan reschedule akan mengubah status tiket menjadi Reschedule Diproses.",
+            confirmText = "Ya, ajukan",
+            onConfirm = {
+                showRescheduleConfirm = false
+                onSubmitClick(bookingId)
+            },
+            onDismiss = {
+                showRescheduleConfirm = false
+            },
+        )
     }
 
     Column(
@@ -59,7 +79,7 @@ fun RescheduleScreen(
         PrimaryButton(
             text = "Ajukan Reschedule",
             onClick = {
-                onSubmitClick(bookingId)
+                showRescheduleConfirm = true
             },
             enabled = selectedScheduleId.isNotBlank(),
             modifier = Modifier
