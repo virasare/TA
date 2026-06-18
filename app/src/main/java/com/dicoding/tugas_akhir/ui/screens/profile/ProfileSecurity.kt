@@ -12,10 +12,10 @@ import androidx.compose.material.icons.outlined.VerifiedUser
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.dicoding.tugas_akhir.ui.components.profile.DetailMenuItem
 import com.dicoding.tugas_akhir.ui.components.profile.InfoNote
-import com.dicoding.tugas_akhir.ui.components.profile.ProfileFormCard
 import com.dicoding.tugas_akhir.ui.localization.LocalAppStrings
+import com.dicoding.tugas_akhir.ui.components.profile.StaticInfoItem
+import com.dicoding.tugas_akhir.ui.components.profile.StaticInfoSection
 
 @Composable
 fun ProfileSecurityScreen(
@@ -38,30 +38,32 @@ fun ProfileSecurityScreen(
         }
 
         item {
-            ProfileFormCard(
-                title = strings.security,
-            ) {
-                DetailMenuItem(
+            StaticInfoSection(title = strings.security) {
+                StaticInfoItem(
                     title = strings.loginStatus,
                     subtitle = strings.accountActive,
                     icon = Icons.Outlined.VerifiedUser,
-                    onClick = {},
                 )
 
-                DetailMenuItem(
+                StaticInfoItem(
                     title = strings.loginProvider,
                     subtitle = strings.googleAccount,
                     icon = Icons.Outlined.Security,
-                    onClick = {},
                 )
 
-                DetailMenuItem(
+                StaticInfoItem(
                     title = strings.protectedFeature,
                     subtitle = strings.protectedFeatureDesc,
                     icon = Icons.Outlined.Lock,
-                    onClick = {},
                 )
             }
+        }
+
+        item {
+            InfoNote(
+                title = "Tips Keamanan",
+                text = "Gunakan akun pribadi, jangan bagikan e-ticket atau kode pembayaran, dan selalu logout jika memakai perangkat bersama.",
+            )
         }
     }
 }

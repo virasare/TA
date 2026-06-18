@@ -36,7 +36,7 @@
         <activity
             android:name="com.canhub.cropper.CropImageActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/Theme.Tugas_Akhir"
+            android:theme="@style/Theme.TugasAkhir.Cropper"
             tools:ignore="DiscouragedApi" />
 
         <provider

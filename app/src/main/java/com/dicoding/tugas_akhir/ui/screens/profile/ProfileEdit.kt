@@ -1,9 +1,6 @@
-@file:Suppress("DEPRECATION")
-
 package com.dicoding.tugas_akhir.ui.screens.profile
 
 import android.Manifest
-import android.content.Intent
 import android.graphics.Bitmap
 import android.net.Uri
 import android.widget.Toast
@@ -90,69 +87,60 @@ fun EditProfileScreen(
     var showSavedDialog by remember { mutableStateOf(false) }
     var cameraUri by remember { mutableStateOf<Uri?>(null) }
 
-//    val cropImageLauncher = rememberLauncherForActivityResult(
-//        contract = CropImageContract(),
-//    ) { result ->
-//        if (result.isSuccessful) {
-//            val croppedUri = result.uriContent
-//
-//            if (croppedUri != null) {
-//                viewModel.updatePhotoUri(croppedUri.toString())
-//
-//                Toast.makeText(
-//                    context,
-//                    "Foto berhasil dipilih. Jangan lupa simpan perubahan.",
-//                    Toast.LENGTH_SHORT,
-//                ).show()
-//            } else {
-//                Toast.makeText(
-//                    context,
-//                    "Foto hasil crop kosong. Silakan coba lagi.",
-//                    Toast.LENGTH_SHORT,
-//                ).show()
-//            }
-//        } else {
-//            Toast.makeText(
-//                context,
-//                result.error?.message ?: "Gagal memotong foto. Silakan coba lagi.",
-//                Toast.LENGTH_LONG,
-//            ).show()
-//        }
-//    }
-//
-//    fun launchCropPhoto(sourceUri: Uri) {
-//        try {
-//            cropImageLauncher.launch(
-//                CropImageContractOptions(
-//                    uri = sourceUri,
-//                    cropImageOptions = CropImageOptions(
-//                        guidelines = CropImageView.Guidelines.ON,
-//                        cropShape = CropImageView.CropShape.OVAL,
-//                        fixAspectRatio = true,
-//                        aspectRatioX = 1,
-//                        aspectRatioY = 1,
-//                        outputCompressFormat = Bitmap.CompressFormat.JPEG,
-//                        outputCompressQuality = 90,
-//                        allowRotation = true,
-//                        allowFlipping = true,
-//                    ),
-//                ),
-//            )
-//        } catch (exception: Exception) {
-//            Toast.makeText(
-//                context,
-//                exception.message ?: "Crop foto gagal dibuka.",
-//                Toast.LENGTH_LONG,
-//            ).show()
-//        }
-//    }
+    val cropImageLauncher = rememberLauncherForActivityResult(
+        contract = CropImageContract(),
+    ) { result ->
+        if (result.isSuccessful) {
+            val croppedUri = result.uriContent
+
+            if (croppedUri != null) {
+                viewModel.updatePhotoUri(croppedUri.toString())
+
+                Toast.makeText(
+                    context,
+                    "Foto berhasil dipilih. Jangan lupa simpan perubahan.",
+                    Toast.LENGTH_SHORT,
+                ).show()
+            } else {
+                Toast.makeText(
+                    context,
+                    "Foto hasil crop kosong. Silakan coba lagi.",
+                    Toast.LENGTH_SHORT,
+                ).show()
+            }
+        } else {
+            Toast.makeText(
+                context,
+                result.error?.message ?: "Gagal memotong foto. Silakan coba lagi.",
+                Toast.LENGTH_LONG,
+            ).show()
+        }
+    }
+
+    fun launchCropPhoto(sourceUri: Uri) {
+        cropImageLauncher.launch(
+            CropImageContractOptions(
+                uri = sourceUri,
+                cropImageOptions = CropImageOptions(
+                    guidelines = CropImageView.Guidelines.ON,
+                    cropShape = CropImageView.CropShape.OVAL,
+                    fixAspectRatio = true,
+                    aspectRatioX = 1,
+                    aspectRatioY = 1,
+                    allowRotation = true,
+                    allowFlipping = true,
+                    activityTitle = "Atur Foto Profil",
+                    cropMenuCropButtonTitle = "Simpan",
+                ),
+            ),
+        )
+    }
 
     val galleryLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent(),
     ) { uri ->
         if (uri != null) {
-//            launchCropPhoto(uri)
-            viewModel.updatePhotoUri(uri.toString())
+            launchCropPhoto(uri)
         }
     }
 
@@ -161,8 +149,7 @@ fun EditProfileScreen(
     ) { success ->
         if (success) {
             cameraUri?.let { uri ->
-//                launchCropPhoto(uri)
-                viewModel.updatePhotoUri(uri.toString())
+                launchCropPhoto(uri)
             }
         } else {
             Toast.makeText(

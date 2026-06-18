@@ -14,10 +14,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.dicoding.tugas_akhir.ui.components.profile.DetailMenuItem
 import com.dicoding.tugas_akhir.ui.components.profile.InfoNote
-import com.dicoding.tugas_akhir.ui.components.profile.ProfileFormCard
 import com.dicoding.tugas_akhir.ui.localization.LocalAppStrings
+import com.dicoding.tugas_akhir.ui.components.profile.StaticInfoItem
+import com.dicoding.tugas_akhir.ui.components.profile.StaticInfoSection
 
 @Composable
 fun ProfileAboutScreen(
@@ -41,62 +41,51 @@ fun ProfileAboutScreen(
         }
 
         item {
-            ProfileFormCard(
-                title = strings.information,
-            ) {
-                DetailMenuItem(
+            StaticInfoSection(title = strings.information) {
+                StaticInfoItem(
                     title = strings.appVersion,
                     subtitle = "Release build",
                     icon = Icons.Outlined.Verified,
-                    onClick = {},
                 )
 
-                DetailMenuItem(
+                StaticInfoItem(
                     title = strings.platform,
                     subtitle = "Jetpack Compose",
                     icon = Icons.Outlined.Android,
-                    onClick = {},
                 )
 
-                DetailMenuItem(
+                StaticInfoItem(
                     title = strings.method,
                     subtitle = strings.purpose,
                     icon = Icons.Outlined.Description,
-                    onClick = {},
                 )
             }
         }
 
         item {
-            ProfileFormCard(
-                title = strings.mainFeature,
-            ) {
-                DetailMenuItem(
+            StaticInfoSection(title = strings.mainFeature) {
+                StaticInfoItem(
                     title = "Cari Jadwal Kapal",
                     subtitle = "Mencari jadwal berdasarkan pelabuhan asal, tujuan, dan tanggal.",
                     icon = Icons.Outlined.CheckCircle,
-                    onClick = {},
                 )
 
-                DetailMenuItem(
+                StaticInfoItem(
                     title = "Booking dan Pembayaran",
                     subtitle = "Melakukan pemesanan tiket dan melihat instruksi pembayaran.",
                     icon = Icons.Outlined.CheckCircle,
-                    onClick = {},
                 )
 
-                DetailMenuItem(
+                StaticInfoItem(
                     title = "E-Ticket",
                     subtitle = "Menampilkan tiket digital setelah pembayaran berhasil.",
                     icon = Icons.Outlined.CheckCircle,
-                    onClick = {},
                 )
 
-                DetailMenuItem(
+                StaticInfoItem(
                     title = "Data Penumpang",
                     subtitle = "Menyimpan data penumpang untuk mempercepat proses booking.",
                     icon = Icons.Outlined.CheckCircle,
-                    onClick = {},
                 )
             }
         }
