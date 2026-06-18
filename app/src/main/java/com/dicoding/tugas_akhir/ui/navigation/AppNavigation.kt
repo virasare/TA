@@ -91,6 +91,8 @@ import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import com.dicoding.tugas_akhir.ui.viewmodel.BookingViewModel
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.FileDownload
 
 @Composable
 fun AppNavigation() {
@@ -199,6 +201,8 @@ fun AppNavigation() {
     var passengerList by remember {
         mutableStateOf<List<PassengerData>>(emptyList())
     }
+
+    var eTicketDownloadRequest by remember { mutableStateOf(0) }
 
     val bottomBarRoutes = listOf(
         Screens.Home,
@@ -333,7 +337,19 @@ fun AppNavigation() {
                         title = getTopBarTitle(currentRoute.orEmpty()),
                         onBackClick = {
                             navController.popBackStack()
-                        }
+                        },
+                        actionIcon = if (
+                            currentRoute == Screens.ETicket ||
+                            currentRoute == Screens.ETicketByPayment
+                        ) {
+                            Icons.Outlined.FileDownload
+                        } else {
+                            null
+                        },
+                        actionDescription = "Download E-Ticket",
+                        onActionClick = {
+                            eTicketDownloadRequest++
+                        },
                     )
                 } else {
                     AppTopBar(
@@ -613,7 +629,7 @@ fun AppNavigation() {
                 PopularRouteResultScreen(
                     popularRoute = selectedPopularRoute,
                     onScheduleClick = { scheduleId ->
-                        navController.navigate(Screens.scheduleDetail(scheduleId.toString()))
+                        navController.navigate(Screens.scheduleDetail(scheduleId))
                     }
                 )
             }

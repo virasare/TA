@@ -23,6 +23,31 @@ import com.dicoding.tugas_akhir.ui.components.profile.ProfileFormCard
 import com.dicoding.tugas_akhir.ui.components.profile.ProfileTextField
 import com.dicoding.tugas_akhir.ui.viewmodel.SavedPassengerViewModel
 import com.dicoding.tugas_akhir.ui.viewmodel.ViewModelFactory
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.CalendarMonth
+import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerDefaults
+import androidx.compose.material3.DatePickerDialog
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.rememberDatePickerState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
+import androidx.compose.material3.ButtonDefaults
 
 @Composable
 fun PassengerProfileFormScreen(
@@ -90,11 +115,9 @@ fun PassengerProfileFormScreen(
                         keyboardType = KeyboardType.Phone,
                     )
 
-                    ProfileTextField(
-                        label = "Tanggal Lahir",
+                    ProfileBirthDatePickerField(
                         value = formState.birthDate,
-                        onValueChange = viewModel::updateBirthDate,
-                        placeholder = "Contoh: 28-08-2003",
+                        onDateSelected = viewModel::updateBirthDate,
                     )
 
                     ChoiceSection(
@@ -125,5 +148,123 @@ fun PassengerProfileFormScreen(
             enabled = formState.isValid,
             modifier = Modifier.navigationBarsPadding(),
         )
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun ProfileBirthDatePickerField(
+    value: String,
+    onDateSelected: (String) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    var showDatePicker by remember { mutableStateOf(false) }
+
+    val datePickerState = rememberDatePickerState(
+        initialSelectedDateMillis = value.toDateMillis()
+    )
+
+    Box(modifier = modifier.fillMaxWidth()) {
+        OutlinedTextField(
+            value = value,
+            onValueChange = {},
+            modifier = Modifier.fillMaxWidth(),
+            label = { Text("Tanggal Lahir") },
+            placeholder = { Text("Pilih tanggal lahir") },
+            leadingIcon = {
+                Icon(
+                    imageVector = Icons.Outlined.CalendarMonth,
+                    contentDescription = null,
+                )
+            },
+            trailingIcon = {
+                Icon(
+                    imageVector = Icons.Outlined.CalendarMonth,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary,
+                )
+            },
+            readOnly = true,
+            singleLine = true,
+            shape = RoundedCornerShape(16.dp),
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedBorderColor = MaterialTheme.colorScheme.primary,
+                focusedLabelColor = MaterialTheme.colorScheme.primary,
+                cursorColor = MaterialTheme.colorScheme.primary,
+            ),
+        )
+
+        Box(
+            modifier = Modifier
+                .matchParentSize()
+                .clickable(
+                    interactionSource = remember { MutableInteractionSource() },
+                    indication = null,
+                ) {
+                    showDatePicker = true
+                }
+        )
+    }
+
+    if (showDatePicker) {
+        DatePickerDialog(
+            onDismissRequest = { showDatePicker = false },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        datePickerState.selectedDateMillis?.let {
+                            onDateSelected(it.toDateString())
+                        }
+                        showDatePicker = false
+                    },
+                    colors = ButtonDefaults.textButtonColors(
+                        contentColor = MaterialTheme.colorScheme.primary,
+                    ),
+                ) {
+                    Text("Pilih")
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = { showDatePicker = false },
+                    colors = ButtonDefaults.textButtonColors(
+                        contentColor = MaterialTheme.colorScheme.primary,
+                    ),
+                ) {
+                    Text("Batal")
+                }
+            },
+        ) {
+            DatePicker(
+                state = datePickerState,
+                showModeToggle = false,
+                colors = DatePickerDefaults.colors(
+                    containerColor = MaterialTheme.colorScheme.surface,
+                    selectedDayContainerColor = MaterialTheme.colorScheme.primary,
+                    selectedDayContentColor = MaterialTheme.colorScheme.onPrimary,
+                    todayContentColor = MaterialTheme.colorScheme.primary,
+                    todayDateBorderColor = MaterialTheme.colorScheme.primary,
+                    navigationContentColor = MaterialTheme.colorScheme.primary,
+                    selectedYearContainerColor = MaterialTheme.colorScheme.primary,
+                    selectedYearContentColor = MaterialTheme.colorScheme.onPrimary,
+                ),
+            )
+        }
+    }
+}
+
+private fun Long.toDateString(): String {
+    val formatter = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+    return formatter.format(Date(this))
+}
+
+private fun String.toDateMillis(): Long? {
+    if (isBlank()) return null
+
+    return try {
+        val formatter = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+        formatter.parse(this)?.time
+    } catch (e: Exception) {
+        null
     }
 }

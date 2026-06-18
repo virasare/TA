@@ -40,6 +40,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.dicoding.tugas_akhir.data.dummy.Port
 import com.dicoding.tugas_akhir.data.dummy.dummyPorts
+import com.dicoding.tugas_akhir.ui.components.lottie.LottieStateView
 import com.dicoding.tugas_akhir.ui.theme.Background
 import com.dicoding.tugas_akhir.ui.theme.Neutral200
 import com.dicoding.tugas_akhir.ui.theme.Neutral300
@@ -115,10 +116,10 @@ fun PortSearchScreen(
                     .padding(top = 40.dp),
                 contentAlignment = Alignment.Center
             ) {
-                Text(
-                    text = "Pelabuhan tidak ditemukan",
-                    color = Neutral500,
-                    style = MaterialTheme.typography.bodyMedium
+                LottieStateView(
+                    animationFile = "empty.json",
+                    title = "Pelabuhan tidak ditemukan",
+                    message = "Coba gunakan nama kota atau pelabuhan lain.",
                 )
             }
         } else {

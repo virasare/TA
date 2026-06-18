@@ -45,6 +45,18 @@ import com.dicoding.tugas_akhir.ui.components.ticket.FakeQrCode
 import com.dicoding.tugas_akhir.ui.state.ETicketUiState
 import com.dicoding.tugas_akhir.ui.viewmodel.MyTicketViewModel
 import com.dicoding.tugas_akhir.ui.viewmodel.ViewModelFactory
+import android.content.ContentValues
+import android.content.Context
+import android.graphics.Paint
+import android.graphics.Typeface
+import android.graphics.pdf.PdfDocument
+import android.os.Build
+import android.os.Environment
+import android.provider.MediaStore
+import android.widget.Toast
+import androidx.compose.ui.platform.LocalContext
+import java.io.File
+import java.io.FileOutputStream
 
 private val White = Color(0xFFFFFFFF)
 private val Black = Color(0xFF111827)
@@ -69,6 +81,7 @@ private val InfoLight = Color(0xFFDBEAFE)
 fun ETicketScreen(
     bookingId: String? = null,
     paymentId: String? = null,
+    downloadRequest: Int = 0,
     onBackClick: () -> Unit,
     onRefundClick: (String) -> Unit = {},
     onRescheduleClick: (String) -> Unit = {},
@@ -78,6 +91,8 @@ fun ETicketScreen(
     ),
 ) {
     val eTicketUiState by viewModel.eTicketUiState.collectAsStateWithLifecycle()
+
+    val context = LocalContext.current
 
     LaunchedEffect(bookingId, paymentId) {
         when {
@@ -96,6 +111,14 @@ fun ETicketScreen(
         }
 
         is ETicketUiState.Success -> {
+            LaunchedEffect(downloadRequest, state.ticket.bookingId) {
+                if (downloadRequest > 0) {
+                    downloadETicketPdf(
+                        context = context,
+                        ticket = state.ticket,
+                    )
+                }
+            }
             ETicketContent(
                 ticket = state.ticket,
                 onRefundClick = onRefundClick,
@@ -817,5 +840,98 @@ private fun maskNik(nik: String): String {
         nik.take(6) + "xxxxxxxxxx"
     } else {
         nik
+    }
+}
+
+private fun downloadETicketPdf(
+    context: Context,
+    ticket: ETicket,
+) {
+    val fileName = "e-ticket-${ticket.bookingCode}.pdf"
+    val pdfDocument = PdfDocument()
+    val pageInfo = PdfDocument.PageInfo.Builder(595, 842, 1).create()
+    val page = pdfDocument.startPage(pageInfo)
+    val canvas = page.canvas
+
+    val titlePaint = Paint().apply {
+        textSize = 22f
+        typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
+        color = android.graphics.Color.rgb(25, 118, 210)
+    }
+
+    val bodyPaint = Paint().apply {
+        textSize = 14f
+        color = android.graphics.Color.rgb(17, 24, 39)
+    }
+
+    var y = 72f
+
+    canvas.drawText("E-Ticket Kapal", 48f, y, titlePaint)
+    y += 34f
+    canvas.drawText("Kode Booking: ${ticket.bookingCode}", 48f, y, bodyPaint)
+    y += 26f
+    canvas.drawText("Status: ${ticket.status}", 48f, y, bodyPaint)
+    y += 34f
+    canvas.drawText("Kapal: ${ticket.shipName}", 48f, y, bodyPaint)
+    y += 26f
+    canvas.drawText("Rute: ${ticket.origin} - ${ticket.destination}", 48f, y, bodyPaint)
+    y += 26f
+    canvas.drawText("Tanggal: ${DateFormatter.formatDate(ticket.departureDate)}", 48f, y, bodyPaint)
+    y += 26f
+    canvas.drawText("Jam: ${ticket.departureTime}", 48f, y, bodyPaint)
+    y += 26f
+    canvas.drawText("Kelas: ${ticket.ticketClassName}", 48f, y, bodyPaint)
+    y += 40f
+    canvas.drawText("Data Penumpang", 48f, y, titlePaint)
+    y += 30f
+
+    ticket.passengers.forEachIndexed { index, passenger ->
+        canvas.drawText("${index + 1}. ${passenger.fullName} - NIK: ${maskNik(passenger.nik)}", 48f, y, bodyPaint)
+        y += 24f
+    }
+
+    y += 24f
+    canvas.drawText("Terminal: ${ticket.terminal}", 48f, y, bodyPaint)
+    y += 24f
+    canvas.drawText("Gate: ${ticket.gate}", 48f, y, bodyPaint)
+    y += 34f
+    canvas.drawText(ticket.note.take(80), 48f, y, bodyPaint)
+
+    pdfDocument.finishPage(page)
+
+    try {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            val values = ContentValues().apply {
+                put(MediaStore.Downloads.DISPLAY_NAME, fileName)
+                put(MediaStore.Downloads.MIME_TYPE, "application/pdf")
+                put(MediaStore.Downloads.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS)
+            }
+
+            val uri = context.contentResolver.insert(
+                MediaStore.Downloads.EXTERNAL_CONTENT_URI,
+                values,
+            )
+
+            if (uri != null) {
+                context.contentResolver.openOutputStream(uri)?.use { output ->
+                    pdfDocument.writeTo(output)
+                }
+            }
+        } else {
+            val file = File(
+                context.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS),
+                fileName,
+            )
+
+            FileOutputStream(file).use { output ->
+                pdfDocument.writeTo(output)
+            }
+        }
+
+        Toast.makeText(context, "E-ticket berhasil diunduh.", Toast.LENGTH_SHORT).show()
+    } catch (exception: Exception) {
+        Toast.makeText(context, "Gagal mengunduh e-ticket.", Toast.LENGTH_SHORT).show()
+    } finally {
+        pdfDocument.close()
     }
 }

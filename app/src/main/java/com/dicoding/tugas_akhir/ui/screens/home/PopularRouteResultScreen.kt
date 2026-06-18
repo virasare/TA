@@ -2,6 +2,7 @@ package com.dicoding.tugas_akhir.ui.screens.home
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -11,13 +12,18 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.dicoding.tugas_akhir.core.utils.DateFormatter
+import com.dicoding.tugas_akhir.core.utils.PriceFormatter
+import com.dicoding.tugas_akhir.data.dummy.DummyShipScheduleApiData
 import com.dicoding.tugas_akhir.data.dummy.PopularRoute
-import com.dicoding.tugas_akhir.data.dummy.ShipSchedule
-import com.dicoding.tugas_akhir.data.dummy.dummyShipSchedules
+import com.dicoding.tugas_akhir.data.remote.response.ShipScheduleResponse
 import com.dicoding.tugas_akhir.ui.components.cards.ShipScheduleCard
+import com.dicoding.tugas_akhir.ui.components.cards.ShipScheduleStatus
+import com.dicoding.tugas_akhir.ui.components.lottie.LottieStateView
 import com.dicoding.tugas_akhir.ui.theme.Background
 import com.dicoding.tugas_akhir.ui.theme.Neutral500
 import com.dicoding.tugas_akhir.ui.theme.Neutral700
@@ -25,45 +31,34 @@ import com.dicoding.tugas_akhir.ui.theme.Neutral700
 @Composable
 fun PopularRouteResultScreen(
     popularRoute: PopularRoute?,
-    onScheduleClick: (Int) -> Unit
+    onScheduleClick: (String) -> Unit
 ) {
     if (popularRoute == null) {
-        Column(
+        Box(
             modifier = Modifier
                 .fillMaxSize()
                 .background(Background),
-            verticalArrangement = Arrangement.Center
+            contentAlignment = Alignment.Center
         ) {
-            Text(
-                text = "Rute populer tidak ditemukan",
-                color = Neutral700,
-                style = MaterialTheme.typography.titleMedium
+            LottieStateView(
+                animationFile = "empty.json",
+                title = "Rute populer tidak ditemukan",
+                message = "Data rute populer belum tersedia.",
             )
         }
         return
     }
 
     val schedules = remember(popularRoute) {
-        dummyShipSchedules
+        DummyShipScheduleApiData.schedules
             .filter { schedule ->
-                val routeDirection = schedule.route.toRouteDirection()
-
-                routeDirection.origin.equals(
-                    popularRoute.originCity,
-                    ignoreCase = true
-                ) && routeDirection.destination.equals(
-                    popularRoute.destinationCity,
-                    ignoreCase = true
-                )
+                schedule.origin.equals(popularRoute.originCity, ignoreCase = true) &&
+                        schedule.destination.equals(popularRoute.destinationCity, ignoreCase = true)
             }
             .sortedWith(
-                compareBy<ShipSchedule> { schedule ->
-                    schedule.price.toPriceNumber()
-                }.thenBy { schedule ->
-                    schedule.departureDate
-                }.thenBy { schedule ->
-                    schedule.departureTime
-                }
+                compareBy<ShipScheduleResponse> { it.economyPrice }
+                    .thenBy { it.departureDate }
+                    .thenBy { it.departureTime }
             )
     }
 
@@ -93,43 +88,44 @@ fun PopularRouteResultScreen(
             }
         }
 
-        items(schedules) { schedule ->
-            ShipScheduleCard(
-                shipName = schedule.shipName,
-                route = schedule.route,
-                departureDate = schedule.departureDate,
-                departureTime = schedule.departureTime,
-                arrivalTime = "${schedule.arrivalDate}, ${schedule.arrivalTime}",
-                duration = schedule.duration,
-                price = schedule.price,
-                quota = schedule.quota,
-                status = schedule.status,
-                onClick = {
-                    onScheduleClick(schedule.id)
-                }
-            )
+        if (schedules.isEmpty()) {
+            item {
+                LottieStateView(
+                    animationFile = "empty.json",
+                    title = "Jadwal belum tersedia",
+                    message = "Belum ada jadwal untuk rute ${popularRoute.route}.",
+                )
+            }
+        } else {
+            items(
+                items = schedules,
+                key = { schedule -> schedule.id }
+            ) { schedule ->
+                ShipScheduleCard(
+                    shipName = schedule.shipName,
+                    route = "${schedule.origin} - ${schedule.destination}",
+                    departureDate = DateFormatter.formatDate(schedule.departureDate),
+                    departureTime = schedule.departureTime,
+                    arrivalTime = "${DateFormatter.formatDate(schedule.arrivalDate)}, ${schedule.arrivalTime}",
+                    duration = schedule.duration,
+                    price = PriceFormatter.formatToRupiah(schedule.economyPrice),
+                    quota = if (schedule.quota <= 0) "Habis" else "${schedule.quota} kursi",
+                    status = schedule.toUiStatus(),
+                    onClick = {
+                        onScheduleClick(schedule.id)
+                    }
+                )
+            }
         }
     }
 }
 
-private data class RouteDirection(
-    val origin: String,
-    val destination: String
-)
-
-private fun String.toRouteDirection(): RouteDirection {
-    val parts = split("→")
-
-    return RouteDirection(
-        origin = parts.getOrNull(0)?.trim().orEmpty(),
-        destination = parts.getOrNull(1)?.trim().orEmpty()
-    )
-}
-
-private fun String.toPriceNumber(): Int {
-    return replace("Rp", "")
-        .replace(".", "")
-        .replace(",", "")
-        .trim()
-        .toIntOrNull() ?: Int.MAX_VALUE
+private fun ShipScheduleResponse.toUiStatus(): ShipScheduleStatus {
+    return when {
+        quota <= 0 -> ShipScheduleStatus.Unavailable
+        status.contains("habis", ignoreCase = true) -> ShipScheduleStatus.Unavailable
+        status.contains("terbatas", ignoreCase = true) -> ShipScheduleStatus.Limited
+        quota <= 10 -> ShipScheduleStatus.Limited
+        else -> ShipScheduleStatus.Available
+    }
 }

@@ -77,7 +77,10 @@ fun AppTopBar(
 fun AppBackTopBar(
     title: String,
     modifier: Modifier = Modifier,
-    onBackClick: () -> Unit = {}
+    onBackClick: () -> Unit = {},
+    actionIcon: ImageVector? = null,
+    actionDescription: String? = null,
+    onActionClick: () -> Unit = {},
 ) {
     TopAppBar(
         modifier = modifier,
@@ -99,11 +102,23 @@ fun AppBackTopBar(
                 )
             }
         },
+        actions = {
+            if (actionIcon != null) {
+                IconButton(onClick = onActionClick) {
+                    Icon(
+                        imageVector = actionIcon,
+                        contentDescription = actionDescription,
+                        tint = Neutral700,
+                    )
+                }
+            }
+        },
         colors = TopAppBarDefaults.topAppBarColors(
             containerColor = MaterialTheme.colorScheme.surface,
             titleContentColor = Neutral700,
             navigationIconContentColor = Neutral700
         )
+
     )
 }
 

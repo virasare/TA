@@ -141,7 +141,7 @@ fun PaymentScreen(
                 is PaymentMethodUiState.Empty -> {
                     item {
                         LottieStateView(
-                            animationFile = "empty_schedule.json",
+                            animationFile = "empty.json",
                             title = "Metode pembayaran kosong",
                             message = state.message,
                         )

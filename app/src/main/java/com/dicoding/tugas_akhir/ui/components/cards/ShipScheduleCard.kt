@@ -77,6 +77,50 @@ fun ShipScheduleCard(
         ShipScheduleStatus.Unavailable -> Color(0xFFD32F2F)
     }
 
+    val isUnavailable = status == ShipScheduleStatus.Unavailable
+
+    val cardContainerColor = if (isUnavailable) {
+        Color(0xFFFFF7F7)
+    } else {
+        White
+    }
+
+    val cardBorderColor = if (isUnavailable) {
+        Color(0xFFFFCACA)
+    } else {
+        Neutral200
+    }
+
+    val cardShadowElevation = if (isUnavailable) {
+        0.dp
+    } else {
+        2.dp
+    }
+
+    val iconContainerColor = if (isUnavailable) {
+        Color(0xFFFFEAEA)
+    } else {
+        Primary3
+    }
+
+    val iconTintColor = if (isUnavailable) {
+        Color(0xFFD32F2F)
+    } else {
+        Primary2
+    }
+
+    val titleColor = if (isUnavailable) {
+        Neutral500
+    } else {
+        Neutral700
+    }
+
+    val bodyColor = if (isUnavailable) {
+        Color(0xFF9CA3AF)
+    } else {
+        Neutral500
+    }
+
     Surface(
         modifier = modifier
             .fillMaxWidth()
@@ -84,9 +128,9 @@ fun ShipScheduleCard(
                 onClick()
             },
         shape = RoundedCornerShape(18.dp),
-        color = White,
-        border = BorderStroke(1.dp, Neutral200),
-        shadowElevation = 2.dp
+        color = cardContainerColor,
+        border = BorderStroke(1.dp, cardBorderColor),
+        shadowElevation = cardShadowElevation
     ) {
         Column(
             modifier = Modifier.padding(16.dp),
@@ -99,7 +143,7 @@ fun ShipScheduleCard(
                 Surface(
                     modifier = Modifier.size(44.dp),
                     shape = RoundedCornerShape(14.dp),
-                    color = Primary3
+                    color = iconContainerColor
                 ) {
                     Box(
                         contentAlignment = Alignment.Center
@@ -107,7 +151,7 @@ fun ShipScheduleCard(
                         Icon(
                             imageVector = Icons.Outlined.DirectionsBoat,
                             contentDescription = null,
-                            tint = Primary2,
+                            tint = iconTintColor,
                             modifier = Modifier.size(24.dp)
                         )
                     }

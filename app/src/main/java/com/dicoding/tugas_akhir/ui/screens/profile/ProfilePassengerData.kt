@@ -79,7 +79,7 @@ fun PassengerDataScreen(
         if (passengers.isEmpty()) {
             item {
                 LottieStateView(
-                    animationFile = "lottie/empty_schedule.json",
+                    animationFile = "empty.json",
                     title = "Belum Ada Data Penumpang",
                     message = "Tambahkan data penumpang agar proses booking lebih cepat.",
                 )

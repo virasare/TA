@@ -94,7 +94,7 @@ fun MyTicketScreen(
             is MyTicketUiState.Empty -> {
                 item {
                     LottieStateView(
-                        animationFile = "lottie/empty_schedule.json",
+                        animationFile = "empty.json",
                         title = "Belum Ada Tiket",
                         message = state.message,
                     )
@@ -104,7 +104,7 @@ fun MyTicketScreen(
             is MyTicketUiState.Error -> {
                 item {
                     LottieStateView(
-                        animationFile = "lottie/error_connection.json",
+                        animationFile = "error_connection.json",
                         title = "Terjadi Kesalahan",
                         message = state.message,
                     )

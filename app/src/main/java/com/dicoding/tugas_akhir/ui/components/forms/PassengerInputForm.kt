@@ -16,7 +16,6 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Badge
 import androidx.compose.material.icons.outlined.CalendarMonth
-import androidx.compose.material.icons.outlined.KeyboardArrowDown
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.outlined.PhoneAndroid
 import androidx.compose.material3.DatePicker
@@ -54,6 +53,7 @@ import com.dicoding.tugas_akhir.ui.theme.White
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import androidx.compose.material3.DatePickerDefaults
 
 @Composable
 fun PassengerInputForm(
@@ -300,7 +300,17 @@ private fun BirthDatePickerField(
         ) {
             DatePicker(
                 state = datePickerState,
-                showModeToggle = false
+                showModeToggle = false,
+                colors = DatePickerDefaults.colors(
+                    containerColor = MaterialTheme.colorScheme.surface,
+                    selectedDayContainerColor = MaterialTheme.colorScheme.primary,
+                    selectedDayContentColor = MaterialTheme.colorScheme.onPrimary,
+                    todayContentColor = MaterialTheme.colorScheme.primary,
+                    todayDateBorderColor = MaterialTheme.colorScheme.primary,
+                    navigationContentColor = MaterialTheme.colorScheme.primary,
+                    selectedYearContainerColor = MaterialTheme.colorScheme.primary,
+                    selectedYearContentColor = MaterialTheme.colorScheme.onPrimary,
+                )
             )
         }
     }

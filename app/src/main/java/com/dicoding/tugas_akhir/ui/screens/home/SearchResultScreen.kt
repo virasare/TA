@@ -28,6 +28,7 @@ import com.dicoding.tugas_akhir.data.dummy.ShipSchedule
 import com.dicoding.tugas_akhir.data.dummy.dummyShipSchedules
 import com.dicoding.tugas_akhir.data.recomendation.findExactSchedules
 import com.dicoding.tugas_akhir.data.recomendation.findRecommendedSchedules
+import com.dicoding.tugas_akhir.data.recomendation.findItemBasedScheduleRecommendations
 import com.dicoding.tugas_akhir.ui.components.dialog.buttons.PrimaryButton
 import com.dicoding.tugas_akhir.ui.components.dialog.buttons.SecondaryButton
 import com.dicoding.tugas_akhir.ui.components.cards.ShipScheduleCard
@@ -66,8 +67,16 @@ fun SearchResultScreen(
         destinationPort,
         selectedDate
     ) {
-        findRecommendedSchedules(
+//        findRecommendedSchedules(
+//            schedules = dummyShipSchedules,
+//            originPort = originPort,
+//            destinationPort = destinationPort,
+//            selectedDate = selectedDate
+//        )
+
+        findItemBasedScheduleRecommendations(
             schedules = dummyShipSchedules,
+            currentUserId = "USER_CURRENT",
             originPort = originPort,
             destinationPort = destinationPort,
             selectedDate = selectedDate
@@ -254,7 +263,8 @@ private fun SearchResultRecommendationContent(
 
         item {
             Text(
-                text = "Rekomendasi Menuju ${destinationPort.city}",
+//                text = "Rekomendasi Menuju ${destinationPort.city}",
+                text = "Rekomendasi Jadwal untuk Kamu",
                 color = Neutral700,
                 fontWeight = FontWeight.Bold,
                 style = MaterialTheme.typography.titleMedium

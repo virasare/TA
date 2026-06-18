@@ -141,7 +141,7 @@ fun SelectTicketScreen(
                 is TicketClassUiState.Empty -> {
                     item {
                         LottieStateView(
-                            animationFile = "lottie/empty_schedule.json",
+                            animationFile = "empty.json",
                             title = "Kelas tiket tidak tersedia",
                             message = state.message
                         )
@@ -151,7 +151,7 @@ fun SelectTicketScreen(
                 is TicketClassUiState.Error -> {
                     item {
                         LottieStateView(
-                            animationFile = "lottie/error_connection.json",
+                            animationFile = "no_internet.json",
                             title = "Terjadi Kesalahan",
                             message = state.message
                         )
