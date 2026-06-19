@@ -32,6 +32,7 @@ import android.view.View
 import android.view.animation.PathInterpolator
 import androidx.core.splashscreen.SplashScreenViewProvider
 
+@Suppress("DEPRECATION")
 class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -62,7 +63,9 @@ class MainActivity : ComponentActivity() {
             val view = LocalView.current
             val window = (view.context as Activity).window
 
-            val statusBarColor = if (useDarkTheme) {
+            val statusBarColor = Color(0xFF0B1F3A)
+
+            val navigationBarColor = if (useDarkTheme) {
                 Color(0xFF0B1220)
             } else {
                 Color(0xFFF7FAFC)
@@ -70,10 +73,10 @@ class MainActivity : ComponentActivity() {
 
             SideEffect {
                 window.statusBarColor = statusBarColor.toArgb()
-                window.navigationBarColor = statusBarColor.toArgb()
+                window.navigationBarColor = navigationBarColor.toArgb()
 
                 WindowCompat.getInsetsController(window, view).apply {
-                    isAppearanceLightStatusBars = !useDarkTheme
+                    isAppearanceLightStatusBars = false
                     isAppearanceLightNavigationBars = !useDarkTheme
                 }
             }

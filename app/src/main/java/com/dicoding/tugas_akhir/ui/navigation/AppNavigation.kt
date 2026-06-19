@@ -59,7 +59,6 @@ import com.dicoding.tugas_akhir.ui.screens.profile.ProfileScreen
 import com.dicoding.tugas_akhir.ui.screens.profile.SettingsScreen
 import com.dicoding.tugas_akhir.ui.screens.schedule.ScheduleDetailScreen
 import com.dicoding.tugas_akhir.ui.screens.schedule.ScheduleScreen
-import com.dicoding.tugas_akhir.ui.theme.Background
 import com.google.firebase.auth.FirebaseAuth
 import com.dicoding.tugas_akhir.ui.screens.profile.ProfileLanguageScreen
 import com.dicoding.tugas_akhir.ui.screens.profile.ProfileSecurityScreen
@@ -93,6 +92,7 @@ import kotlinx.coroutines.launch
 import com.dicoding.tugas_akhir.ui.viewmodel.BookingViewModel
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.FileDownload
+import androidx.compose.material3.MaterialTheme
 
 @Composable
 fun AppNavigation() {
@@ -329,7 +329,7 @@ fun AppNavigation() {
     }
 
     Scaffold(
-        containerColor = Background,
+        containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             if (showTopBar) {
                 if (showBackTopBar) {
@@ -973,6 +973,7 @@ fun AppNavigation() {
                 ) {
                     ETicketScreen(
                         bookingId = bookingId,
+                        downloadRequest = eTicketDownloadRequest,
                         onBackClick = {
                             navController.popBackStack()
                         },
@@ -1006,6 +1007,7 @@ fun AppNavigation() {
                 ) {
                     ETicketScreen(
                         paymentId = paymentId,
+                        downloadRequest = eTicketDownloadRequest,
                         onBackClick = {
                             navController.popBackStack()
                         },
@@ -1440,6 +1442,7 @@ private fun getTopBarTitle(route: String): String {
         Screens.PaymentSuccess -> "Status Pembayaran"
         Screens.MyTicket -> "Pesanan Saya"
         Screens.ETicket -> "E-Ticket"
+        Screens.ETicketByPayment -> "E-Ticket"
         Screens.Refund -> "Ajukan Refund"
         Screens.Reschedule -> "Reschedule Tiket"
         Screens.RefundSuccess -> "Refund Diproses"

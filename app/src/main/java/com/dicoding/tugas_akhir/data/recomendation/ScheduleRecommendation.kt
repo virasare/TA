@@ -48,8 +48,6 @@ fun findRecommendedSchedules(
         .filter { schedule ->
             val route = schedule.toRouteDirection()
 
-            // Ini penting:
-            // hanya ambil jadwal yang TUJUANNYA sama dengan tujuan yang dicari user.
             route.destination.equals(destinationPort.city, ignoreCase = true)
         }
         .sortedWith(
@@ -67,13 +65,8 @@ private fun scheduleRecommendationComparator(
     selectedDate: String
 ): Comparator<ShipSchedule> {
     return compareBy<ShipSchedule> { schedule ->
-        // Prioritas 1:
-        // Tersedia → Terbatas → Habis
         schedule.status.toAvailabilityRank()
     }.thenBy { schedule ->
-        // Prioritas 2:
-        // Asal + tujuan sama dulu.
-        // Setelah itu baru asal lain dengan tujuan yang sama.
         val route = schedule.toRouteDirection()
 
         val isExactRoute =
@@ -82,12 +75,8 @@ private fun scheduleRecommendationComparator(
 
         if (isExactRoute) 0 else 1
     }.thenBy { schedule ->
-        // Prioritas 3:
-        // Tanggal paling dekat dari tanggal yang dipilih user.
         schedule.departureDate.dateDistanceFrom(selectedDate)
     }.thenBy { schedule ->
-        // Prioritas 4:
-        // Kalau tanggalnya sama-sama dekat, urutkan jam berangkat.
         schedule.departureTime.toTimeRank()
     }
 }
@@ -98,14 +87,15 @@ private data class RouteDirection(
 )
 
 private fun ShipSchedule.toRouteDirection(): RouteDirection {
-    val parts = route.split("→")
-
-    val origin = parts.getOrNull(0)?.trim().orEmpty()
-    val destination = parts.getOrNull(1)?.trim().orEmpty()
+    val parts = when {
+        route.contains("→") -> route.split("→")
+        route.contains("â†’") -> route.split("â†’")
+        else -> route.split("-")
+    }
 
     return RouteDirection(
-        origin = origin,
-        destination = destination
+        origin = parts.getOrNull(0)?.trim().orEmpty(),
+        destination = parts.getOrNull(1)?.trim().orEmpty()
     )
 }
 

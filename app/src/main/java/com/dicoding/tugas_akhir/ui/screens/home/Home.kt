@@ -34,6 +34,7 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import androidx.compose.material3.DatePickerDefaults
+import com.dicoding.tugas_akhir.data.recomendation.findItemBasedPopularRoutes
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -52,6 +53,13 @@ fun HomeScreen(
     val canSearch = originPort != null &&
             destinationPort != null &&
             selectedDate.isNotEmpty()
+
+    val recommendedPopularRoutes = remember(popularRoutes) {
+        findItemBasedPopularRoutes(
+            routes = popularRoutes,
+            currentUserId = "USER_CURRENT",
+        )
+    }
 
     Box(
         modifier = Modifier
@@ -82,7 +90,7 @@ fun HomeScreen(
             )
 
             PopularRouteSection(
-                routes = popularRoutes,
+                routes = recommendedPopularRoutes,
                 onRouteClick = { route ->
                     onPopularRouteClick(route)
                 }

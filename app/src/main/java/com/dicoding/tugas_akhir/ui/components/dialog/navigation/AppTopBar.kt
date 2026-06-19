@@ -40,35 +40,35 @@ fun AppTopBar(
     modifier: Modifier = Modifier,
     actionIcon: ImageVector? = null,
     actionDescription: String? = null,
-    onActionClick: () -> Unit = {}
+    onActionClick: () -> Unit = {},
 ) {
+    val colors = MaterialTheme.colorScheme
+
     CenterAlignedTopAppBar(
         modifier = modifier,
         title = {
             Text(
                 text = title,
                 style = MaterialTheme.typography.titleMedium,
-                color = Neutral700
+                color = colors.onSurface,
             )
         },
         actions = {
             if (actionIcon != null) {
-                IconButton(
-                    onClick = onActionClick
-                ) {
+                IconButton(onClick = onActionClick) {
                     Icon(
                         imageVector = actionIcon,
                         contentDescription = actionDescription,
-                        tint = Neutral700
+                        tint = colors.onSurface,
                     )
                 }
             }
         },
         colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-            containerColor = MaterialTheme.colorScheme.surface,
-            titleContentColor = Neutral700,
-            actionIconContentColor = Neutral700
-        )
+            containerColor = colors.surface,
+            titleContentColor = colors.onSurface,
+            actionIconContentColor = colors.onSurface,
+        ),
     )
 }
 
@@ -82,23 +82,23 @@ fun AppBackTopBar(
     actionDescription: String? = null,
     onActionClick: () -> Unit = {},
 ) {
+    val colors = MaterialTheme.colorScheme
+
     TopAppBar(
         modifier = modifier,
         title = {
             Text(
                 text = title,
                 style = MaterialTheme.typography.titleMedium,
-                color = Neutral700
+                color = colors.onSurface,
             )
         },
         navigationIcon = {
-            IconButton(
-                onClick = onBackClick
-            ) {
+            IconButton(onClick = onBackClick) {
                 Icon(
                     imageVector = Icons.Outlined.ArrowBack,
                     contentDescription = "Kembali",
-                    tint = Neutral700
+                    tint = colors.onSurface,
                 )
             }
         },
@@ -108,17 +108,17 @@ fun AppBackTopBar(
                     Icon(
                         imageVector = actionIcon,
                         contentDescription = actionDescription,
-                        tint = Neutral700,
+                        tint = colors.onSurface,
                     )
                 }
             }
         },
         colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = MaterialTheme.colorScheme.surface,
-            titleContentColor = Neutral700,
-            navigationIconContentColor = Neutral700
-        )
-
+            containerColor = colors.surface,
+            titleContentColor = colors.onSurface,
+            navigationIconContentColor = colors.onSurface,
+            actionIconContentColor = colors.onSurface,
+        ),
     )
 }
 

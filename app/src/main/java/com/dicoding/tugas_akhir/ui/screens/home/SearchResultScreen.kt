@@ -67,20 +67,20 @@ fun SearchResultScreen(
         destinationPort,
         selectedDate
     ) {
-//        findRecommendedSchedules(
-//            schedules = dummyShipSchedules,
-//            originPort = originPort,
-//            destinationPort = destinationPort,
-//            selectedDate = selectedDate
-//        )
-
-        findItemBasedScheduleRecommendations(
+        findRecommendedSchedules(
             schedules = dummyShipSchedules,
-            currentUserId = "USER_CURRENT",
             originPort = originPort,
             destinationPort = destinationPort,
             selectedDate = selectedDate
         )
+
+//        findItemBasedScheduleRecommendations(
+//            schedules = dummyShipSchedules,
+//            currentUserId = "USER_CURRENT",
+//            originPort = originPort,
+//            destinationPort = destinationPort,
+//            selectedDate = selectedDate
+//        )
     }
 
     when {
@@ -263,8 +263,7 @@ private fun SearchResultRecommendationContent(
 
         item {
             Text(
-//                text = "Rekomendasi Menuju ${destinationPort.city}",
-                text = "Rekomendasi Jadwal untuk Kamu",
+                text = "Rekomendasi Menuju ${destinationPort.city}",
                 color = Neutral700,
                 fontWeight = FontWeight.Bold,
                 style = MaterialTheme.typography.titleMedium

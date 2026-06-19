@@ -15,13 +15,8 @@ import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import com.dicoding.tugas_akhir.R
-import com.dicoding.tugas_akhir.ui.theme.Neutral500
-import com.dicoding.tugas_akhir.ui.theme.Primary2
-import com.dicoding.tugas_akhir.ui.theme.Primary3
-import com.dicoding.tugas_akhir.ui.theme.White
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.dicoding.tugas_akhir.ui.navigation.Screens
@@ -45,7 +40,7 @@ val bottomNavItems = listOf(
     ),
     BottomNavItem(
         route = Screens.MyTicket,
-        label = "Pesanan",
+        label = "Tiket Saya",
         icon = R.drawable.ic_riwayat
     ),
     BottomNavItem(
@@ -66,15 +61,17 @@ fun AppBottomNavigationBar(
     onItemClick: (BottomNavItem) -> Unit,
     unreadNotificationCount: Int = 0,
 ) {
+    val colors = MaterialTheme.colorScheme
+
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .background(MaterialTheme.colorScheme.surface)
-            .padding(horizontal = 16.dp)
+            .background(colors.surface)
+            .padding(horizontal = 16.dp),
     ) {
         NavigationBar(
             modifier = Modifier.fillMaxWidth(),
-            containerColor = MaterialTheme.colorScheme.surface
+            containerColor = colors.surface,
         ) {
             bottomNavItems.forEach { item ->
                 val selected = currentRoute == item.route
@@ -85,15 +82,16 @@ fun AppBottomNavigationBar(
                         onItemClick(item)
                     },
                     icon = {
-                        val showBadge = item.route == "notification" && unreadNotificationCount > 0
+                        val showBadge = item.route == Screens.Notification &&
+                                unreadNotificationCount > 0
 
                         if (showBadge) {
                             BadgedBox(
                                 badge = {
                                     Badge(
-                                        containerColor = Color(0xFFD32F2F)
+                                        containerColor = colors.error,
                                     )
-                                }
+                                },
                             ) {
                                 Icon(
                                     painter = painterResource(id = item.icon),
@@ -110,16 +108,16 @@ fun AppBottomNavigationBar(
                     label = {
                         Text(
                             text = item.label,
-                            style = MaterialTheme.typography.labelMedium
+                            style = MaterialTheme.typography.labelMedium,
                         )
                     },
                     colors = NavigationBarItemDefaults.colors(
-                        selectedIconColor = Primary2,
-                        selectedTextColor = Primary2,
-                        indicatorColor = Primary3,
-                        unselectedIconColor = Neutral500,
-                        unselectedTextColor = Neutral500
-                    )
+                        selectedIconColor = colors.primary,
+                        selectedTextColor = colors.primary,
+                        indicatorColor = colors.primaryContainer,
+                        unselectedIconColor = colors.onSurfaceVariant,
+                        unselectedTextColor = colors.onSurfaceVariant,
+                    ),
                 )
             }
         }

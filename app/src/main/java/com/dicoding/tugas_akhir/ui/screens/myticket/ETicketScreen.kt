@@ -129,12 +129,12 @@ fun ETicketScreen(
 
         is ETicketUiState.Error -> {
             LottieStateView(
-                animationFile = "lottie/error_connection.json",
+                animationFile = "no_internet.json",
                 title = "E-Ticket Tidak Ditemukan",
                 message = state.message,
                 modifier = modifier
                     .fillMaxSize()
-                    .background(Background),
+                    .background(MaterialTheme.colorScheme.background),
             )
         }
     }

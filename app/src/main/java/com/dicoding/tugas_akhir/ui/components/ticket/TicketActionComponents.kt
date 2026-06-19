@@ -23,12 +23,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.dicoding.tugas_akhir.ui.theme.Neutral200
-import com.dicoding.tugas_akhir.ui.theme.Neutral500
-import com.dicoding.tugas_akhir.ui.theme.Neutral700
-import com.dicoding.tugas_akhir.ui.theme.Primary2
-import com.dicoding.tugas_akhir.ui.theme.Primary3
-import com.dicoding.tugas_akhir.ui.theme.White
 
 @Composable
 fun TicketManageActionCard(
@@ -37,14 +31,19 @@ fun TicketManageActionCard(
     onRescheduleClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val colors = MaterialTheme.colorScheme
+
     Card(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(22.dp),
         colors = CardDefaults.cardColors(
-            containerColor = White,
+            containerColor = colors.surface,
         ),
-        border = BorderStroke(1.dp, Neutral200),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        border = BorderStroke(
+            width = 1.dp,
+            color = colors.outlineVariant,
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
     ) {
         Column(
             modifier = Modifier.padding(18.dp),
@@ -57,7 +56,7 @@ fun TicketManageActionCard(
                 Icon(
                     imageVector = Icons.Outlined.Info,
                     contentDescription = null,
-                    tint = Primary2,
+                    tint = colors.primary,
                 )
 
                 Column(
@@ -67,7 +66,7 @@ fun TicketManageActionCard(
                         text = "Kelola Tiket",
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
-                        color = Neutral700,
+                        color = colors.onSurface,
                     )
 
                     Text(
@@ -77,7 +76,7 @@ fun TicketManageActionCard(
                             "Tiket ini tidak dapat dikelola karena statusnya sudah tidak aktif."
                         },
                         style = MaterialTheme.typography.bodySmall,
-                        color = Neutral500,
+                        color = colors.onSurfaceVariant,
                     )
                 }
             }
@@ -91,10 +90,17 @@ fun TicketManageActionCard(
                     enabled = canManageTicket,
                     modifier = Modifier.weight(1f),
                     colors = ButtonDefaults.outlinedButtonColors(
-                        contentColor = Primary2,
-                        disabledContentColor = Neutral500,
+                        contentColor = colors.primary,
+                        disabledContentColor = colors.onSurfaceVariant,
                     ),
-                    border = BorderStroke(1.dp, if (canManageTicket) Primary2 else Neutral200),
+                    border = BorderStroke(
+                        width = 1.dp,
+                        color = if (canManageTicket) {
+                            colors.primary
+                        } else {
+                            colors.outlineVariant
+                        },
+                    ),
                     shape = RoundedCornerShape(14.dp),
                 ) {
                     Icon(
@@ -113,10 +119,17 @@ fun TicketManageActionCard(
                     enabled = canManageTicket,
                     modifier = Modifier.weight(1f),
                     colors = ButtonDefaults.outlinedButtonColors(
-                        contentColor = Primary2,
-                        disabledContentColor = Neutral500,
+                        contentColor = colors.primary,
+                        disabledContentColor = colors.onSurfaceVariant,
                     ),
-                    border = BorderStroke(1.dp, if (canManageTicket) Primary2 else Neutral200),
+                    border = BorderStroke(
+                        width = 1.dp,
+                        color = if (canManageTicket) {
+                            colors.primary
+                        } else {
+                            colors.outlineVariant
+                        },
+                    ),
                     shape = RoundedCornerShape(14.dp),
                 ) {
                     Icon(
@@ -136,15 +149,19 @@ fun TicketManageActionCard(
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(16.dp),
                     colors = CardDefaults.cardColors(
-                        containerColor = Primary3,
+                        containerColor = colors.surfaceVariant,
                     ),
-                    border = BorderStroke(1.dp, Neutral200),
+                    border = BorderStroke(
+                        width = 1.dp,
+                        color = colors.outlineVariant,
+                    ),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
                 ) {
                     Text(
                         text = "Refund dan reschedule hanya tersedia untuk tiket dengan status aktif.",
                         modifier = Modifier.padding(12.dp),
                         style = MaterialTheme.typography.bodySmall,
-                        color = Neutral700,
+                        color = colors.onSurfaceVariant,
                     )
                 }
             }
