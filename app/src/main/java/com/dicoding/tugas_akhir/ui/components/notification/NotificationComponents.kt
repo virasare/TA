@@ -37,7 +37,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.dicoding.tugas_akhir.domain.model.AppNotification
 import com.dicoding.tugas_akhir.domain.model.NotificationType
-import com.dicoding.tugas_akhir.ui.theme.Primary2
 import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.TextButton
 
@@ -47,15 +46,17 @@ fun NotificationSummaryCard(
     onMarkAllAsRead: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val colors = MaterialTheme.colorScheme
+
     Card(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(24.dp),
         colors = CardDefaults.cardColors(
-            containerColor = Color(0xFFEAF4FF)
+            containerColor = colors.primaryContainer.copy(alpha = 0.58f)
         ),
         border = BorderStroke(
             width = 1.dp,
-            color = Color(0xFFD7E9FF)
+            color = colors.outlineVariant
         ),
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
     ) {
@@ -70,7 +71,7 @@ fun NotificationSummaryCard(
                 modifier = Modifier
                     .size(46.dp)
                     .background(
-                        color = Color.White,
+                        color = colors.surface,
                         shape = RoundedCornerShape(16.dp),
                     ),
                 contentAlignment = Alignment.Center,
@@ -79,7 +80,7 @@ fun NotificationSummaryCard(
                     text = unreadCount.toString(),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
-                    color = Color(0xFF1976D2),
+                    color = colors.primary,
                 )
             }
 
@@ -91,7 +92,7 @@ fun NotificationSummaryCard(
                     text = "Notifikasi Belum Dibaca",
                     style = MaterialTheme.typography.titleSmall,
                     fontWeight = FontWeight.Bold,
-                    color = Color(0xFF102A43),
+                    color = colors.onSurface,
                 )
 
                 Text(
@@ -101,14 +102,14 @@ fun NotificationSummaryCard(
                         "Semua notifikasi sudah dibaca."
                     },
                     style = MaterialTheme.typography.bodySmall,
-                    color = Color(0xFF627D98),
+                    color = colors.onSurfaceVariant,
                 )
             }
 
             Text(
                 text = "Tandai semua",
                 style = MaterialTheme.typography.labelMedium,
-                color = Color(0xFF1976D2),
+                color = colors.primary,
                 fontWeight = FontWeight.SemiBold,
                 modifier = Modifier.clickable {
                     onMarkAllAsRead()
@@ -298,7 +299,7 @@ private fun NotificationType.toColor(): Color {
         NotificationType.SCHEDULE -> Color(0xFF1976D2)
         NotificationType.REFUND -> Color(0xFFD32F2F)
         NotificationType.RESCHEDULE -> Color(0xFF0288D1)
-        NotificationType.INFO -> Primary2
+        NotificationType.INFO -> Color(0xFF1976D2)
     }
 }
 

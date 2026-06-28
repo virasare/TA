@@ -46,18 +46,15 @@ import com.dicoding.tugas_akhir.ui.components.loading.PaymentMethodListPlacehold
 import com.dicoding.tugas_akhir.ui.components.lottie.LottieStateView
 import com.dicoding.tugas_akhir.ui.state.CreatePaymentUiState
 import com.dicoding.tugas_akhir.ui.state.PaymentMethodUiState
-import com.dicoding.tugas_akhir.ui.theme.Neutral200
-import com.dicoding.tugas_akhir.ui.theme.Neutral500
-import com.dicoding.tugas_akhir.ui.theme.Neutral700
-import com.dicoding.tugas_akhir.ui.theme.Primary2
-import com.dicoding.tugas_akhir.ui.theme.Primary3
-import com.dicoding.tugas_akhir.ui.theme.White
 import com.dicoding.tugas_akhir.ui.viewmodel.PaymentViewModel
 import com.dicoding.tugas_akhir.ui.viewmodel.ViewModelFactory
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import com.dicoding.tugas_akhir.core.utils.PriceFormatter
 import com.dicoding.tugas_akhir.ui.components.dialog.ConfirmActionDialog
+import com.dicoding.tugas_akhir.ui.state.BookingDetailUiState
+import com.dicoding.tugas_akhir.ui.viewmodel.BookingViewModel
 
 @Composable
 fun PaymentScreen(
@@ -68,14 +65,27 @@ fun PaymentScreen(
     viewModel: PaymentViewModel = viewModel(
         factory = ViewModelFactory.getInstance()
     ),
+    bookingViewModel: BookingViewModel = viewModel(
+        factory = ViewModelFactory.getInstance()
+    ),
 ) {
     val paymentMethodUiState by viewModel.paymentMethodUiState.collectAsStateWithLifecycle()
     val selectedPaymentMethod by viewModel.selectedPaymentMethod.collectAsStateWithLifecycle()
     val createPaymentUiState by viewModel.createPaymentUiState.collectAsStateWithLifecycle()
+    val bookingDetailUiState by bookingViewModel.bookingDetailUiState.collectAsStateWithLifecycle()
     var showConfirmPayment by remember { mutableStateOf(false) }
+    val totalPaymentText = when (val state = bookingDetailUiState) {
+        is BookingDetailUiState.Success -> PriceFormatter.formatToRupiah(state.booking.totalPrice)
+        is BookingDetailUiState.Loading -> "Memuat total..."
+        is BookingDetailUiState.Error -> null
+    }
 
     LaunchedEffect(Unit) {
         viewModel.loadPaymentMethods()
+    }
+
+    LaunchedEffect(bookingId) {
+        bookingViewModel.getBookingDetail(bookingId)
     }
 
     LaunchedEffect(createPaymentUiState) {
@@ -110,7 +120,7 @@ fun PaymentScreen(
             item {
                 Text(
                     text = "Metode Pembayaran",
-                    color = Neutral700,
+                    color = MaterialTheme.colorScheme.onSurface,
                     fontWeight = FontWeight.Bold,
                     style = MaterialTheme.typography.titleMedium,
                 )
@@ -162,6 +172,7 @@ fun PaymentScreen(
 
         PaymentBottomActionBar(
             selectedMethodName = selectedPaymentMethod?.name,
+            totalPaymentText = totalPaymentText,
             createPaymentUiState = createPaymentUiState,
             onContinueClick = {
                 showConfirmPayment = true
@@ -192,8 +203,8 @@ private fun PaymentHeaderCard(
     Surface(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(22.dp),
-        color = White,
-        border = BorderStroke(1.dp, Neutral200),
+        color = MaterialTheme.colorScheme.surface,
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
         shadowElevation = 3.dp,
     ) {
         Box(
@@ -223,7 +234,7 @@ private fun PaymentHeaderCard(
                         Icon(
                             imageVector = Icons.Outlined.ArrowBack,
                             contentDescription = "Kembali",
-                            tint = Neutral700,
+                            tint = MaterialTheme.colorScheme.onSurface,
                         )
                     }
 
@@ -231,7 +242,7 @@ private fun PaymentHeaderCard(
 
                     Text(
                         text = "Pembayaran",
-                        color = Neutral700,
+                        color = MaterialTheme.colorScheme.onSurface,
                         fontWeight = FontWeight.Bold,
                         style = MaterialTheme.typography.titleLarge,
                     )
@@ -243,7 +254,7 @@ private fun PaymentHeaderCard(
                     Surface(
                         modifier = Modifier.size(52.dp),
                         shape = CircleShape,
-                        color = Primary3,
+                        color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.58f),
                     ) {
                         Box(
                             contentAlignment = Alignment.Center,
@@ -251,7 +262,7 @@ private fun PaymentHeaderCard(
                             Icon(
                                 imageVector = Icons.Outlined.Payments,
                                 contentDescription = null,
-                                tint = Primary2,
+                                tint = MaterialTheme.colorScheme.primary,
                                 modifier = Modifier.size(28.dp),
                             )
                         }
@@ -264,14 +275,14 @@ private fun PaymentHeaderCard(
                     ) {
                         Text(
                             text = "Pilih metode pembayaran",
-                            color = Neutral700,
+                            color = MaterialTheme.colorScheme.onSurface,
                             fontWeight = FontWeight.Bold,
                             style = MaterialTheme.typography.titleMedium,
                         )
 
                         Text(
                             text = "Selesaikan pembayaran untuk menerbitkan e-ticket kamu.",
-                            color = Neutral500,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                             style = MaterialTheme.typography.bodyMedium,
                         )
                     }
@@ -288,8 +299,8 @@ private fun PaymentSecurityInfo(
     Surface(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
-        color = Primary3,
-        border = BorderStroke(1.dp, Neutral200),
+        color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.58f),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
     ) {
         Row(
             modifier = Modifier.padding(14.dp),
@@ -298,7 +309,7 @@ private fun PaymentSecurityInfo(
             Icon(
                 imageVector = Icons.Outlined.Lock,
                 contentDescription = null,
-                tint = Primary2,
+                tint = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.size(22.dp),
             )
 
@@ -306,7 +317,7 @@ private fun PaymentSecurityInfo(
 
             Text(
                 text = "Pembayaran diproses secara aman. Pastikan nominal dan metode pembayaran sudah sesuai.",
-                color = Neutral700,
+                color = MaterialTheme.colorScheme.onSurface,
                 style = MaterialTheme.typography.bodySmall,
             )
         }
@@ -316,14 +327,15 @@ private fun PaymentSecurityInfo(
 @Composable
 private fun PaymentBottomActionBar(
     selectedMethodName: String?,
+    totalPaymentText: String?,
     createPaymentUiState: CreatePaymentUiState,
     onContinueClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Surface(
         modifier = modifier.fillMaxWidth(),
-        color = White,
-        border = BorderStroke(1.dp, Neutral200),
+        color = MaterialTheme.colorScheme.surface,
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
         shadowElevation = 8.dp,
     ) {
         Column(
@@ -333,17 +345,38 @@ private fun PaymentBottomActionBar(
                 .padding(horizontal = 24.dp, vertical = 14.dp),
             verticalArrangement = Arrangement.spacedBy(10.dp),
         ) {
+            if (totalPaymentText != null) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Text(
+                        text = "Total Pembayaran",
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        style = MaterialTheme.typography.bodySmall,
+                    )
+
+                    Text(
+                        text = totalPaymentText,
+                        color = MaterialTheme.colorScheme.primary,
+                        fontWeight = FontWeight.Bold,
+                        style = MaterialTheme.typography.titleSmall,
+                    )
+                }
+            }
+
             if (selectedMethodName != null) {
                 Text(
                     text = "Dipilih: $selectedMethodName",
-                    color = Neutral700,
+                    color = MaterialTheme.colorScheme.onSurface,
                     fontWeight = FontWeight.SemiBold,
                     style = MaterialTheme.typography.bodyMedium,
                 )
             } else {
                 Text(
                     text = "Pilih metode pembayaran terlebih dahulu.",
-                    color = Neutral500,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     style = MaterialTheme.typography.bodyMedium,
                 )
             }
@@ -361,10 +394,10 @@ private fun PaymentBottomActionBar(
                 enabled = selectedMethodName != null &&
                         createPaymentUiState !is CreatePaymentUiState.Loading,
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = Primary2,
-                    contentColor = White,
-                    disabledContainerColor = Neutral200,
-                    disabledContentColor = Neutral500,
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.onPrimary,
+                    disabledContainerColor = MaterialTheme.colorScheme.outlineVariant,
+                    disabledContentColor = MaterialTheme.colorScheme.onSurfaceVariant,
                 ),
                 shape = RoundedCornerShape(14.dp),
                 modifier = Modifier.fillMaxWidth(),
@@ -373,7 +406,7 @@ private fun PaymentBottomActionBar(
                     CircularProgressIndicator(
                         modifier = Modifier.size(20.dp),
                         strokeWidth = 2.dp,
-                        color = White,
+                        color = MaterialTheme.colorScheme.onPrimary,
                     )
                 } else {
                     Text("Lanjut ke Instruksi Pembayaran")

@@ -201,8 +201,16 @@ private fun ProfileBirthDatePickerField(
             shape = RoundedCornerShape(16.dp),
             colors = OutlinedTextFieldDefaults.colors(
                 focusedBorderColor = MaterialTheme.colorScheme.primary,
+                unfocusedBorderColor = MaterialTheme.colorScheme.outlineVariant,
                 focusedLabelColor = MaterialTheme.colorScheme.primary,
+                unfocusedLabelColor = MaterialTheme.colorScheme.onSurfaceVariant,
                 cursorColor = MaterialTheme.colorScheme.primary,
+                focusedContainerColor = MaterialTheme.colorScheme.surface,
+                unfocusedContainerColor = MaterialTheme.colorScheme.surface,
+                focusedTextColor = MaterialTheme.colorScheme.onSurface,
+                unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
+                focusedPlaceholderColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                unfocusedPlaceholderColor = MaterialTheme.colorScheme.onSurfaceVariant,
             ),
         )
 
@@ -252,6 +260,10 @@ private fun ProfileBirthDatePickerField(
                 showModeToggle = false,
                 colors = DatePickerDefaults.colors(
                     containerColor = MaterialTheme.colorScheme.surface,
+                    titleContentColor = MaterialTheme.colorScheme.onSurface,
+                    headlineContentColor = MaterialTheme.colorScheme.onSurface,
+                    weekdayContentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                    subheadContentColor = MaterialTheme.colorScheme.onSurfaceVariant,
                     selectedDayContainerColor = MaterialTheme.colorScheme.primary,
                     selectedDayContentColor = MaterialTheme.colorScheme.onPrimary,
                     todayContentColor = MaterialTheme.colorScheme.primary,
@@ -259,6 +271,7 @@ private fun ProfileBirthDatePickerField(
                     navigationContentColor = MaterialTheme.colorScheme.primary,
                     selectedYearContainerColor = MaterialTheme.colorScheme.primary,
                     selectedYearContentColor = MaterialTheme.colorScheme.onPrimary,
+                    currentYearContentColor = MaterialTheme.colorScheme.primary,
                 ),
             )
         }

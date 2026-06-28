@@ -16,9 +16,14 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import com.dicoding.tugas_akhir.R
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.dicoding.tugas_akhir.ui.localization.AppStrings
+import com.dicoding.tugas_akhir.ui.localization.LocalAppStrings
 import com.dicoding.tugas_akhir.ui.navigation.Screens
 
 data class BottomNavItem(
@@ -62,6 +67,7 @@ fun AppBottomNavigationBar(
     unreadNotificationCount: Int = 0,
 ) {
     val colors = MaterialTheme.colorScheme
+    val strings = LocalAppStrings.current
 
     Box(
         modifier = Modifier
@@ -75,6 +81,7 @@ fun AppBottomNavigationBar(
         ) {
             bottomNavItems.forEach { item ->
                 val selected = currentRoute == item.route
+                val label = item.localizedLabel(strings)
 
                 NavigationBarItem(
                     selected = selected,
@@ -95,20 +102,26 @@ fun AppBottomNavigationBar(
                             ) {
                                 Icon(
                                     painter = painterResource(id = item.icon),
-                                    contentDescription = item.label,
+                                    contentDescription = label,
                                 )
                             }
                         } else {
                             Icon(
                                 painter = painterResource(id = item.icon),
-                                contentDescription = item.label,
+                                contentDescription = label,
                             )
                         }
                     },
                     label = {
                         Text(
-                            text = item.label,
-                            style = MaterialTheme.typography.labelMedium,
+                            text = label,
+                            style = MaterialTheme.typography.labelSmall.copy(
+                                fontSize = 10.sp,
+                            ),
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            softWrap = false,
+                            textAlign = TextAlign.Center,
                         )
                     },
                     colors = NavigationBarItemDefaults.colors(
@@ -121,6 +134,19 @@ fun AppBottomNavigationBar(
                 )
             }
         }
+    }
+}
+
+private fun BottomNavItem.localizedLabel(
+    strings: AppStrings,
+): String {
+    return when (route) {
+        Screens.Home -> strings.navHome
+        Screens.Schedule -> strings.navSchedule
+        Screens.MyTicket -> strings.navMyTicket
+        Screens.Notification -> strings.navNotification
+        Screens.Profile -> strings.navProfile
+        else -> label
     }
 }
 

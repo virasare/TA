@@ -26,12 +26,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.dicoding.tugas_akhir.core.utils.PriceFormatter
 import com.dicoding.tugas_akhir.domain.model.TicketClassOption
-import com.dicoding.tugas_akhir.ui.theme.Neutral200
-import com.dicoding.tugas_akhir.ui.theme.Neutral500
-import com.dicoding.tugas_akhir.ui.theme.Neutral700
-import com.dicoding.tugas_akhir.ui.theme.Primary2
-import com.dicoding.tugas_akhir.ui.theme.Primary3
-import com.dicoding.tugas_akhir.ui.theme.White
 
 @Composable
 fun TicketClassOptionCard(
@@ -40,15 +34,17 @@ fun TicketClassOptionCard(
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val colors = MaterialTheme.colorScheme
+
     Surface(
         modifier = modifier
             .fillMaxWidth()
             .clickable { onClick() },
         shape = RoundedCornerShape(18.dp),
-        color = White,
+        color = colors.surface,
         border = BorderStroke(
             width = if (selected) 1.5.dp else 1.dp,
-            color = if (selected) Primary2 else Neutral200
+            color = if (selected) colors.primary else colors.outlineVariant
         ),
         shadowElevation = if (selected) 4.dp else 2.dp
     ) {
@@ -59,8 +55,8 @@ fun TicketClassOptionCard(
             Surface(
                 modifier = Modifier.size(42.dp),
                 shape = RoundedCornerShape(14.dp),
-                color = Primary3,
-                border = BorderStroke(1.dp, Neutral200)
+                color = colors.primaryContainer.copy(alpha = 0.64f),
+                border = BorderStroke(1.dp, colors.outlineVariant)
             ) {
                 Box(
                     contentAlignment = Alignment.Center
@@ -68,7 +64,7 @@ fun TicketClassOptionCard(
                     Icon(
                         imageVector = Icons.Outlined.EventSeat,
                         contentDescription = null,
-                        tint = Primary2,
+                        tint = colors.primary,
                         modifier = Modifier.size(22.dp)
                     )
                 }
@@ -85,7 +81,7 @@ fun TicketClassOptionCard(
                 ) {
                     Text(
                         text = ticketClass.name,
-                        color = Neutral700,
+                        color = colors.onSurface,
                         fontWeight = FontWeight.Bold,
                         style = MaterialTheme.typography.titleMedium,
                         modifier = Modifier.weight(1f)
@@ -95,31 +91,41 @@ fun TicketClassOptionCard(
                         Icon(
                             imageVector = Icons.Outlined.CheckCircle,
                             contentDescription = null,
-                            tint = Primary2,
+                            tint = colors.primary,
                             modifier = Modifier.size(22.dp)
                         )
                     } else {
                         Surface(
                             modifier = Modifier.size(20.dp),
                             shape = CircleShape,
-                            color = White,
-                            border = BorderStroke(1.5.dp, Neutral200)
+                            color = colors.surface,
+                            border = BorderStroke(1.5.dp, colors.outlineVariant)
                         ) {}
                     }
                 }
 
                 Text(
                     text = ticketClass.description,
-                    color = Neutral500,
+                    color = colors.onSurfaceVariant,
                     style = MaterialTheme.typography.bodySmall
                 )
 
-                Text(
-                    text = PriceFormatter.formatToRupiah(ticketClass.price),
-                    color = Primary2,
-                    fontWeight = FontWeight.Bold,
-                    style = MaterialTheme.typography.titleSmall
-                )
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(2.dp)
+                ) {
+                    Text(
+                        text = "Harga per orang",
+                        color = colors.onSurfaceVariant,
+                        style = MaterialTheme.typography.labelSmall
+                    )
+
+                    Text(
+                        text = PriceFormatter.formatToRupiah(ticketClass.price),
+                        color = colors.primary,
+                        fontWeight = FontWeight.Bold,
+                        style = MaterialTheme.typography.titleSmall
+                    )
+                }
             }
         }
     }

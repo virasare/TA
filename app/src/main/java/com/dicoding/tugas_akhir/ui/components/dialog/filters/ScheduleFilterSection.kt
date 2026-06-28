@@ -16,10 +16,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.dicoding.tugas_akhir.ui.theme.Neutral200
-import com.dicoding.tugas_akhir.ui.theme.Neutral700
-import com.dicoding.tugas_akhir.ui.theme.Primary2
-import com.dicoding.tugas_akhir.ui.theme.White
 
 enum class ScheduleFilter(
     val label: String
@@ -65,9 +61,10 @@ private fun ScheduleFilterChip(
     selected: Boolean,
     onClick: () -> Unit
 ) {
-    val containerColor = if (selected) Primary2 else White
-    val contentColor = if (selected) White else Neutral700
-    val borderColor = if (selected) Primary2 else Neutral200
+    val colors = MaterialTheme.colorScheme
+    val containerColor = if (selected) colors.primary else colors.surface
+    val contentColor = if (selected) colors.onPrimary else colors.onSurface
+    val borderColor = if (selected) colors.primary else colors.outlineVariant
 
     Surface(
         modifier = Modifier.clickable { onClick() },

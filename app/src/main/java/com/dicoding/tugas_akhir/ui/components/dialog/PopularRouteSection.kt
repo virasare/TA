@@ -27,12 +27,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.dicoding.tugas_akhir.data.dummy.PopularRoute
 import com.dicoding.tugas_akhir.data.dummy.popularRoutes
-import com.dicoding.tugas_akhir.ui.theme.Neutral200
-import com.dicoding.tugas_akhir.ui.theme.Neutral500
-import com.dicoding.tugas_akhir.ui.theme.Neutral700
-import com.dicoding.tugas_akhir.ui.theme.Primary2
-import com.dicoding.tugas_akhir.ui.theme.Primary3
-import com.dicoding.tugas_akhir.ui.theme.White
 
 @Composable
 fun PopularRouteSection(
@@ -44,23 +38,6 @@ fun PopularRouteSection(
         modifier = modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        Column(
-            verticalArrangement = Arrangement.spacedBy(4.dp)
-        ) {
-            Text(
-                text = "Rute Populer",
-                color = Neutral700,
-                fontWeight = FontWeight.Bold,
-                style = MaterialTheme.typography.titleMedium
-            )
-
-            Text(
-                text = "Rute yang sering dicari penumpang.",
-                color = Neutral500,
-                style = MaterialTheme.typography.bodySmall
-            )
-        }
-
         routes.forEach { route ->
             PopularRouteCard(
                 route = route,
@@ -78,13 +55,15 @@ fun PopularRouteCard(
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val colors = MaterialTheme.colorScheme
+
     Surface(
         modifier = modifier
             .fillMaxWidth()
             .clickable { onClick() },
         shape = RoundedCornerShape(14.dp),
-        color = White,
-        border = BorderStroke(1.dp, Neutral200),
+        color = colors.surface,
+        border = BorderStroke(1.dp, colors.outlineVariant),
         shadowElevation = 2.dp
     ) {
         Row(
@@ -96,7 +75,7 @@ fun PopularRouteCard(
             Surface(
                 modifier = Modifier.size(54.dp),
                 shape = RoundedCornerShape(12.dp),
-                color = Primary3
+                color = colors.primaryContainer.copy(alpha = 0.46f)
             ) {
                 Box(
                     contentAlignment = Alignment.Center
@@ -104,7 +83,7 @@ fun PopularRouteCard(
                     Icon(
                         imageVector = Icons.Outlined.DirectionsBoat,
                         contentDescription = null,
-                        tint = Primary2,
+                        tint = colors.primary,
                         modifier = Modifier.size(24.dp)
                     )
                 }
@@ -118,21 +97,21 @@ fun PopularRouteCard(
             ) {
                 Text(
                     text = route.route,
-                    color = Neutral700,
+                    color = colors.onSurface,
                     fontWeight = FontWeight.Bold,
                     style = MaterialTheme.typography.titleMedium
                 )
 
                 Text(
                     text = route.price,
-                    color = Primary2,
+                    color = colors.primary,
                     fontWeight = FontWeight.SemiBold,
                     style = MaterialTheme.typography.bodySmall
                 )
 
                 Text(
                     text = route.date,
-                    color = Neutral500,
+                    color = colors.onSurfaceVariant,
                     style = MaterialTheme.typography.bodySmall
                 )
             }
@@ -140,7 +119,7 @@ fun PopularRouteCard(
             Surface(
                 modifier = Modifier.size(32.dp),
                 shape = RoundedCornerShape(50.dp),
-                color = Primary3
+                color = colors.primaryContainer.copy(alpha = 0.56f)
             ) {
                 Box(
                     contentAlignment = Alignment.Center
@@ -148,7 +127,7 @@ fun PopularRouteCard(
                     Icon(
                         imageVector = Icons.AutoMirrored.Outlined.ArrowForward,
                         contentDescription = null,
-                        tint = Primary2,
+                        tint = colors.primary,
                         modifier = Modifier.size(18.dp)
                     )
                 }

@@ -54,6 +54,7 @@ private val DarkColorScheme = darkColorScheme(
 @Composable
 fun Tugas_AkhirTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
+    textScale: Float = 1f,
     content: @Composable () -> Unit,
 ) {
     val colorScheme = if (darkTheme) {
@@ -64,7 +65,7 @@ fun Tugas_AkhirTheme(
 
     MaterialTheme(
         colorScheme = colorScheme,
-        typography = Typography,
+        typography = scaledTypography(textScale),
         content = content,
     )
 }

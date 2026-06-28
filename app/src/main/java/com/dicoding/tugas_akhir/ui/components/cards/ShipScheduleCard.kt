@@ -20,24 +20,25 @@ import androidx.compose.material.icons.outlined.DirectionsBoat
 import androidx.compose.material.icons.outlined.EventSeat
 import androidx.compose.material.icons.outlined.Payments
 import androidx.compose.material.icons.outlined.Sailing
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.dicoding.tugas_akhir.ui.theme.Neutral200
-import com.dicoding.tugas_akhir.ui.theme.Neutral500
-import com.dicoding.tugas_akhir.ui.theme.Neutral700
-import com.dicoding.tugas_akhir.ui.theme.Primary2
-import com.dicoding.tugas_akhir.ui.theme.Primary3
-import com.dicoding.tugas_akhir.ui.theme.White
 
 enum class ShipScheduleStatus {
     Available,
@@ -59,16 +60,12 @@ fun ShipScheduleCard(
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val colors = MaterialTheme.colorScheme
+
     val statusText = when (status) {
         ShipScheduleStatus.Available -> "Tersedia"
         ShipScheduleStatus.Limited -> "Terbatas"
         ShipScheduleStatus.Unavailable -> "Habis"
-    }
-
-    val statusContainerColor = when (status) {
-        ShipScheduleStatus.Available -> Color(0xFFE8F7EF)
-        ShipScheduleStatus.Limited -> Color(0xFFFFF4DF)
-        ShipScheduleStatus.Unavailable -> Color(0xFFFFEAEA)
     }
 
     val statusTextColor = when (status) {
@@ -76,20 +73,13 @@ fun ShipScheduleCard(
         ShipScheduleStatus.Limited -> Color(0xFFC47A00)
         ShipScheduleStatus.Unavailable -> Color(0xFFD32F2F)
     }
+    val statusContainerColor = statusTextColor.copy(alpha = 0.14f)
 
     val isUnavailable = status == ShipScheduleStatus.Unavailable
 
-    val cardContainerColor = if (isUnavailable) {
-        Color(0xFFFFF7F7)
-    } else {
-        White
-    }
+    val cardContainerColor = colors.surface
 
-    val cardBorderColor = if (isUnavailable) {
-        Color(0xFFFFCACA)
-    } else {
-        Neutral200
-    }
+    val cardBorderColor = colors.outlineVariant
 
     val cardShadowElevation = if (isUnavailable) {
         0.dp
@@ -98,35 +88,69 @@ fun ShipScheduleCard(
     }
 
     val iconContainerColor = if (isUnavailable) {
-        Color(0xFFFFEAEA)
+        colors.errorContainer.copy(alpha = 0.58f)
     } else {
-        Primary3
+        colors.primaryContainer.copy(alpha = 0.58f)
     }
 
     val iconTintColor = if (isUnavailable) {
-        Color(0xFFD32F2F)
+        colors.error
     } else {
-        Primary2
+        colors.primary
     }
 
     val titleColor = if (isUnavailable) {
-        Neutral500
+        colors.onSurfaceVariant
     } else {
-        Neutral700
+        colors.onSurface
     }
 
-    val bodyColor = if (isUnavailable) {
-        Color(0xFF9CA3AF)
-    } else {
-        Neutral500
+    val bodyColor = colors.onSurfaceVariant
+
+    var showSoldOutDialog by remember {
+        mutableStateOf(false)
+    }
+
+    if (showSoldOutDialog) {
+        AlertDialog(
+            onDismissRequest = {
+                showSoldOutDialog = false
+            },
+            containerColor = colors.surface,
+            titleContentColor = colors.onSurface,
+            textContentColor = colors.onSurfaceVariant,
+            title = {
+                Text("Tiket sudah habis")
+            },
+            text = {
+                Text("Kuota jadwal ini sudah habis. Silakan pilih jadwal lain atau ubah pencarian untuk melihat alternatif keberangkatan.")
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        showSoldOutDialog = false
+                    },
+                ) {
+                    Text(
+                        text = "Mengerti",
+                        color = colors.primary,
+                    )
+                }
+            },
+        )
     }
 
     Surface(
         modifier = modifier
             .fillMaxWidth()
-            .clickable(enabled = status != ShipScheduleStatus.Unavailable) {
-                onClick()
-            },
+            .clickable {
+                if (isUnavailable) {
+                    showSoldOutDialog = true
+                } else {
+                    onClick()
+                }
+            }
+            .alpha(if (isUnavailable) 0.92f else 1f),
         shape = RoundedCornerShape(18.dp),
         color = cardContainerColor,
         border = BorderStroke(1.dp, cardBorderColor),
@@ -165,7 +189,7 @@ fun ShipScheduleCard(
                 ) {
                     Text(
                         text = shipName,
-                        color = Neutral700,
+                        color = titleColor,
                         fontWeight = FontWeight.Bold,
                         style = MaterialTheme.typography.titleMedium,
                         maxLines = 1,
@@ -174,7 +198,7 @@ fun ShipScheduleCard(
 
                     Text(
                         text = route,
-                        color = Neutral500,
+                        color = bodyColor,
                         style = MaterialTheme.typography.bodyMedium,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
@@ -190,7 +214,7 @@ fun ShipScheduleCard(
                 )
             }
 
-            Divider(color = Neutral200)
+            Divider(color = colors.outlineVariant)
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -224,15 +248,15 @@ fun ShipScheduleCard(
                     Icon(
                         imageVector = Icons.Outlined.EventSeat,
                         contentDescription = null,
-                        tint = Neutral500,
+                        tint = colors.onSurfaceVariant,
                         modifier = Modifier.size(17.dp)
                     )
 
                     Spacer(modifier = Modifier.width(6.dp))
 
                     Text(
-                        text = "$quota tersedia",
-                        color = Neutral500,
+                        text = if (isUnavailable) "Kuota habis" else "$quota tersedia",
+                        color = bodyColor,
                         style = MaterialTheme.typography.bodySmall
                     )
                 }
@@ -243,7 +267,7 @@ fun ShipScheduleCard(
                 ) {
                     Text(
                         text = duration,
-                        color = Neutral500,
+                        color = colors.onSurfaceVariant,
                         style = MaterialTheme.typography.bodySmall
                     )
 
@@ -253,7 +277,7 @@ fun ShipScheduleCard(
                         Icon(
                             imageVector = Icons.Outlined.Payments,
                             contentDescription = null,
-                            tint = Primary2,
+                            tint = colors.primary,
                             modifier = Modifier.size(17.dp)
                         )
 
@@ -261,7 +285,7 @@ fun ShipScheduleCard(
 
                         Text(
                             text = price,
-                            color = Primary2,
+                            color = colors.primary,
                             fontWeight = FontWeight.Bold,
                             style = MaterialTheme.typography.titleSmall
                         )
@@ -279,6 +303,8 @@ private fun ScheduleMiniInfo(
     value: String,
     modifier: Modifier = Modifier
 ) {
+    val colors = MaterialTheme.colorScheme
+
     Row(
         modifier = modifier,
         verticalAlignment = Alignment.Top
@@ -286,7 +312,7 @@ private fun ScheduleMiniInfo(
         Surface(
             modifier = Modifier.size(28.dp),
             shape = CircleShape,
-            color = Primary3
+            color = colors.primaryContainer.copy(alpha = 0.58f)
         ) {
             Box(
                 contentAlignment = Alignment.Center
@@ -294,7 +320,7 @@ private fun ScheduleMiniInfo(
                 Icon(
                     imageVector = icon,
                     contentDescription = null,
-                    tint = Primary2,
+                    tint = colors.primary,
                     modifier = Modifier.size(16.dp)
                 )
             }
@@ -307,13 +333,13 @@ private fun ScheduleMiniInfo(
         ) {
             Text(
                 text = label,
-                color = Neutral500,
+                color = colors.onSurfaceVariant,
                 style = MaterialTheme.typography.labelSmall
             )
 
             Text(
                 text = value,
-                color = Neutral700,
+                color = colors.onSurface,
                 fontWeight = FontWeight.Medium,
                 style = MaterialTheme.typography.bodySmall,
                 maxLines = 2,

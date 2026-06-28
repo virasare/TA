@@ -48,13 +48,6 @@ import com.dicoding.tugas_akhir.ui.components.dialog.buttons.PrimaryButton
 import com.dicoding.tugas_akhir.ui.components.loading.ScheduleListPlaceholder
 import com.dicoding.tugas_akhir.ui.components.lottie.LottieStateView
 import com.dicoding.tugas_akhir.ui.state.TicketClassUiState
-import com.dicoding.tugas_akhir.ui.theme.Background
-import com.dicoding.tugas_akhir.ui.theme.Neutral200
-import com.dicoding.tugas_akhir.ui.theme.Neutral500
-import com.dicoding.tugas_akhir.ui.theme.Neutral700
-import com.dicoding.tugas_akhir.ui.theme.Primary2
-import com.dicoding.tugas_akhir.ui.theme.Primary3
-import com.dicoding.tugas_akhir.ui.theme.White
 import com.dicoding.tugas_akhir.ui.viewmodel.BookingViewModel
 import com.dicoding.tugas_akhir.ui.viewmodel.ViewModelFactory
 
@@ -84,7 +77,7 @@ fun SelectTicketScreen(
     Column(
         modifier = modifier
             .fillMaxSize()
-            .background(Background)
+            .background(MaterialTheme.colorScheme.background)
             .testTag("select_ticket_screen")
     ) {
         LazyColumn(
@@ -196,8 +189,8 @@ private fun SelectTicketHeader(
     Surface(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(20.dp),
-        color = White,
-        border = BorderStroke(1.dp, Neutral200),
+        color = MaterialTheme.colorScheme.surface,
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
         shadowElevation = 2.dp
     ) {
         Row(
@@ -207,13 +200,13 @@ private fun SelectTicketHeader(
             Surface(
                 modifier = Modifier.size(46.dp),
                 shape = RoundedCornerShape(15.dp),
-                color = Primary3
+                color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.58f)
             ) {
                 Box(contentAlignment = Alignment.Center) {
                     Icon(
                         imageVector = Icons.Outlined.Sailing,
                         contentDescription = null,
-                        tint = Primary2,
+                        tint = MaterialTheme.colorScheme.primary,
                         modifier = Modifier.size(25.dp)
                     )
                 }
@@ -227,27 +220,27 @@ private fun SelectTicketHeader(
             ) {
                 Text(
                     text = "Atur Tiket Perjalanan",
-                    color = Neutral700,
+                    color = MaterialTheme.colorScheme.onSurface,
                     fontWeight = FontWeight.Bold,
                     style = MaterialTheme.typography.titleMedium
                 )
 
                 Text(
                     text = "Tentukan kelas tiket dan jumlah penumpang.",
-                    color = Neutral500,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     style = MaterialTheme.typography.bodySmall
                 )
             }
 
             Surface(
                 shape = RoundedCornerShape(50.dp),
-                color = Primary3,
-                border = BorderStroke(1.dp, Neutral200)
+                color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.58f),
+                border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
             ) {
                 Text(
                     text = "Step 1/3",
                     modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
-                    color = Primary2,
+                    color = MaterialTheme.colorScheme.primary,
                     fontWeight = FontWeight.SemiBold,
                     style = MaterialTheme.typography.labelSmall
                 )
@@ -263,8 +256,8 @@ private fun BookingStepCard(
     Surface(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(18.dp),
-        color = White,
-        border = BorderStroke(1.dp, Neutral200),
+        color = MaterialTheme.colorScheme.surface,
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
         shadowElevation = 1.dp
     ) {
         Column(
@@ -273,7 +266,7 @@ private fun BookingStepCard(
         ) {
             Text(
                 text = "Proses Pemesanan",
-                color = Neutral700,
+                color = MaterialTheme.colorScheme.onSurface,
                 fontWeight = FontWeight.Bold,
                 style = MaterialTheme.typography.titleSmall
             )
@@ -330,10 +323,10 @@ private fun StepItem(
         Surface(
             modifier = Modifier.size(30.dp),
             shape = CircleShape,
-            color = if (active || done) Primary2 else Background,
+            color = if (active || done) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant,
             border = BorderStroke(
                 width = 1.dp,
-                color = if (active || done) Primary2 else Neutral200
+                color = if (active || done) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outlineVariant
             )
         ) {
             Box(contentAlignment = Alignment.Center) {
@@ -341,13 +334,13 @@ private fun StepItem(
                     Icon(
                         imageVector = Icons.Outlined.TaskAlt,
                         contentDescription = null,
-                        tint = White,
+                        tint = MaterialTheme.colorScheme.onPrimary,
                         modifier = Modifier.size(17.dp)
                     )
                 } else {
                     Text(
                         text = number,
-                        color = if (active) White else Neutral500,
+                        color = if (active) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant,
                         fontWeight = FontWeight.Bold,
                         style = MaterialTheme.typography.labelMedium
                     )
@@ -357,7 +350,7 @@ private fun StepItem(
 
         Text(
             text = title,
-            color = if (active) Primary2 else Neutral500,
+            color = if (active) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
             fontWeight = if (active) FontWeight.Bold else FontWeight.Normal,
             style = MaterialTheme.typography.labelSmall,
             textAlign = TextAlign.Center
@@ -371,7 +364,7 @@ private fun StepLine(
 ) {
     HorizontalDivider(
         modifier = modifier.padding(horizontal = 4.dp),
-        color = Neutral200
+        color = MaterialTheme.colorScheme.outlineVariant
     )
 }
 
@@ -387,14 +380,14 @@ private fun SectionTitle(
     ) {
         Text(
             text = title,
-            color = Neutral700,
+            color = MaterialTheme.colorScheme.onSurface,
             fontWeight = FontWeight.Bold,
             style = MaterialTheme.typography.titleMedium
         )
 
         Text(
             text = description,
-            color = Neutral500,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
             style = MaterialTheme.typography.bodySmall
         )
     }
@@ -410,8 +403,8 @@ private fun PassengerCounterCard(
     Surface(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(20.dp),
-        color = White,
-        border = BorderStroke(1.dp, Neutral200),
+        color = MaterialTheme.colorScheme.surface,
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
         shadowElevation = 2.dp
     ) {
         Column(
@@ -424,14 +417,14 @@ private fun PassengerCounterCard(
                 Surface(
                     modifier = Modifier.size(40.dp),
                     shape = RoundedCornerShape(13.dp),
-                    color = Primary3,
-                    border = BorderStroke(1.dp, Neutral200)
+                    color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.58f),
+                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
                 ) {
                     Box(contentAlignment = Alignment.Center) {
                         Icon(
                             imageVector = Icons.Outlined.EventSeat,
                             contentDescription = null,
-                            tint = Primary2,
+                            tint = MaterialTheme.colorScheme.primary,
                             modifier = Modifier.size(22.dp)
                         )
                     }
@@ -444,20 +437,20 @@ private fun PassengerCounterCard(
                 ) {
                     Text(
                         text = "Jumlah Penumpang",
-                        color = Neutral700,
+                        color = MaterialTheme.colorScheme.onSurface,
                         fontWeight = FontWeight.Bold,
                         style = MaterialTheme.typography.titleMedium
                     )
 
                     Text(
                         text = "Maksimal 5 penumpang per pesanan",
-                        color = Neutral500,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                         style = MaterialTheme.typography.bodySmall
                     )
                 }
             }
 
-            HorizontalDivider(color = Neutral200)
+            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -466,7 +459,7 @@ private fun PassengerCounterCard(
             ) {
                 Text(
                     text = "$passengerCount penumpang",
-                    color = Neutral700,
+                    color = MaterialTheme.colorScheme.onSurface,
                     fontWeight = FontWeight.SemiBold,
                     style = MaterialTheme.typography.bodyMedium
                 )
@@ -483,7 +476,7 @@ private fun PassengerCounterCard(
                     Text(
                         text = passengerCount.toString(),
                         modifier = Modifier.padding(horizontal = 18.dp),
-                        color = Neutral700,
+                        color = MaterialTheme.colorScheme.onSurface,
                         fontWeight = FontWeight.Bold,
                         style = MaterialTheme.typography.titleMedium,
                         textAlign = TextAlign.Center
@@ -509,8 +502,8 @@ private fun CounterButton(
     Surface(
         modifier = Modifier.size(36.dp),
         shape = CircleShape,
-        color = if (enabled) Primary3 else Background,
-        border = BorderStroke(1.dp, Neutral200)
+        color = if (enabled) MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.58f) else MaterialTheme.colorScheme.surfaceVariant,
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
     ) {
         IconButton(
             onClick = onClick,
@@ -519,7 +512,7 @@ private fun CounterButton(
             Icon(
                 imageVector = icon,
                 contentDescription = null,
-                tint = if (enabled) Primary2 else Neutral500,
+                tint = if (enabled) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.size(18.dp)
             )
         }
@@ -533,8 +526,8 @@ private fun SelectTicketNoteCard(
     Surface(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
-        color = Primary3,
-        border = BorderStroke(1.dp, Neutral200)
+        color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.58f),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
     ) {
         Row(
             modifier = Modifier.padding(14.dp),
@@ -543,7 +536,7 @@ private fun SelectTicketNoteCard(
             Icon(
                 imageVector = Icons.Outlined.Info,
                 contentDescription = null,
-                tint = Primary2,
+                tint = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.size(20.dp)
             )
 
@@ -551,7 +544,7 @@ private fun SelectTicketNoteCard(
 
             Text(
                 text = "Jumlah penumpang yang dipilih akan menentukan jumlah data penumpang yang perlu diisi pada langkah berikutnya.",
-                color = Neutral700,
+                color = MaterialTheme.colorScheme.onSurface,
                 style = MaterialTheme.typography.bodySmall
             )
         }
@@ -571,8 +564,8 @@ private fun SelectTicketBottomBar(
 
     Surface(
         modifier = modifier.fillMaxWidth(),
-        color = White,
-        border = BorderStroke(1.dp, Neutral200),
+        color = MaterialTheme.colorScheme.surface,
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
         shadowElevation = 8.dp
     ) {
         Column(
@@ -592,7 +585,7 @@ private fun SelectTicketBottomBar(
                 ) {
                     Text(
                         text = selectedTicketClass?.name ?: "Belum pilih kelas",
-                        color = Neutral500,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                         style = MaterialTheme.typography.bodySmall
                     )
 
@@ -602,7 +595,7 @@ private fun SelectTicketBottomBar(
                         } else {
                             "Rp0"
                         },
-                        color = Neutral700,
+                        color = MaterialTheme.colorScheme.onSurface,
                         fontWeight = FontWeight.Bold,
                         style = MaterialTheme.typography.titleMedium
                     )
@@ -610,7 +603,7 @@ private fun SelectTicketBottomBar(
 
                 Surface(
                     shape = RoundedCornerShape(50.dp),
-                    color = Primary3
+                    color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.58f)
                 ) {
                     Row(
                         modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
@@ -623,7 +616,7 @@ private fun SelectTicketBottomBar(
                                 Icons.Outlined.ConfirmationNumber
                             },
                             contentDescription = null,
-                            tint = Primary2,
+                            tint = MaterialTheme.colorScheme.primary,
                             modifier = Modifier.size(15.dp)
                         )
 
@@ -631,7 +624,7 @@ private fun SelectTicketBottomBar(
 
                         Text(
                             text = "$passengerCount pax",
-                            color = Primary2,
+                            color = MaterialTheme.colorScheme.primary,
                             fontWeight = FontWeight.SemiBold,
                             style = MaterialTheme.typography.labelSmall
                         )

@@ -63,6 +63,7 @@ fun MyTicketCard(
     onPayNowClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val colors = MaterialTheme.colorScheme
     val isWaitingPayment = ticket.status.equals(
         other = "Menunggu Pembayaran",
         ignoreCase = true,
@@ -81,7 +82,7 @@ fun MyTicketCard(
         ),
         border = BorderStroke(
             width = 1.dp,
-            color = Neutral200,
+            color = colors.outlineVariant,
         ),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
     ) {
@@ -109,6 +110,8 @@ private fun TicketHeaderSection(
     ticket: Booking,
     modifier: Modifier = Modifier,
 ) {
+    val colors = MaterialTheme.colorScheme
+
     Row(
         modifier = modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(12.dp),
@@ -117,7 +120,7 @@ private fun TicketHeaderSection(
         Surface(
             modifier = Modifier.size(46.dp),
             shape = RoundedCornerShape(16.dp),
-            color = Primary3,
+            color = colors.primaryContainer,
         ) {
             Box(
                 contentAlignment = Alignment.Center,
@@ -125,7 +128,7 @@ private fun TicketHeaderSection(
                 Icon(
                     imageVector = Icons.Outlined.Sailing,
                     contentDescription = null,
-                    tint = Primary2,
+                    tint = colors.primary,
                     modifier = Modifier.size(24.dp),
                 )
             }
@@ -137,7 +140,7 @@ private fun TicketHeaderSection(
         ) {
             Text(
                 text = ticket.shipName,
-                color = Black,
+                color = colors.onSurface,
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
                 maxLines = 1,
@@ -145,8 +148,9 @@ private fun TicketHeaderSection(
             )
 
             Surface(
+                modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(50),
-                color = Neutral100,
+                color = colors.surfaceVariant,
             ) {
                 Row(
                     modifier = Modifier.padding(horizontal = 9.dp, vertical = 5.dp),
@@ -156,15 +160,18 @@ private fun TicketHeaderSection(
                     Icon(
                         imageVector = Icons.Outlined.ConfirmationNumber,
                         contentDescription = null,
-                        tint = Neutral500,
+                        tint = colors.onSurfaceVariant,
                         modifier = Modifier.size(14.dp),
                     )
 
                     Text(
                         text = ticket.id,
-                        color = Neutral500,
+                        modifier = Modifier.weight(1f),
+                        color = colors.onSurfaceVariant,
                         style = MaterialTheme.typography.labelSmall,
                         fontWeight = FontWeight.SemiBold,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
                     )
                 }
             }
@@ -179,13 +186,15 @@ private fun RouteSection(
     ticket: Booking,
     modifier: Modifier = Modifier,
 ) {
+    val colors = MaterialTheme.colorScheme
+
     Surface(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(20.dp),
-        color = Primary3,
+        color = colors.primaryContainer.copy(alpha = 0.52f),
         border = BorderStroke(
             width = 1.dp,
-            color = Color(0xFFD7EAFE),
+            color = colors.outlineVariant,
         ),
     ) {
         Column(
@@ -202,7 +211,7 @@ private fun RouteSection(
                 ) {
                     Text(
                         text = ticket.origin,
-                        color = Primary2,
+                        color = colors.primary,
                         style = MaterialTheme.typography.titleSmall,
                         fontWeight = FontWeight.Bold,
                         maxLines = 1,
@@ -211,20 +220,20 @@ private fun RouteSection(
 
                     Text(
                         text = "Pelabuhan asal",
-                        color = Neutral500,
+                        color = colors.onSurfaceVariant,
                         style = MaterialTheme.typography.labelSmall,
                     )
                 }
 
                 Surface(
                     shape = CircleShape,
-                    color = White,
-                    border = BorderStroke(1.dp, Neutral200),
+                    color = colors.surface,
+                    border = BorderStroke(1.dp, colors.outlineVariant),
                 ) {
                     Text(
                         text = "→",
                         modifier = Modifier.padding(horizontal = 11.dp, vertical = 7.dp),
-                        color = Primary2,
+                        color = colors.primary,
                         style = MaterialTheme.typography.titleSmall,
                         fontWeight = FontWeight.Bold,
                     )
@@ -237,7 +246,7 @@ private fun RouteSection(
                 ) {
                     Text(
                         text = ticket.destination,
-                        color = Primary2,
+                        color = colors.primary,
                         style = MaterialTheme.typography.titleSmall,
                         fontWeight = FontWeight.Bold,
                         maxLines = 1,
@@ -246,7 +255,7 @@ private fun RouteSection(
 
                     Text(
                         text = "Pelabuhan tujuan",
-                        color = Neutral500,
+                        color = colors.onSurfaceVariant,
                         style = MaterialTheme.typography.labelSmall,
                     )
                 }
@@ -255,12 +264,12 @@ private fun RouteSection(
             Surface(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(14.dp),
-                color = White,
+                color = colors.surface,
             ) {
                 Text(
                     text = "${DateFormatter.formatDate(ticket.departureDate)}, ${ticket.departureTime}",
                     modifier = Modifier.padding(horizontal = 12.dp, vertical = 9.dp),
-                    color = Neutral700,
+                    color = colors.onSurface,
                     style = MaterialTheme.typography.bodySmall,
                     fontWeight = FontWeight.SemiBold,
                 )
@@ -274,10 +283,12 @@ private fun TicketInfoSection(
     ticket: Booking,
     modifier: Modifier = Modifier,
 ) {
+    val colors = MaterialTheme.colorScheme
+
     Surface(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(18.dp),
-        color = Neutral100,
+        color = colors.surfaceVariant,
     ) {
         Row(
             modifier = Modifier.padding(12.dp),
@@ -314,6 +325,8 @@ private fun TicketSmallInfo(
     value: String,
     modifier: Modifier = Modifier,
 ) {
+    val colors = MaterialTheme.colorScheme
+
     Column(
         modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(6.dp),
@@ -321,20 +334,20 @@ private fun TicketSmallInfo(
         Icon(
             imageVector = icon,
             contentDescription = null,
-            tint = Primary2,
+            tint = colors.primary,
             modifier = Modifier.size(18.dp),
         )
 
         Text(
             text = title,
-            color = Neutral500,
+            color = colors.onSurfaceVariant,
             style = MaterialTheme.typography.labelSmall,
             maxLines = 1,
         )
 
         Text(
             text = value,
-            color = Black,
+            color = colors.onSurface,
             style = MaterialTheme.typography.bodySmall,
             fontWeight = FontWeight.Bold,
             maxLines = 1,
@@ -350,14 +363,16 @@ private fun TicketActionSection(
     onPayNowClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val colors = MaterialTheme.colorScheme
+
     if (isWaitingPayment) {
         Button(
             onClick = onPayNowClick,
             modifier = modifier.fillMaxWidth(),
             shape = RoundedCornerShape(16.dp),
             colors = ButtonDefaults.buttonColors(
-                containerColor = Primary2,
-                contentColor = White,
+                containerColor = colors.primary,
+                contentColor = colors.onPrimary,
             ),
             elevation = ButtonDefaults.buttonElevation(defaultElevation = 0.dp),
         ) {
@@ -373,9 +388,9 @@ private fun TicketActionSection(
             modifier = modifier.fillMaxWidth(),
             shape = RoundedCornerShape(16.dp),
             colors = ButtonDefaults.outlinedButtonColors(
-                contentColor = Primary2,
+                contentColor = colors.primary,
             ),
-            border = BorderStroke(1.dp, Primary2),
+            border = BorderStroke(1.dp, colors.primary),
         ) {
             Text(
                 text = "Lihat E-Ticket",
@@ -391,6 +406,7 @@ private fun TicketStatusPill(
     status: String,
     modifier: Modifier = Modifier,
 ) {
+    val colors = MaterialTheme.colorScheme
     val backgroundColor: Color
     val contentColor: Color
 
@@ -411,8 +427,8 @@ private fun TicketStatusPill(
         }
 
         status.equals("Selesai", ignoreCase = true) -> {
-            backgroundColor = Neutral200
-            contentColor = Neutral500
+            backgroundColor = colors.surfaceVariant
+            contentColor = colors.onSurfaceVariant
         }
 
         status.equals("Refund Diproses", ignoreCase = true) -> {
@@ -434,7 +450,11 @@ private fun TicketStatusPill(
     Surface(
         modifier = modifier,
         shape = RoundedCornerShape(50),
-        color = backgroundColor,
+        color = if (status.equals("Selesai", ignoreCase = true)) {
+            backgroundColor
+        } else {
+            contentColor.copy(alpha = 0.14f)
+        },
     ) {
         Text(
             text = status,

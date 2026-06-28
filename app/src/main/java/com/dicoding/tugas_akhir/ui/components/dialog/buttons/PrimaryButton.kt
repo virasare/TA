@@ -15,15 +15,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.dicoding.tugas_akhir.ui.theme.Error
-import com.dicoding.tugas_akhir.ui.theme.Neutral200
-import com.dicoding.tugas_akhir.ui.theme.Primary1
-import com.dicoding.tugas_akhir.ui.theme.Primary2
-import com.dicoding.tugas_akhir.ui.theme.White
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
-import com.dicoding.tugas_akhir.ui.theme.Neutral300
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -45,10 +39,15 @@ fun PrimaryButton(
     variant: PrimaryButtonVariant = PrimaryButtonVariant.Blue,
     leadingIcon: ImageVector? = null
 ) {
+    val colors = MaterialTheme.colorScheme
     val containerColor = when (variant) {
-        PrimaryButtonVariant.Blue -> Primary2
-        PrimaryButtonVariant.Dark -> Primary1
-        PrimaryButtonVariant.Danger -> Error
+        PrimaryButtonVariant.Blue -> colors.primary
+        PrimaryButtonVariant.Dark -> colors.primary
+        PrimaryButtonVariant.Danger -> colors.error
+    }
+    val contentColor = when (variant) {
+        PrimaryButtonVariant.Danger -> colors.onError
+        else -> colors.onPrimary
     }
 
     Button(
@@ -64,16 +63,16 @@ fun PrimaryButton(
         ),
         colors = ButtonDefaults.buttonColors(
             containerColor = containerColor,
-            contentColor = White,
+            contentColor = contentColor,
             disabledContainerColor = if (isLoading) {
                 containerColor.copy(alpha = 0.72f)
             } else {
-                Neutral200
+                colors.surfaceVariant
             },
             disabledContentColor = if (isLoading) {
-                White
+                contentColor
             } else {
-                Neutral300
+                colors.onSurfaceVariant.copy(alpha = 0.62f)
             }
         )
     ) {
@@ -81,7 +80,7 @@ fun PrimaryButton(
             CircularProgressIndicator(
                 modifier = Modifier.size(18.dp),
                 strokeWidth = 2.dp,
-                color = White,
+                color = contentColor,
             )
 
             Spacer(modifier = Modifier.width(8.dp))

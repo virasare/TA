@@ -17,4 +17,5 @@ data class ETicket(
     val terminal: String,
     val gate: String,
     val note: String,
+    val transitInfo: String = "Langsung",
 )

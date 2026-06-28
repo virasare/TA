@@ -51,13 +51,6 @@ import com.dicoding.tugas_akhir.ui.components.dialog.buttons.PrimaryButton
 import com.dicoding.tugas_akhir.ui.components.loading.BookingSummaryPlaceholder
 import com.dicoding.tugas_akhir.ui.components.lottie.LottieStateView
 import com.dicoding.tugas_akhir.ui.state.BookingDetailUiState
-import com.dicoding.tugas_akhir.ui.theme.Background
-import com.dicoding.tugas_akhir.ui.theme.Neutral200
-import com.dicoding.tugas_akhir.ui.theme.Neutral500
-import com.dicoding.tugas_akhir.ui.theme.Neutral700
-import com.dicoding.tugas_akhir.ui.theme.Primary2
-import com.dicoding.tugas_akhir.ui.theme.Primary3
-import com.dicoding.tugas_akhir.ui.theme.White
 import com.dicoding.tugas_akhir.ui.viewmodel.BookingViewModel
 import com.dicoding.tugas_akhir.ui.viewmodel.ViewModelFactory
 
@@ -176,8 +169,8 @@ private fun BookingSummaryHeader(
     Surface(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(20.dp),
-        color = White,
-        border = BorderStroke(1.dp, Neutral200),
+        color = MaterialTheme.colorScheme.surface,
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
         shadowElevation = 2.dp
     ) {
         Row(
@@ -187,7 +180,7 @@ private fun BookingSummaryHeader(
             Surface(
                 modifier = Modifier.size(46.dp),
                 shape = RoundedCornerShape(15.dp),
-                color = Primary3
+                color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.58f)
             ) {
                 Box(
                     contentAlignment = Alignment.Center
@@ -195,7 +188,7 @@ private fun BookingSummaryHeader(
                     Icon(
                         imageVector = Icons.Outlined.ConfirmationNumber,
                         contentDescription = null,
-                        tint = Primary2,
+                        tint = MaterialTheme.colorScheme.primary,
                         modifier = Modifier.size(25.dp)
                     )
                 }
@@ -209,14 +202,14 @@ private fun BookingSummaryHeader(
             ) {
                 Text(
                     text = "Ringkasan Pesanan",
-                    color = Neutral700,
+                    color = MaterialTheme.colorScheme.onSurface,
                     fontWeight = FontWeight.Bold,
                     style = MaterialTheme.typography.titleMedium
                 )
 
                 Text(
                     text = "${booking.passengerCount} penumpang • ${booking.ticketClassName}",
-                    color = Neutral500,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     style = MaterialTheme.typography.bodySmall
                 )
             }
@@ -233,8 +226,8 @@ private fun BookingStepCard(
     Surface(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(18.dp),
-        color = White,
-        border = BorderStroke(1.dp, Neutral200),
+        color = MaterialTheme.colorScheme.surface,
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
         shadowElevation = 1.dp
     ) {
         Column(
@@ -243,7 +236,7 @@ private fun BookingStepCard(
         ) {
             Text(
                 text = "Proses Pemesanan",
-                color = Neutral700,
+                color = MaterialTheme.colorScheme.onSurface,
                 fontWeight = FontWeight.Bold,
                 style = MaterialTheme.typography.titleSmall
             )
@@ -300,10 +293,10 @@ private fun StepItem(
         Surface(
             modifier = Modifier.size(30.dp),
             shape = CircleShape,
-            color = if (active || done) Primary2 else Background,
+            color = if (active || done) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant,
             border = BorderStroke(
                 width = 1.dp,
-                color = if (active || done) Primary2 else Neutral200
+                color = if (active || done) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outlineVariant
             )
         ) {
             Box(
@@ -313,13 +306,13 @@ private fun StepItem(
                     Icon(
                         imageVector = Icons.Outlined.TaskAlt,
                         contentDescription = null,
-                        tint = White,
+                        tint = MaterialTheme.colorScheme.onPrimary,
                         modifier = Modifier.size(17.dp)
                     )
                 } else {
                     Text(
                         text = number,
-                        color = if (active) White else Neutral500,
+                        color = if (active) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant,
                         fontWeight = FontWeight.Bold,
                         style = MaterialTheme.typography.labelMedium
                     )
@@ -329,7 +322,7 @@ private fun StepItem(
 
         Text(
             text = title,
-            color = if (active) Primary2 else Neutral500,
+            color = if (active) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
             fontWeight = if (active) FontWeight.Bold else FontWeight.Normal,
             style = MaterialTheme.typography.labelSmall,
             textAlign = TextAlign.Center
@@ -343,7 +336,7 @@ private fun StepLine(
 ) {
     HorizontalDivider(
         modifier = modifier.padding(horizontal = 4.dp),
-        color = Neutral200
+        color = MaterialTheme.colorScheme.outlineVariant
     )
 }
 
@@ -359,14 +352,14 @@ private fun SectionTitle(
     ) {
         Text(
             text = title,
-            color = Neutral700,
+            color = MaterialTheme.colorScheme.onSurface,
             fontWeight = FontWeight.Bold,
             style = MaterialTheme.typography.titleMedium
         )
 
         Text(
             text = description,
-            color = Neutral500,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
             style = MaterialTheme.typography.bodySmall
         )
     }
@@ -384,7 +377,7 @@ private fun TravelSummaryCard(
     ) {
         Text(
             text = booking.shipName,
-            color = Neutral700,
+            color = MaterialTheme.colorScheme.onSurface,
             fontWeight = FontWeight.Bold,
             style = MaterialTheme.typography.titleMedium
         )
@@ -423,8 +416,8 @@ private fun PassengerSummaryCard(
             Surface(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(14.dp),
-                color = Background,
-                border = BorderStroke(1.dp, Neutral200)
+                color = MaterialTheme.colorScheme.background,
+                border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
             ) {
                 Row(
                     modifier = Modifier.padding(12.dp),
@@ -433,14 +426,14 @@ private fun PassengerSummaryCard(
                     Surface(
                         modifier = Modifier.size(34.dp),
                         shape = CircleShape,
-                        color = Primary3
+                        color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.58f)
                     ) {
                         Box(
                             contentAlignment = Alignment.Center
                         ) {
                             Text(
                                 text = "${index + 1}",
-                                color = Primary2,
+                                color = MaterialTheme.colorScheme.primary,
                                 fontWeight = FontWeight.Bold,
                                 style = MaterialTheme.typography.labelMedium
                             )
@@ -455,20 +448,32 @@ private fun PassengerSummaryCard(
                     ) {
                         Text(
                             text = passenger.fullName,
-                            color = Neutral700,
+                            color = MaterialTheme.colorScheme.onSurface,
                             fontWeight = FontWeight.Bold,
                             style = MaterialTheme.typography.bodyMedium
                         )
 
                         Text(
                             text = "NIK: ${passenger.nik}",
-                            color = Neutral500,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                             style = MaterialTheme.typography.bodySmall
                         )
 
                         Text(
                             text = "No. HP: ${passenger.phoneNumber}",
-                            color = Neutral500,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            style = MaterialTheme.typography.bodySmall
+                        )
+
+                        Text(
+                            text = "Tanggal Lahir: ${passenger.birthDate}",
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            style = MaterialTheme.typography.bodySmall
+                        )
+
+                        Text(
+                            text = "Jenis Kelamin: ${passenger.gender}",
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                             style = MaterialTheme.typography.bodySmall
                         )
                     }
@@ -500,7 +505,7 @@ private fun PaymentSummaryCard(
             value = PriceFormatter.formatToRupiah(booking.adminFee)
         )
 
-        HorizontalDivider(color = Neutral200)
+        HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
 
         PriceRow(
             title = "Total",
@@ -510,7 +515,7 @@ private fun PaymentSummaryCard(
 
         Text(
             text = "Metode pembayaran belum dipilih.",
-            color = Neutral500,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
             style = MaterialTheme.typography.bodySmall
         )
     }
@@ -523,8 +528,8 @@ private fun PaymentNoteCard(
     Surface(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
-        color = Primary3,
-        border = BorderStroke(1.dp, Neutral200)
+        color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.58f),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
     ) {
         Row(
             modifier = Modifier.padding(14.dp),
@@ -533,7 +538,7 @@ private fun PaymentNoteCard(
             Icon(
                 imageVector = Icons.Outlined.Info,
                 contentDescription = null,
-                tint = Primary2,
+                tint = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.size(20.dp)
             )
 
@@ -541,7 +546,7 @@ private fun PaymentNoteCard(
 
             Text(
                 text = "Pesanan belum masuk status Menunggu Pembayaran. Status tersebut akan muncul setelah kamu memilih metode pembayaran dan menekan tombol Bayar.",
-                color = Neutral700,
+                color = MaterialTheme.colorScheme.onSurface,
                 style = MaterialTheme.typography.bodySmall
             )
         }
@@ -558,8 +563,8 @@ private fun SummaryCard(
     Surface(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(20.dp),
-        color = White,
-        border = BorderStroke(1.dp, Neutral200),
+        color = MaterialTheme.colorScheme.surface,
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
         shadowElevation = 2.dp
     ) {
         Column(
@@ -572,7 +577,7 @@ private fun SummaryCard(
                 Surface(
                     modifier = Modifier.size(38.dp),
                     shape = RoundedCornerShape(12.dp),
-                    color = Primary3
+                    color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.58f)
                 ) {
                     Box(
                         contentAlignment = Alignment.Center
@@ -580,7 +585,7 @@ private fun SummaryCard(
                         Icon(
                             imageVector = icon,
                             contentDescription = null,
-                            tint = Primary2,
+                            tint = MaterialTheme.colorScheme.primary,
                             modifier = Modifier.size(21.dp)
                         )
                     }
@@ -590,13 +595,13 @@ private fun SummaryCard(
 
                 Text(
                     text = title,
-                    color = Neutral700,
+                    color = MaterialTheme.colorScheme.onSurface,
                     fontWeight = FontWeight.Bold,
                     style = MaterialTheme.typography.titleMedium
                 )
             }
 
-            HorizontalDivider(color = Neutral200)
+            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
 
             content()
         }
@@ -616,7 +621,7 @@ private fun SummaryInfoRow(
         Icon(
             imageVector = icon,
             contentDescription = null,
-            tint = Primary2,
+            tint = MaterialTheme.colorScheme.primary,
             modifier = Modifier.size(18.dp)
         )
 
@@ -625,14 +630,14 @@ private fun SummaryInfoRow(
         Text(
             text = label,
             modifier = Modifier.weight(1f),
-            color = Neutral500,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
             style = MaterialTheme.typography.bodySmall
         )
 
         Text(
             text = value,
             modifier = Modifier.weight(1.4f),
-            color = Neutral700,
+            color = MaterialTheme.colorScheme.onSurface,
             fontWeight = FontWeight.SemiBold,
             style = MaterialTheme.typography.bodySmall,
             textAlign = TextAlign.End
@@ -654,7 +659,7 @@ private fun PriceRow(
     ) {
         Text(
             text = title,
-            color = if (isTotal) Neutral700 else Neutral500,
+            color = if (isTotal) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurfaceVariant,
             fontWeight = if (isTotal) FontWeight.Bold else FontWeight.Normal,
             style = if (isTotal) {
                 MaterialTheme.typography.titleMedium
@@ -665,7 +670,7 @@ private fun PriceRow(
 
         Text(
             text = value,
-            color = if (isTotal) Primary2 else Neutral700,
+            color = if (isTotal) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
             fontWeight = FontWeight.Bold,
             style = if (isTotal) {
                 MaterialTheme.typography.titleMedium
@@ -684,13 +689,13 @@ private fun SummaryChip(
     Surface(
         modifier = modifier,
         shape = RoundedCornerShape(50.dp),
-        color = Primary3,
-        border = BorderStroke(1.dp, Neutral200)
+        color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.58f),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
     ) {
         Text(
             text = text,
             modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
-            color = Primary2,
+            color = MaterialTheme.colorScheme.primary,
             fontWeight = FontWeight.SemiBold,
             style = MaterialTheme.typography.labelSmall
         )
@@ -705,8 +710,8 @@ private fun BookingSummaryBottomBar(
 ) {
     Surface(
         modifier = modifier.fillMaxWidth(),
-        color = White,
-        border = BorderStroke(1.dp, Neutral200),
+        color = MaterialTheme.colorScheme.surface,
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
         shadowElevation = 8.dp
     ) {
         Column(
@@ -726,13 +731,13 @@ private fun BookingSummaryBottomBar(
                 ) {
                     Text(
                         text = "Total Pembayaran",
-                        color = Neutral500,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                         style = MaterialTheme.typography.bodySmall
                     )
 
                     Text(
                         text = PriceFormatter.formatToRupiah(booking.totalPrice),
-                        color = Neutral700,
+                        color = MaterialTheme.colorScheme.onSurface,
                         fontWeight = FontWeight.Bold,
                         style = MaterialTheme.typography.titleMedium
                     )
@@ -740,7 +745,7 @@ private fun BookingSummaryBottomBar(
 
                 Surface(
                     shape = RoundedCornerShape(50.dp),
-                    color = Primary3
+                    color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.58f)
                 ) {
                     Row(
                         modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
@@ -749,7 +754,7 @@ private fun BookingSummaryBottomBar(
                         Icon(
                             imageVector = Icons.Outlined.Wallet,
                             contentDescription = null,
-                            tint = Primary2,
+                            tint = MaterialTheme.colorScheme.primary,
                             modifier = Modifier.size(15.dp)
                         )
 
@@ -757,7 +762,7 @@ private fun BookingSummaryBottomBar(
 
                         Text(
                             text = "Step 3/3",
-                            color = Primary2,
+                            color = MaterialTheme.colorScheme.primary,
                             fontWeight = FontWeight.SemiBold,
                             style = MaterialTheme.typography.labelSmall
                         )

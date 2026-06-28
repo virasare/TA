@@ -123,6 +123,7 @@ object Screens {
     const val ProfileSettings = "profile_settings"
     const val ProfileLanguage = "profile_language"
     const val ProfileTheme = "profile_theme"
+    const val ProfileTextSize = "profile_text_size"
     const val ProfileHelp = "profile_help"
 
     const val ProfileHelpDetail = "profile_help_detail/{type}"

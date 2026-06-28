@@ -9,6 +9,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.HelpOutline
 import androidx.compose.material.icons.outlined.DarkMode
+import androidx.compose.material.icons.outlined.FormatSize
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Language
 import androidx.compose.material.icons.outlined.Security
@@ -23,6 +24,7 @@ import com.dicoding.tugas_akhir.ui.localization.LocalAppStrings
 fun SettingsScreen(
     onLanguageClick: () -> Unit,
     onThemeClick: () -> Unit,
+    onTextSizeClick: () -> Unit,
     onAboutClick: () -> Unit,
     onHelpClick: () -> Unit,
     onSecurityClick: () -> Unit,
@@ -52,6 +54,12 @@ fun SettingsScreen(
                         subtitle = strings.themeSubtitle,
                         icon = Icons.Outlined.DarkMode,
                         onClick = onThemeClick,
+                    ),
+                    ProfileMenuItemData(
+                        title = strings.textSize,
+                        subtitle = strings.textSizeSubtitle,
+                        icon = Icons.Outlined.FormatSize,
+                        onClick = onTextSizeClick,
                     ),
                 ),
             )

@@ -26,6 +26,7 @@ import com.dicoding.tugas_akhir.data.dummy.ShipSchedule
 import com.dicoding.tugas_akhir.data.dummy.TicketClassOption
 import com.dicoding.tugas_akhir.data.dummy.dummyPorts
 import com.dicoding.tugas_akhir.data.dummy.popularRoutes
+import com.dicoding.tugas_akhir.domain.model.Booking
 import com.dicoding.tugas_akhir.domain.model.NotificationType
 import com.dicoding.tugas_akhir.ui.components.dialog.navigation.AppBackTopBar
 import com.dicoding.tugas_akhir.ui.components.dialog.navigation.AppBottomNavigationBar
@@ -62,6 +63,7 @@ import com.dicoding.tugas_akhir.ui.screens.schedule.ScheduleScreen
 import com.google.firebase.auth.FirebaseAuth
 import com.dicoding.tugas_akhir.ui.screens.profile.ProfileLanguageScreen
 import com.dicoding.tugas_akhir.ui.screens.profile.ProfileSecurityScreen
+import com.dicoding.tugas_akhir.ui.screens.profile.ProfileTextSizeScreen
 import com.dicoding.tugas_akhir.ui.screens.profile.ProfileThemeScreen
 import com.dicoding.tugas_akhir.ui.viewmodel.NotificationViewModel
 import com.dicoding.tugas_akhir.ui.viewmodel.ViewModelFactory
@@ -93,6 +95,12 @@ import com.dicoding.tugas_akhir.ui.viewmodel.BookingViewModel
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.FileDownload
 import androidx.compose.material3.MaterialTheme
+import com.dicoding.tugas_akhir.ui.localization.AppStrings
+import com.dicoding.tugas_akhir.ui.localization.LocalAppStrings
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Locale
+import java.util.concurrent.TimeUnit
 
 @Composable
 fun AppNavigation() {
@@ -107,6 +115,7 @@ fun AppNavigation() {
     )
 
     val context = LocalContext.current
+    val strings = LocalAppStrings.current
     val factory = ViewModelFactory.getInstance()
 
     val webClientId = stringResource(
@@ -162,8 +171,15 @@ fun AppNavigation() {
         )
     }
 
-    var hasSeenOnboarding by remember {
-        mutableStateOf(prefs.getBoolean("has_seen_onboarding", false))
+    val localNotificationPrefs = remember {
+        context.getSharedPreferences(
+            "local_notification_markers",
+            Context.MODE_PRIVATE
+        )
+    }
+
+    val initialHasSeenOnboarding = remember {
+        prefs.getBoolean("has_seen_onboarding", false)
     }
 
     var hasPassedSplash by remember {
@@ -204,6 +220,16 @@ fun AppNavigation() {
 
     var eTicketDownloadRequest by remember { mutableStateOf(0) }
 
+    var homeTicketOverview by remember {
+        mutableStateOf<Booking?>(null)
+    }
+
+    fun resetSearchInput() {
+        originPort = null
+        destinationPort = null
+        selectedDate = ""
+    }
+
     val bottomBarRoutes = listOf(
         Screens.Home,
         Screens.Schedule,
@@ -236,11 +262,8 @@ fun AppNavigation() {
         }
     }
 
-//    val showBottomBar = hasPassedSplash &&
-//            currentRoute != null &&
-//            currentRoute in bottomBarRoutes
-
-    val showBottomBar = currentRoute != null &&
+    val showBottomBar = hasPassedSplash &&
+            currentRoute != null &&
             currentRoute in bottomBarRoutes
 
     val showTopBar = currentRoute != null &&
@@ -251,9 +274,11 @@ fun AppNavigation() {
             currentRoute !in hideTopBarRoutes
 
     fun navigateAfterAuthSuccess() {
+        val targetRoute = pendingProtectedRoute
         pendingProtectedRoute = null
+        resetSearchInput()
 
-        navController.navigate(Screens.Home) {
+        navController.navigate(targetRoute ?: Screens.Home) {
             popUpTo(Screens.Login) {
                 inclusive = true
             }
@@ -322,10 +347,127 @@ fun AppNavigation() {
         )
     }
 
-    val startDestination = if (hasSeenOnboarding) {
-        Screens.Home
-    } else {
-        Screens.Onboarding
+    fun markManageProcessStarted(
+        bookingId: String,
+        status: String,
+    ) {
+        val key = bookingId.toManageProcessStartKey(status)
+
+        if (!localNotificationPrefs.contains(key)) {
+            localNotificationPrefs.edit()
+                .putLong(key, System.currentTimeMillis())
+                .apply()
+        }
+    }
+
+    fun pushNotificationOnce(
+        markerKey: String,
+        title: String,
+        message: String,
+        type: NotificationType,
+    ) {
+        if (localNotificationPrefs.getBoolean(markerKey, false)) return
+
+        localNotificationPrefs.edit()
+            .putBoolean(markerKey, true)
+            .apply()
+
+        pushNotification(
+            title = title,
+            message = message,
+            type = type,
+        )
+    }
+
+    suspend fun syncLocalTicketNotifications() {
+        val bookings = try {
+            bookingViewModel.getLocalBookingsSnapshot()
+        } catch (exception: Exception) {
+            emptyList()
+        }
+
+        val now = System.currentTimeMillis()
+
+        bookings.forEach { booking ->
+            if (booking.status.equals("Aktif", ignoreCase = true)) {
+                val daysUntilDeparture = booking.daysUntilDeparture()
+
+                if (daysUntilDeparture in listOf(3L, 1L, 0L)) {
+                    val reminderLabel = when (daysUntilDeparture) {
+                        3L -> "H-3"
+                        1L -> "H-1"
+                        else -> "Hari Ini"
+                    }
+
+                    pushNotificationOnce(
+                        markerKey = "departure:${booking.id}:$daysUntilDeparture",
+                        title = "Pengingat Keberangkatan $reminderLabel",
+                        message = "${booking.shipName} berangkat ${booking.departureDate}, ${booking.departureTime} dari ${booking.origin} ke ${booking.destination}.",
+                        type = NotificationType.SCHEDULE,
+                    )
+                }
+            }
+
+            val processStatus = when {
+                booking.status.equals("Refund Diproses", ignoreCase = true) -> {
+                    "Refund Berhasil"
+                }
+
+                booking.status.equals("Reschedule Diproses", ignoreCase = true) -> {
+                    "Reschedule Berhasil"
+                }
+
+                else -> null
+            }
+
+            if (processStatus != null) {
+                val startedKey = booking.id.toManageProcessStartKey(booking.status)
+                val startedAt = localNotificationPrefs.getLong(startedKey, 0L)
+
+                if (startedAt == 0L) {
+                    localNotificationPrefs.edit()
+                        .putLong(startedKey, now)
+                        .apply()
+                } else if (now - startedAt >= MANAGE_TICKET_PROCESS_DURATION_MILLIS) {
+                    val updatedBooking = bookingViewModel.updateBookingStatusForSimulation(
+                        bookingId = booking.id,
+                        status = processStatus,
+                    )
+
+                    pushNotificationOnce(
+                        markerKey = "manage-complete:${updatedBooking.id}:$processStatus",
+                        title = processStatus,
+                        message = "Status tiket ${updatedBooking.id} berubah menjadi $processStatus.",
+                        type = if (processStatus.contains("Refund", ignoreCase = true)) {
+                            NotificationType.REFUND
+                        } else {
+                            NotificationType.RESCHEDULE
+                        },
+                    )
+                }
+            }
+        }
+    }
+
+    LaunchedEffect(isLoggedIn, currentRoute) {
+        if (isLoggedIn) {
+            syncLocalTicketNotifications()
+            homeTicketOverview = try {
+                bookingViewModel.getLocalBookingsSnapshot().nearestActiveBooking()
+            } catch (exception: Exception) {
+                null
+            }
+        } else {
+            homeTicketOverview = null
+        }
+    }
+
+    val startDestination = remember {
+        if (initialHasSeenOnboarding) {
+            Screens.Home
+        } else {
+            Screens.Onboarding
+        }
     }
 
     Scaffold(
@@ -334,7 +476,7 @@ fun AppNavigation() {
             if (showTopBar) {
                 if (showBackTopBar) {
                     AppBackTopBar(
-                        title = getTopBarTitle(currentRoute.orEmpty()),
+                        title = getTopBarTitle(currentRoute.orEmpty(), strings),
                         onBackClick = {
                             navController.popBackStack()
                         },
@@ -353,7 +495,7 @@ fun AppNavigation() {
                     )
                 } else {
                     AppTopBar(
-                        title = getTopBarTitle(currentRoute.orEmpty())
+                        title = getTopBarTitle(currentRoute.orEmpty(), strings)
                     )
                 }
             }
@@ -364,6 +506,10 @@ fun AppNavigation() {
                     currentRoute = currentRoute.orEmpty(),
                     unreadNotificationCount = unreadNotificationCount,
                     onItemClick = { item ->
+                        if (item.route in bottomBarRoutes && item.route != currentRoute) {
+                            resetSearchInput()
+                        }
+
                         if (!isLoggedIn && item.route in protectedRoutes) {
                             pendingProtectedRoute = null
 
@@ -409,8 +555,6 @@ fun AppNavigation() {
             composable(Screens.Onboarding) {
                 OnboardingScreen(
                     onFinishClick = {
-                        hasSeenOnboarding = true
-
                         prefs.edit()
                             .putBoolean("has_seen_onboarding", true)
                             .apply()
@@ -568,7 +712,8 @@ fun AppNavigation() {
                     },
                     onPopularRouteClick = { route ->
                         navController.navigate(Screens.popularRouteResult(route.id))
-                    }
+                    },
+                    ticketOverview = homeTicketOverview,
                 )
             }
 
@@ -675,6 +820,7 @@ fun AppNavigation() {
 
                 AuthGate(
                     onLoginClick = {
+                        pendingProtectedRoute = Screens.selectTicket(scheduleId)
                         navController.navigate(Screens.Login)
                     },
                     onBackClick = {
@@ -1045,10 +1191,15 @@ fun AppNavigation() {
                             bookingViewModel.submitRefund(
                                 bookingId = selectedBookingId,
                                 onSuccess = {
+                                    markManageProcessStarted(
+                                        bookingId = selectedBookingId,
+                                        status = "Refund Diproses",
+                                    )
+
                                     pushNotification(
                                         title = "Refund Diproses",
                                         message = "Pengajuan refund tiket berhasil dikirim dan sedang diproses.",
-                                        type = NotificationType.INFO,
+                                        type = NotificationType.REFUND,
                                     )
 
                                     navController.navigate(
@@ -1088,10 +1239,15 @@ fun AppNavigation() {
                             bookingViewModel.submitReschedule(
                                 bookingId = selectedBookingId,
                                 onSuccess = {
+                                    markManageProcessStarted(
+                                        bookingId = selectedBookingId,
+                                        status = "Reschedule Diproses",
+                                    )
+
                                     pushNotification(
                                         title = "Reschedule Diproses",
                                         message = "Pengajuan reschedule tiket berhasil dikirim dan sedang diproses.",
-                                        type = NotificationType.INFO,
+                                        type = NotificationType.RESCHEDULE,
                                     )
 
                                     navController.navigate(
@@ -1125,7 +1281,7 @@ fun AppNavigation() {
                 ) {
                     ManageTicketSuccessScreen(
                         title = "Refund Diproses",
-                        description = "Pengajuan refund berhasil dikirim. Status refund dapat dilihat pada halaman Pesanan Saya.",
+                        description = "Pengajuan refund berhasil dikirim. Status refund dapat dilihat pada halaman Tiket Saya.",
                         onContinueClick = {
                             navController.navigate(Screens.MyTicket)
                         }
@@ -1327,6 +1483,9 @@ fun AppNavigation() {
                         onThemeClick = {
                             navController.navigate(Screens.ProfileTheme)
                         },
+                        onTextSizeClick = {
+                            navController.navigate(Screens.ProfileTextSize)
+                        },
                         onAboutClick = {
                             navController.navigate(Screens.ProfileAbout)
                         },
@@ -1363,6 +1522,19 @@ fun AppNavigation() {
                     }
                 ) {
                     ProfileThemeScreen()
+                }
+            }
+
+            composable(Screens.ProfileTextSize) {
+                AuthGate(
+                    onLoginClick = {
+                        navController.navigate(Screens.Login)
+                    },
+                    onBackClick = {
+                        navController.popBackStack()
+                    }
+                ) {
+                    ProfileTextSizeScreen()
                 }
             }
 
@@ -1427,41 +1599,114 @@ fun AppNavigation() {
     }
 }
 
-private fun getTopBarTitle(route: String): String {
+private const val MANAGE_TICKET_PROCESS_DURATION_MILLIS = 24L * 60L * 60L * 1000L
+
+private fun String.toManageProcessStartKey(
+    status: String,
+): String {
+    return "manage-start:${this}:${status.lowercase().replace(" ", "-")}"
+}
+
+private fun Booking.daysUntilDeparture(): Long? {
+    val departureMillis = departureDate.toStartOfDayMillis() ?: return null
+    val todayMillis = Calendar.getInstance().startOfDayMillis()
+
+    return TimeUnit.MILLISECONDS.toDays(departureMillis - todayMillis)
+}
+
+private fun List<Booking>.nearestActiveBooking(): Booking? {
+    val activeBookings = filter { booking ->
+        booking.status.equals("Aktif", ignoreCase = true)
+    }
+
+    return activeBookings
+        .map { booking ->
+            booking to (booking.daysUntilDeparture() ?: Long.MAX_VALUE)
+        }
+        .filter { (_, daysUntilDeparture) ->
+            daysUntilDeparture >= 0L
+        }
+        .minByOrNull { (_, daysUntilDeparture) ->
+            daysUntilDeparture
+        }
+        ?.first
+        ?: activeBookings.firstOrNull()
+}
+
+private fun String.toStartOfDayMillis(): Long? {
+    val formats = listOf(
+        SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()),
+        SimpleDateFormat("dd MMM yyyy", Locale.forLanguageTag("id-ID")),
+        SimpleDateFormat("dd MMMM yyyy", Locale.forLanguageTag("id-ID")),
+    )
+
+    formats.forEach { formatter ->
+        try {
+            formatter.isLenient = false
+            val date = formatter.parse(this)
+
+            if (date != null) {
+                return Calendar.getInstance().apply {
+                    time = date
+                }.startOfDayMillis()
+            }
+        } catch (exception: Exception) {
+            // Try the next supported date format.
+        }
+    }
+
+    return null
+}
+
+private fun Calendar.startOfDayMillis(): Long {
+    return apply {
+        set(Calendar.HOUR_OF_DAY, 0)
+        set(Calendar.MINUTE, 0)
+        set(Calendar.SECOND, 0)
+        set(Calendar.MILLISECOND, 0)
+    }.timeInMillis
+}
+
+private fun getTopBarTitle(
+    route: String,
+    strings: AppStrings,
+): String {
     return when (route) {
-        Screens.AuthRequired -> "Login Diperlukan"
-        Screens.Home -> "Beranda"
-        Screens.Schedule -> "Jadwal Kapal"
-        Screens.ScheduleDetail -> "Detail Jadwal"
-        Screens.SelectTicket -> "Pilih Tiket"
-        Screens.PassengerForm -> "Data Penumpang"
-        Screens.BookingSummary -> "Ringkasan Pesanan"
-        Screens.Payment -> "Pembayaran"
-        Screens.PaymentWaiting -> "Menunggu Pembayaran"
-        Screens.PaymentFailed -> "Status Pembayaran"
-        Screens.PaymentSuccess -> "Status Pembayaran"
-        Screens.MyTicket -> "Pesanan Saya"
-        Screens.ETicket -> "E-Ticket"
-        Screens.ETicketByPayment -> "E-Ticket"
-        Screens.Refund -> "Ajukan Refund"
-        Screens.Reschedule -> "Reschedule Tiket"
-        Screens.RefundSuccess -> "Refund Diproses"
-        Screens.RescheduleSuccess -> "Reschedule Berhasil"
-        Screens.Notification -> "Notifikasi"
-        Screens.NotificationDetail -> "Detail Notifikasi"
-        Screens.Profile -> "Profil"
-        Screens.PortSearchRoute -> "Pilih Pelabuhan"
-        Screens.SearchResult -> "Hasil Pencarian"
-        Screens.PopularRouteResult -> "Rute Populer"
-        Screens.ProfileEdit -> "Edit Profil"
-        Screens.ProfilePassengerData -> "Data Penumpang"
-        Screens.ProfilePassengerForm -> "Tambah Penumpang"
-        Screens.ProfileSettings -> "Pengaturan"
-        Screens.ProfileLanguage -> "Bahasa"
-        Screens.ProfileTheme -> "Tema"
-        Screens.ProfileHelp -> "Bantuan"
-        Screens.ProfileHelpDetail -> "Detail Bantuan"
-        Screens.ProfileAbout -> "Tentang Aplikasi"
+        Screens.AuthRequired -> strings.titleLoginRequired
+        Screens.Home -> strings.navHome
+        Screens.Schedule -> strings.navSchedule
+        Screens.ScheduleDetail -> strings.titleScheduleDetail
+        Screens.SelectTicket -> strings.titleSelectTicket
+        Screens.PassengerForm -> strings.titlePassengerForm
+        Screens.BookingSummary -> strings.titleBookingSummary
+        Screens.Payment -> strings.titlePayment
+        Screens.PaymentWaiting -> strings.titlePaymentWaiting
+        Screens.PaymentFailed -> strings.titlePaymentStatus
+        Screens.PaymentSuccess -> strings.titlePaymentStatus
+        Screens.MyTicket -> strings.navMyTicket
+        Screens.ETicket -> strings.titleETicket
+        Screens.ETicketByPayment -> strings.titleETicket
+        Screens.Refund -> strings.titleRefund
+        Screens.Reschedule -> strings.titleReschedule
+        Screens.RefundSuccess -> strings.titleRefundProcess
+        Screens.RescheduleSuccess -> strings.titleRescheduleSuccess
+        Screens.Notification -> strings.navNotification
+        Screens.NotificationDetail -> strings.titleNotificationDetail
+        Screens.Profile -> strings.navProfile
+        Screens.PortSearchRoute -> strings.titleChoosePort
+        Screens.SearchResult -> strings.titleSearchResult
+        Screens.PopularRouteResult -> strings.titlePopularRoute
+        Screens.ProfileEdit -> strings.editProfile
+        Screens.ProfilePassengerData -> strings.passengerData
+        Screens.ProfilePassengerForm -> strings.titleAddPassenger
+        Screens.ProfileSettings -> strings.settings
+        Screens.ProfileLanguage -> strings.language
+        Screens.ProfileTheme -> strings.theme
+        Screens.ProfileTextSize -> strings.textSize
+        Screens.ProfileHelp -> strings.help
+        Screens.ProfileHelpDetail -> strings.helpTitle
+        Screens.ProfileAbout -> strings.aboutApp
+        Screens.ProfileSecurity -> strings.security
         else -> ""
     }
 }

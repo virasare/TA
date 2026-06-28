@@ -52,14 +52,13 @@ import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import com.dicoding.tugas_akhir.domain.model.UserProfile
-import com.dicoding.tugas_akhir.ui.theme.Primary2
 
 @Composable
 fun ProfileHeaderCard(
     profile: UserProfile,
     modifier: Modifier = Modifier,
 ) {
-    val softBlue = Color(0xFFEAF4FF)
+    val colors = MaterialTheme.colorScheme
 
     Card(
         modifier = modifier.fillMaxWidth(),
@@ -69,7 +68,7 @@ fun ProfileHeaderCard(
         ),
         border = BorderStroke(
             width = 1.dp,
-            color = Color(0xFFE3EAF2),
+            color = colors.outlineVariant,
         ),
         elevation = CardDefaults.cardElevation(defaultElevation = 3.dp),
     ) {
@@ -83,7 +82,7 @@ fun ProfileHeaderCard(
             ProfileAvatar(
                 name = profile.name,
                 photoUri = profile.photoUri,
-                avatarBackground = softBlue,
+                avatarBackground = colors.primaryContainer,
             )
 
             Spacer(modifier = Modifier.height(14.dp))
@@ -92,7 +91,7 @@ fun ProfileHeaderCard(
                 text = profile.name.ifBlank { "Pengguna NusaKapal" },
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold,
-                color = Color(0xFF102A43),
+                color = colors.onSurface,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
             )
@@ -102,7 +101,7 @@ fun ProfileHeaderCard(
             Text(
                 text = profile.email.ifBlank { "Email belum tersedia" },
                 style = MaterialTheme.typography.bodyMedium,
-                color = Color(0xFF627D98),
+                color = colors.onSurfaceVariant,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
             )
@@ -114,7 +113,7 @@ fun ProfileHeaderCard(
                 label = {
                     Text(
                         text = "Akun Aktif",
-                        color = Primary2,
+                        color = colors.primary,
                     )
                 },
             )
@@ -154,7 +153,7 @@ private fun ProfileAvatar(
             Text(
                 text = initial,
                 style = MaterialTheme.typography.headlineLarge,
-                color = Primary2,
+                color = MaterialTheme.colorScheme.primary,
                 fontWeight = FontWeight.Bold,
             )
         }
@@ -167,6 +166,8 @@ fun ProfileMenuCard(
     items: List<ProfileMenuItemData>,
     modifier: Modifier = Modifier,
 ) {
+    val colors = MaterialTheme.colorScheme
+
     Card(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(24.dp),
@@ -175,7 +176,7 @@ fun ProfileMenuCard(
         ),
         border = BorderStroke(
             width = 1.dp,
-            color = Color(0xFFE3EAF2),
+            color = colors.outlineVariant,
         ),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
     ) {
@@ -186,7 +187,7 @@ fun ProfileMenuCard(
                 text = title,
                 style = MaterialTheme.typography.titleSmall,
                 fontWeight = FontWeight.Bold,
-                color = Color(0xFF1976D2),
+                color = colors.primary,
                 modifier = Modifier.padding(
                     horizontal = 18.dp,
                     vertical = 8.dp,
@@ -199,7 +200,7 @@ fun ProfileMenuCard(
                 if (index != items.lastIndex) {
                     HorizontalDivider(
                         modifier = Modifier.padding(start = 62.dp),
-                        color = Color(0xFFE9EEF5),
+                        color = colors.outlineVariant,
                     )
                 }
             }
@@ -212,8 +213,7 @@ private fun ProfileMenuRow(
     item: ProfileMenuItemData,
     modifier: Modifier = Modifier,
 ) {
-    val oceanBlue = Color(0xFF1976D2)
-    val softBlue = Color(0xFFEAF4FF)
+    val colors = MaterialTheme.colorScheme
 
     Row(
         modifier = modifier
@@ -230,13 +230,13 @@ private fun ProfileMenuRow(
             modifier = Modifier
                 .size(40.dp)
                 .clip(RoundedCornerShape(14.dp))
-                .background(softBlue),
+                .background(colors.primaryContainer),
             contentAlignment = Alignment.Center,
         ) {
             Icon(
                 imageVector = item.icon,
                 contentDescription = null,
-                tint = oceanBlue,
+                tint = colors.primary,
             )
         }
 
@@ -248,14 +248,14 @@ private fun ProfileMenuRow(
                 text = item.title,
                 style = MaterialTheme.typography.bodyLarge,
                 fontWeight = FontWeight.SemiBold,
-                color = Color(0xFF102A43),
+                color = colors.onSurface,
             )
 
             if (item.subtitle.isNotBlank()) {
                 Text(
                     text = item.subtitle,
                     style = MaterialTheme.typography.bodySmall,
-                    color = Color(0xFF627D98),
+                    color = colors.onSurfaceVariant,
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis,
                 )
@@ -265,7 +265,7 @@ private fun ProfileMenuRow(
         Icon(
             imageVector = Icons.Outlined.ChevronRight,
             contentDescription = null,
-            tint = Color(0xFF9FB3C8),
+            tint = colors.onSurfaceVariant,
         )
     }
 }
@@ -351,9 +351,19 @@ fun ProfileTextField(
         visualTransformation = visualTransformation,
         shape = RoundedCornerShape(16.dp),
         colors = OutlinedTextFieldDefaults.colors(
-            focusedBorderColor = Primary2,
-            focusedLabelColor = Primary2,
-            cursorColor = Primary2,
+            focusedBorderColor = MaterialTheme.colorScheme.primary,
+            unfocusedBorderColor = MaterialTheme.colorScheme.outlineVariant,
+            focusedLabelColor = MaterialTheme.colorScheme.primary,
+            unfocusedLabelColor = MaterialTheme.colorScheme.onSurfaceVariant,
+            cursorColor = MaterialTheme.colorScheme.primary,
+            focusedContainerColor = MaterialTheme.colorScheme.surface,
+            unfocusedContainerColor = MaterialTheme.colorScheme.surface,
+            disabledContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+            focusedTextColor = MaterialTheme.colorScheme.onSurface,
+            unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
+            disabledTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
+            focusedPlaceholderColor = MaterialTheme.colorScheme.onSurfaceVariant,
+            unfocusedPlaceholderColor = MaterialTheme.colorScheme.onSurfaceVariant,
         ),
         supportingText = if (supportingMessage.isNullOrBlank()) {
             null
@@ -380,7 +390,7 @@ fun ChoiceSection(
         Text(
             text = title,
             style = MaterialTheme.typography.titleSmall,
-            color = Color(0xFF102A43),
+            color = MaterialTheme.colorScheme.onSurface,
             fontWeight = FontWeight.Bold,
         )
 
@@ -398,14 +408,16 @@ fun ChoiceSection(
                         Text(option)
                     },
                     colors = FilterChipDefaults.filterChipColors(
-                        selectedContainerColor = Color(0xFFEAF4FF),
-                        selectedLabelColor = Primary2,
+                        containerColor = MaterialTheme.colorScheme.surface,
+                        labelColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                        selectedContainerColor = MaterialTheme.colorScheme.primaryContainer,
+                        selectedLabelColor = MaterialTheme.colorScheme.onPrimaryContainer,
                     ),
                     border = FilterChipDefaults.filterChipBorder(
                         enabled = true,
                         selected = selectedOption == option,
-                        borderColor = Color(0xFFD6EAFD),
-                        selectedBorderColor = Primary2,
+                        borderColor = MaterialTheme.colorScheme.outlineVariant,
+                        selectedBorderColor = MaterialTheme.colorScheme.primary,
                     ),
                 )
             }
@@ -472,6 +484,8 @@ fun BottomActionButton(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
 ) {
+    val colors = MaterialTheme.colorScheme
+
     Button(
         onClick = onClick,
         enabled = enabled,
@@ -480,10 +494,10 @@ fun BottomActionButton(
             .padding(horizontal = 16.dp, vertical = 12.dp),
         shape = RoundedCornerShape(16.dp),
         colors = ButtonDefaults.buttonColors(
-            containerColor = Primary2,
-            disabledContainerColor = Color(0xFFB8C7D9),
-            contentColor = Color.White,
-            disabledContentColor = Color.White,
+            containerColor = colors.primary,
+            disabledContainerColor = colors.surfaceVariant,
+            contentColor = colors.onPrimary,
+            disabledContentColor = colors.onSurfaceVariant.copy(alpha = 0.62f),
         ),
     ) {
         Text(text)
@@ -697,13 +711,13 @@ fun StepCard(
                 modifier = Modifier
                     .size(32.dp)
                     .clip(CircleShape)
-                    .background(Primary2),
+                    .background(MaterialTheme.colorScheme.primary),
                 contentAlignment = Alignment.Center,
             ) {
                 Text(
                     text = number.toString(),
                     style = MaterialTheme.typography.titleSmall,
-                    color = Color.White,
+                    color = MaterialTheme.colorScheme.onPrimary,
                     fontWeight = FontWeight.Bold,
                 )
             }
@@ -740,6 +754,8 @@ fun AddPassengerCard(
     title: String = "Tambah Data Penumpang",
     subtitle: String = "Simpan data penumpang agar proses booking lebih cepat.",
 ) {
+    val colors = MaterialTheme.colorScheme
+
     Card(
         modifier = modifier
             .fillMaxWidth()
@@ -747,10 +763,10 @@ fun AddPassengerCard(
         shape = RoundedCornerShape(22.dp),
         border = BorderStroke(
             width = 1.dp,
-            color = Primary2,
+            color = colors.primary,
         ),
         colors = CardDefaults.cardColors(
-            containerColor = Color(0xFFEAF4FF),
+            containerColor = colors.primaryContainer.copy(alpha = 0.5f),
         ),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
     ) {
@@ -763,13 +779,13 @@ fun AddPassengerCard(
                 modifier = Modifier
                     .size(42.dp)
                     .clip(RoundedCornerShape(14.dp))
-                    .background(Color.White),
+                    .background(colors.surface),
                 contentAlignment = Alignment.Center,
             ) {
                 Icon(
                     imageVector = Icons.Outlined.Add,
                     contentDescription = null,
-                    tint = Primary2,
+                    tint = colors.primary,
                 )
             }
 
@@ -781,13 +797,13 @@ fun AddPassengerCard(
                     text = title,
                     style = MaterialTheme.typography.titleSmall,
                     fontWeight = FontWeight.Bold,
-                    color = Color(0xFF102A43),
+                    color = colors.onSurface,
                 )
 
                 Text(
                     text = subtitle,
                     style = MaterialTheme.typography.bodySmall,
-                    color = Color(0xFF486581),
+                    color = colors.onSurfaceVariant,
                 )
             }
         }
@@ -810,6 +826,8 @@ fun PassengerDataCard(
     onEditClick: () -> Unit = {},
     onDeleteClick: () -> Unit = {},
 ) {
+    val colors = MaterialTheme.colorScheme
+
     val displayedName = name
         .ifBlank { fullName }
         .ifBlank { title }
@@ -826,7 +844,7 @@ fun PassengerDataCard(
         shape = RoundedCornerShape(22.dp),
         border = BorderStroke(
             width = 1.dp,
-            color = Color(0xFFE3EAF2),
+            color = colors.outlineVariant,
         ),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface,
@@ -842,12 +860,12 @@ fun PassengerDataCard(
                 modifier = Modifier
                     .size(46.dp)
                     .clip(CircleShape)
-                    .background(Color(0xFFEAF4FF)),
+                    .background(colors.primaryContainer),
                 contentAlignment = Alignment.Center,
             ) {
                 Text(
                     text = displayedName.firstOrNull()?.uppercase() ?: "P",
-                    color = Primary2,
+                    color = colors.primary,
                     fontWeight = FontWeight.Bold,
                 )
             }
@@ -860,28 +878,28 @@ fun PassengerDataCard(
                     text = displayedName,
                     style = MaterialTheme.typography.titleSmall,
                     fontWeight = FontWeight.Bold,
-                    color = Color(0xFF102A43),
+                    color = colors.onSurface,
                 )
 
                 if (nik.isNotBlank()) {
                     Text(
                         text = "NIK: $nik",
                         style = MaterialTheme.typography.bodySmall,
-                        color = Color(0xFF627D98),
+                        color = colors.onSurfaceVariant,
                     )
                 }
 
                 Text(
                     text = "No. HP: $displayedPhone",
                     style = MaterialTheme.typography.bodySmall,
-                    color = Color(0xFF627D98),
+                    color = colors.onSurfaceVariant,
                 )
 
                 if (birthDate.isNotBlank()) {
                     Text(
                         text = "Tanggal lahir: $birthDate",
                         style = MaterialTheme.typography.bodySmall,
-                        color = Color(0xFF627D98),
+                        color = colors.onSurfaceVariant,
                     )
                 }
 
@@ -889,7 +907,7 @@ fun PassengerDataCard(
                     Text(
                         text = "Jenis kelamin: $gender",
                         style = MaterialTheme.typography.bodySmall,
-                        color = Color(0xFF627D98),
+                        color = colors.onSurfaceVariant,
                     )
                 }
             }
@@ -901,7 +919,7 @@ fun PassengerDataCard(
                     Icon(
                         imageVector = Icons.Outlined.Edit,
                         contentDescription = "Edit penumpang",
-                        tint = Primary2,
+                        tint = colors.primary,
                     )
                 }
 
@@ -967,7 +985,7 @@ fun StaticInfoItem(
             Icon(
                 imageVector = icon,
                 contentDescription = null,
-                tint = Primary2,
+                tint = MaterialTheme.colorScheme.primary,
             )
         }
 

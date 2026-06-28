@@ -27,12 +27,6 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.dicoding.tugas_akhir.R
-import com.dicoding.tugas_akhir.ui.theme.Error
-import com.dicoding.tugas_akhir.ui.theme.Neutral300
-import com.dicoding.tugas_akhir.ui.theme.Neutral500
-import com.dicoding.tugas_akhir.ui.theme.Neutral700
-import com.dicoding.tugas_akhir.ui.theme.Primary2
-import com.dicoding.tugas_akhir.ui.theme.White
 
 @Composable
 fun AppTextField(
@@ -49,13 +43,15 @@ fun AppTextField(
     @DrawableRes trailingIcon: Int? = null,
     onTrailingIconClick: (() -> Unit)? = null
 ) {
+    val colors = MaterialTheme.colorScheme
+
     Column(
         modifier = modifier.fillMaxWidth()
     ) {
         Text(
             text = label,
             style = MaterialTheme.typography.bodyMedium,
-            color = Neutral700
+            color = colors.onSurface
         )
 
         Spacer(modifier = Modifier.height(8.dp))
@@ -70,11 +66,11 @@ fun AppTextField(
                 Text(
                     text = placeholder,
                     style = MaterialTheme.typography.bodyLarge,
-                    color = Neutral500
+                    color = colors.onSurfaceVariant
                 )
             },
             textStyle = MaterialTheme.typography.bodyLarge.copy(
-                color = Neutral700
+                color = colors.onSurface
             ),
             keyboardOptions = KeyboardOptions(
                 keyboardType = keyboardType
@@ -88,37 +84,37 @@ fun AppTextField(
                             Icon(
                                 painter = painterResource(id = trailingIcon),
                                 contentDescription = null,
-                                tint = Neutral500
+                                tint = colors.onSurfaceVariant
                             )
                         }
                     } else {
                         Icon(
                             painter = painterResource(id = trailingIcon),
                             contentDescription = null,
-                            tint = Neutral500
+                            tint = colors.onSurfaceVariant
                         )
                     }
                 }
             },
             shape = RoundedCornerShape(16.dp),
             colors = OutlinedTextFieldDefaults.colors(
-                focusedContainerColor = White,
-                unfocusedContainerColor = White,
-                disabledContainerColor = White,
-                errorContainerColor = White,
+                focusedContainerColor = colors.surface,
+                unfocusedContainerColor = colors.surface,
+                disabledContainerColor = colors.surfaceVariant.copy(alpha = 0.56f),
+                errorContainerColor = colors.surface,
 
-                focusedBorderColor = Primary2,
-                unfocusedBorderColor = Neutral300,
-                disabledBorderColor = Neutral300,
-                errorBorderColor = Error,
+                focusedBorderColor = colors.primary,
+                unfocusedBorderColor = colors.outlineVariant,
+                disabledBorderColor = colors.outlineVariant,
+                errorBorderColor = colors.error,
 
-                cursorColor = Primary2,
-                errorCursorColor = Error,
+                cursorColor = colors.primary,
+                errorCursorColor = colors.error,
 
-                focusedTextColor = Neutral700,
-                unfocusedTextColor = Neutral700,
-                disabledTextColor = Neutral500,
-                errorTextColor = Neutral700
+                focusedTextColor = colors.onSurface,
+                unfocusedTextColor = colors.onSurface,
+                disabledTextColor = colors.onSurfaceVariant,
+                errorTextColor = colors.onSurface
             ),
             modifier = Modifier
                 .fillMaxWidth()
@@ -131,7 +127,7 @@ fun AppTextField(
             Text(
                 text = errorMessage,
                 style = MaterialTheme.typography.bodySmall,
-                color = Error,
+                color = colors.error,
                 modifier = Modifier.padding(start = 2.dp)
             )
         }

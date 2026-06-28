@@ -24,15 +24,8 @@ class NotificationViewModel(
     val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
 
     init {
-        seedNotifications()
         observeNotifications()
         observeUnreadCount()
-    }
-
-    private fun seedNotifications() {
-        viewModelScope.launch {
-            notificationRepository.seedInitialNotifications()
-        }
     }
 
     private fun observeNotifications() {

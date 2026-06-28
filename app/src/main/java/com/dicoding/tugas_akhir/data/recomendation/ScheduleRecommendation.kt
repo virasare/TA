@@ -4,6 +4,7 @@ import com.dicoding.tugas_akhir.data.dummy.Port
 import com.dicoding.tugas_akhir.data.dummy.ShipSchedule
 import com.dicoding.tugas_akhir.ui.components.cards.ShipScheduleStatus
 import java.text.SimpleDateFormat
+import java.util.Calendar
 import java.util.Locale
 import kotlin.math.abs
 
@@ -24,6 +25,40 @@ fun findExactSchedules(
             route.origin.equals(originPort.city, ignoreCase = true) &&
                     route.destination.equals(destinationPort.city, ignoreCase = true) &&
                     schedule.departureDate == selectedDate
+        }
+        .sortedWith(
+            scheduleRecommendationComparator(
+                originPort = originPort,
+                destinationPort = destinationPort,
+                selectedDate = selectedDate
+            )
+        )
+}
+
+fun findSchedulesWithinDateRange(
+    schedules: List<ShipSchedule>,
+    originPort: Port?,
+    destinationPort: Port?,
+    selectedDate: String,
+    rangeDays: Int = 14,
+): List<ShipSchedule> {
+    if (originPort == null || destinationPort == null || selectedDate.isEmpty()) {
+        return emptyList()
+    }
+
+    val startDateMillis = selectedDate.toDateMillis() ?: return emptyList()
+    val endDateMillis = startDateMillis.plusDays(rangeDays)
+
+    return schedules
+        .filter { schedule ->
+            val route = schedule.toRouteDirection()
+            val departureMillis = schedule.departureDate.toDateMillis()
+
+            route.origin.equals(originPort.city, ignoreCase = true) &&
+                    route.destination.equals(destinationPort.city, ignoreCase = true) &&
+                    departureMillis != null &&
+                    departureMillis >= startDateMillis &&
+                    departureMillis <= endDateMillis
         }
         .sortedWith(
             scheduleRecommendationComparator(
@@ -88,8 +123,10 @@ private data class RouteDirection(
 
 private fun ShipSchedule.toRouteDirection(): RouteDirection {
     val parts = when {
-        route.contains("→") -> route.split("→")
         route.contains("â†’") -> route.split("â†’")
+        route.contains("→") -> route.split("→")
+        route.contains("->") -> route.split("->")
+        route.contains("Ã¢â€ â€™") -> route.split("Ã¢â€ â€™")
         else -> route.split("-")
     }
 
@@ -129,6 +166,15 @@ private fun String.toDateMillis(): Long? {
     } catch (e: Exception) {
         null
     }
+}
+
+private fun Long.plusDays(days: Int): Long {
+    val calendar = Calendar.getInstance().apply {
+        timeInMillis = this@plusDays
+        add(Calendar.DAY_OF_YEAR, days)
+    }
+
+    return calendar.timeInMillis
 }
 
 private fun String.toTimeRank(): Int {

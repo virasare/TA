@@ -18,10 +18,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.dicoding.tugas_akhir.ui.theme.Neutral200
-import com.dicoding.tugas_akhir.ui.theme.Neutral300
-import com.dicoding.tugas_akhir.ui.theme.Primary2
-import com.dicoding.tugas_akhir.ui.theme.White
 
 @Composable
 fun SecondaryButton(
@@ -31,6 +27,8 @@ fun SecondaryButton(
     enabled: Boolean = true,
     leadingIcon: ImageVector? = null
 ) {
+    val colors = MaterialTheme.colorScheme
+
     OutlinedButton(
         onClick = onClick,
         enabled = enabled,
@@ -40,17 +38,17 @@ fun SecondaryButton(
         shape = RoundedCornerShape(10.dp),
         border = BorderStroke(
             width = 1.dp,
-            color = if (enabled) Primary2 else Neutral200
+            color = if (enabled) colors.primary else colors.outlineVariant
         ),
         contentPadding = PaddingValues(
             horizontal = 24.dp,
             vertical = 12.dp
         ),
         colors = ButtonDefaults.outlinedButtonColors(
-            containerColor = if (enabled) White else Neutral200,
-            contentColor = if (enabled) Primary2 else Neutral300,
-            disabledContainerColor = Neutral200,
-            disabledContentColor = Neutral300
+            containerColor = colors.surface,
+            contentColor = if (enabled) colors.primary else colors.onSurfaceVariant.copy(alpha = 0.62f),
+            disabledContainerColor = colors.surfaceVariant,
+            disabledContentColor = colors.onSurfaceVariant.copy(alpha = 0.62f)
         )
     ) {
         if (leadingIcon != null) {

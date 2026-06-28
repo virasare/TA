@@ -34,13 +34,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.dicoding.tugas_akhir.data.dummy.Port
-import com.dicoding.tugas_akhir.ui.theme.Background
-import com.dicoding.tugas_akhir.ui.theme.Neutral200
-import com.dicoding.tugas_akhir.ui.theme.Neutral500
-import com.dicoding.tugas_akhir.ui.theme.Neutral700
-import com.dicoding.tugas_akhir.ui.theme.Primary2
-import com.dicoding.tugas_akhir.ui.theme.Primary3
-import com.dicoding.tugas_akhir.ui.theme.White
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -53,11 +46,12 @@ fun PortPickerBottomSheet(
     val sheetState = rememberModalBottomSheetState(
         skipPartiallyExpanded = true
     )
+    val colors = MaterialTheme.colorScheme
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,
         sheetState = sheetState,
-        containerColor = White,
+        containerColor = colors.surface,
         shape = RoundedCornerShape(
             topStart = 24.dp,
             topEnd = 24.dp
@@ -78,7 +72,7 @@ fun PortPickerBottomSheet(
                 Text(
                     text = "Pilih Pelabuhan",
                     modifier = Modifier.weight(1f),
-                    color = Neutral700,
+                    color = colors.onSurface,
                     fontWeight = FontWeight.Bold,
                     style = MaterialTheme.typography.titleMedium
                 )
@@ -89,7 +83,7 @@ fun PortPickerBottomSheet(
                     Icon(
                         imageVector = Icons.Outlined.Close,
                         contentDescription = "Tutup",
-                        tint = Neutral500
+                        tint = colors.onSurfaceVariant
                     )
                 }
             }
@@ -99,8 +93,8 @@ fun PortPickerBottomSheet(
                     .fillMaxWidth()
                     .height(48.dp),
                 shape = RoundedCornerShape(10.dp),
-                color = Background,
-                border = BorderStroke(1.dp, Neutral200)
+                color = colors.surfaceVariant.copy(alpha = 0.72f),
+                border = BorderStroke(1.dp, colors.outlineVariant)
             ) {
                 Row(
                     modifier = Modifier.padding(horizontal = 14.dp),
@@ -109,7 +103,7 @@ fun PortPickerBottomSheet(
                     Icon(
                         imageVector = Icons.Outlined.Search,
                         contentDescription = null,
-                        tint = Neutral500,
+                        tint = colors.onSurfaceVariant,
                         modifier = Modifier.size(20.dp)
                     )
 
@@ -117,7 +111,7 @@ fun PortPickerBottomSheet(
 
                     Text(
                         text = "Cari Pelabuhan",
-                        color = Neutral500,
+                        color = colors.onSurfaceVariant,
                         style = MaterialTheme.typography.bodySmall
                     )
                 }
@@ -146,7 +140,12 @@ private fun PortItem(
     selected: Boolean,
     onClick: () -> Unit
 ) {
-    val itemBackground = if (selected) Primary3 else White
+    val colors = MaterialTheme.colorScheme
+    val itemBackground = if (selected) {
+        colors.primaryContainer.copy(alpha = 0.45f)
+    } else {
+        colors.surface
+    }
 
     Row(
         modifier = Modifier
@@ -162,7 +161,7 @@ private fun PortItem(
         Surface(
             modifier = Modifier.size(36.dp),
             shape = RoundedCornerShape(10.dp),
-            color = if (selected) Primary2 else Primary3
+            color = if (selected) colors.primary else colors.primaryContainer.copy(alpha = 0.56f)
         ) {
             Box(
                 contentAlignment = Alignment.Center
@@ -174,7 +173,7 @@ private fun PortItem(
                         Icons.Outlined.DirectionsBoat
                     },
                     contentDescription = null,
-                    tint = if (selected) White else Primary2,
+                    tint = if (selected) colors.onPrimary else colors.primary,
                     modifier = Modifier.size(18.dp)
                 )
             }
@@ -185,14 +184,14 @@ private fun PortItem(
         Column {
             Text(
                 text = port.name,
-                color = Neutral700,
+                color = colors.onSurface,
                 fontWeight = FontWeight.SemiBold,
                 style = MaterialTheme.typography.bodyMedium
             )
 
             Text(
                 text = port.city,
-                color = Neutral500,
+                color = colors.onSurfaceVariant,
                 style = MaterialTheme.typography.bodySmall
             )
         }

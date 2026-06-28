@@ -30,13 +30,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.dicoding.tugas_akhir.ui.components.dialog.buttons.PrimaryButton
-import com.dicoding.tugas_akhir.ui.theme.Background
-import com.dicoding.tugas_akhir.ui.theme.Neutral200
-import com.dicoding.tugas_akhir.ui.theme.Neutral500
-import com.dicoding.tugas_akhir.ui.theme.Neutral700
-import com.dicoding.tugas_akhir.ui.theme.Primary2
-import com.dicoding.tugas_akhir.ui.theme.Primary3
-import com.dicoding.tugas_akhir.ui.theme.White
+import com.dicoding.tugas_akhir.ui.localization.LocalAppStrings
 
 @Composable
 fun SearchScheduleCard(
@@ -50,13 +44,16 @@ fun SearchScheduleCard(
     onSearchClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val colors = MaterialTheme.colorScheme
+    val strings = LocalAppStrings.current
+
     Surface(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(18.dp),
-        color = White,
-        border = BorderStroke(1.dp, Neutral200),
-        tonalElevation = 2.dp,
-        shadowElevation = 3.dp
+        color = colors.surface,
+        border = BorderStroke(1.dp, colors.outlineVariant),
+        tonalElevation = 0.dp,
+        shadowElevation = 2.dp
     ) {
         Column(
             modifier = Modifier.padding(16.dp),
@@ -66,15 +63,15 @@ fun SearchScheduleCard(
                 verticalArrangement = Arrangement.spacedBy(4.dp)
             ) {
                 Text(
-                    text = "Cari Jadwal Kapal",
-                    color = Neutral700,
+                    text = strings.searchScheduleTitle,
+                    color = colors.onSurface,
                     fontWeight = FontWeight.Bold,
                     style = MaterialTheme.typography.titleMedium
                 )
 
                 Text(
-                    text = "Temukan jadwal kapal sesuai tujuan perjalanan Anda.",
-                    color = Neutral500,
+                    text = strings.searchScheduleSubtitle,
+                    color = colors.onSurfaceVariant,
                     style = MaterialTheme.typography.bodySmall
                 )
             }
@@ -82,21 +79,21 @@ fun SearchScheduleCard(
             Spacer(modifier = Modifier.height(4.dp))
 
             SearchInputItem(
-                label = "Asal",
+                label = strings.origin,
                 value = originText,
                 icon = Icons.Outlined.LocationOn,
                 onClick = onOriginClick
             )
 
             SearchInputItem(
-                label = "Tujuan",
+                label = strings.destination,
                 value = destinationText,
                 icon = Icons.Outlined.LocationOn,
                 onClick = onDestinationClick
             )
 
             SearchInputItem(
-                label = "Tanggal Keberangkatan",
+                label = strings.departureDate,
                 value = dateText,
                 icon = Icons.Outlined.CalendarMonth,
                 onClick = onDateClick
@@ -105,7 +102,7 @@ fun SearchScheduleCard(
             Spacer(modifier = Modifier.height(2.dp))
 
             PrimaryButton(
-                text = "Cari Jadwal",
+                text = strings.searchSchedule,
                 onClick = onSearchClick,
                 enabled = canSearch
             )
@@ -120,14 +117,16 @@ private fun SearchInputItem(
     icon: ImageVector,
     onClick: () -> Unit
 ) {
+    val colors = MaterialTheme.colorScheme
+
     Surface(
         modifier = Modifier
             .fillMaxWidth()
             .height(58.dp)
             .clickable { onClick() },
         shape = RoundedCornerShape(12.dp),
-        color = Background,
-        border = BorderStroke(1.dp, Neutral200)
+        color = colors.surface,
+        border = BorderStroke(1.dp, colors.outlineVariant)
     ) {
         Row(
             modifier = Modifier
@@ -138,7 +137,8 @@ private fun SearchInputItem(
             Surface(
                 modifier = Modifier.size(36.dp),
                 shape = RoundedCornerShape(10.dp),
-                color = Primary3
+                color = colors.primaryContainer.copy(alpha = 0.42f),
+                border = BorderStroke(1.dp, colors.outlineVariant)
             ) {
                 Box(
                     contentAlignment = Alignment.Center
@@ -146,7 +146,7 @@ private fun SearchInputItem(
                     Icon(
                         imageVector = icon,
                         contentDescription = null,
-                        tint = Primary2,
+                        tint = colors.primary,
                         modifier = Modifier.size(20.dp)
                     )
                 }
@@ -160,13 +160,13 @@ private fun SearchInputItem(
             ) {
                 Text(
                     text = label,
-                    color = Neutral500,
+                    color = colors.onSurfaceVariant,
                     style = MaterialTheme.typography.labelSmall
                 )
 
                 Text(
                     text = value,
-                    color = Neutral700,
+                    color = colors.onSurface,
                     style = MaterialTheme.typography.bodyMedium,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
@@ -176,7 +176,7 @@ private fun SearchInputItem(
             Icon(
                 imageVector = Icons.Outlined.KeyboardArrowDown,
                 contentDescription = null,
-                tint = Neutral500
+                tint = colors.onSurfaceVariant
             )
         }
     }

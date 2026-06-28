@@ -19,6 +19,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
+import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
@@ -28,7 +29,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.dicoding.tugas_akhir.ui.theme.Primary2
 
 @Composable
 fun ManageTicketInfoCard(
@@ -113,7 +113,7 @@ fun RefundReasonCard(
                 Icon(
                     imageVector = Icons.Outlined.Payments,
                     contentDescription = null,
-                    tint = Primary2,
+                    tint = MaterialTheme.colorScheme.primary,
                 )
 
                 Text(
@@ -140,6 +140,10 @@ fun RefundReasonCard(
                         onClick = {
                             onReasonSelected(reason)
                         },
+                        colors = RadioButtonDefaults.colors(
+                            selectedColor = MaterialTheme.colorScheme.primary,
+                            unselectedColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                        ),
                     )
 
                     Text(
@@ -224,7 +228,7 @@ fun RescheduleOptionCard(
                 Icon(
                     imageVector = Icons.Outlined.CalendarMonth,
                     contentDescription = null,
-                    tint = Primary2,
+                    tint = MaterialTheme.colorScheme.primary,
                 )
 
                 Text(
@@ -252,6 +256,10 @@ fun RescheduleOptionCard(
                         onClick = {
                             onScheduleSelected(schedule.id)
                         },
+                        colors = RadioButtonDefaults.colors(
+                            selectedColor = MaterialTheme.colorScheme.primary,
+                            unselectedColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                        ),
                     )
 
                     Column(
@@ -305,7 +313,7 @@ fun ManageTicketSuccessCard(
             Icon(
                 imageVector = Icons.Outlined.Schedule,
                 contentDescription = null,
-                tint = Primary2,
+                tint = MaterialTheme.colorScheme.primary,
             )
 
             Text(

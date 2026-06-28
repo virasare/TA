@@ -24,7 +24,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.dicoding.tugas_akhir.domain.model.SavedPassenger
@@ -169,8 +168,11 @@ fun SavedPassengerPickerSheet(
     onPassengerClick: (SavedPassenger) -> Unit,
     onDismiss: () -> Unit,
 ) {
+    val colors = MaterialTheme.colorScheme
+
     ModalBottomSheet(
         onDismissRequest = onDismiss,
+        containerColor = colors.surface,
     ) {
         Column(
             modifier = Modifier
@@ -183,13 +185,13 @@ fun SavedPassengerPickerSheet(
                 text = "Pilih Data Penumpang",
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
-                color = Color(0xFF102A43),
+                color = colors.onSurface,
             )
 
             Text(
                 text = "Data yang dipilih akan mengisi form penumpang yang sedang aktif.",
                 style = MaterialTheme.typography.bodySmall,
-                color = Color(0xFF627D98),
+                color = colors.onSurfaceVariant,
             )
 
             if (isLoading) {
@@ -216,6 +218,8 @@ private fun SavedPassengerOptionCard(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val colors = MaterialTheme.colorScheme
+
     Card(
         modifier = modifier
             .fillMaxWidth()
@@ -224,11 +228,11 @@ private fun SavedPassengerOptionCard(
             },
         shape = RoundedCornerShape(18.dp),
         colors = CardDefaults.cardColors(
-            containerColor = Color(0xFFF7FAFC),
+            containerColor = colors.surface,
         ),
         border = BorderStroke(
             width = 1.dp,
-            color = Color(0xFFE3EAF2),
+            color = colors.outlineVariant,
         ),
     ) {
         Row(
@@ -241,7 +245,7 @@ private fun SavedPassengerOptionCard(
             androidx.compose.foundation.layout.Box(
                 modifier = Modifier
                     .background(
-                        color = Color(0xFFEAF4FF),
+                        color = colors.primaryContainer.copy(alpha = 0.58f),
                         shape = RoundedCornerShape(14.dp),
                     )
                     .padding(10.dp),
@@ -250,7 +254,7 @@ private fun SavedPassengerOptionCard(
                 Icon(
                     imageVector = Icons.Outlined.People,
                     contentDescription = null,
-                    tint = Color(0xFF1976D2),
+                    tint = colors.primary,
                 )
             }
 
@@ -262,19 +266,25 @@ private fun SavedPassengerOptionCard(
                     text = passenger.fullName,
                     style = MaterialTheme.typography.bodyLarge,
                     fontWeight = FontWeight.Bold,
-                    color = Color(0xFF102A43),
+                    color = colors.onSurface,
                 )
 
                 Text(
-                    text = "${maskNik(passenger.nik)} • ${passenger.gender}",
+                    text = "NIK: ${passenger.nik}",
                     style = MaterialTheme.typography.bodySmall,
-                    color = Color(0xFF627D98),
+                    color = colors.onSurfaceVariant,
                 )
 
                 Text(
-                    text = passenger.phoneNumber,
+                    text = "Tanggal lahir: ${passenger.birthDate.ifBlank { "-" }}",
                     style = MaterialTheme.typography.labelMedium,
-                    color = Color(0xFF829AB1),
+                    color = colors.onSurfaceVariant,
+                )
+
+                Text(
+                    text = "${passenger.gender} - ${passenger.phoneNumber}",
+                    style = MaterialTheme.typography.labelMedium,
+                    color = colors.onSurfaceVariant,
                 )
             }
         }
@@ -337,10 +347,3 @@ private fun SavedPassengerOptionPlaceholder(
     }
 }
 
-private fun maskNik(nik: String): String {
-    return if (nik.length >= 6) {
-        nik.take(6) + "xxxxxxxxxx"
-    } else {
-        nik
-    }
-}

@@ -29,9 +29,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
-import com.dicoding.tugas_akhir.ui.theme.Neutral700
 import androidx.compose.ui.tooling.preview.Preview
-import com.dicoding.tugas_akhir.ui.theme.Neutral500
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -160,7 +158,7 @@ fun AppSearchTopBar(
                 Text(
                     text = placeholder,
                     style = MaterialTheme.typography.bodyMedium,
-                    color = Neutral700,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(start = 12.dp)
                 )
             }

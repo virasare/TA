@@ -43,12 +43,6 @@ import com.dicoding.tugas_akhir.ui.components.dialog.filters.ScheduleFilterSecti
 import com.dicoding.tugas_akhir.ui.components.loading.ScheduleListPlaceholder
 import com.dicoding.tugas_akhir.ui.components.lottie.LottieStateView
 import com.dicoding.tugas_akhir.ui.state.ScheduleUiState
-import com.dicoding.tugas_akhir.ui.theme.Neutral200
-import com.dicoding.tugas_akhir.ui.theme.Neutral500
-import com.dicoding.tugas_akhir.ui.theme.Neutral700
-import com.dicoding.tugas_akhir.ui.theme.Primary2
-import com.dicoding.tugas_akhir.ui.theme.Primary3
-import com.dicoding.tugas_akhir.ui.theme.White
 import com.dicoding.tugas_akhir.ui.viewmodel.ScheduleViewModel
 import com.dicoding.tugas_akhir.ui.viewmodel.ViewModelFactory
 import java.text.SimpleDateFormat
@@ -216,14 +210,14 @@ private fun ScheduleHeader(
     ) {
         Text(
             text = "Jadwal Kapal Terdekat",
-            color = Neutral700,
+            color = MaterialTheme.colorScheme.onBackground,
             fontWeight = FontWeight.Bold,
             style = MaterialTheme.typography.titleLarge
         )
 
         Text(
             text = "Menampilkan jadwal kapal dalam 60 hari ke depan. $totalSchedule jadwal ditemukan.",
-            color = Neutral500,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
             style = MaterialTheme.typography.bodyMedium
         )
     }

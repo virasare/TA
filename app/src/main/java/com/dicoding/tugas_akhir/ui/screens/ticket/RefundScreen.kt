@@ -75,7 +75,7 @@ fun RefundScreen(
             item {
                 ManageTicketInfoCard(
                     title = "Pengajuan Refund",
-                    description = "Refund dapat diajukan sesuai ketentuan tiket. Proses verifikasi membutuhkan waktu dan statusnya akan muncul pada halaman Pesanan Saya.",
+                    description = "Refund dapat diajukan sesuai ketentuan tiket. Proses verifikasi membutuhkan waktu dan statusnya akan muncul pada halaman Tiket Saya.",
                 )
             }
 

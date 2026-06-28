@@ -27,9 +27,6 @@ import com.dicoding.tugas_akhir.ui.theme.Error
 import com.dicoding.tugas_akhir.ui.theme.ErrorLight
 import com.dicoding.tugas_akhir.ui.theme.Info
 import com.dicoding.tugas_akhir.ui.theme.InfoLight
-import com.dicoding.tugas_akhir.ui.theme.Neutral100
-import com.dicoding.tugas_akhir.ui.theme.Neutral500
-import com.dicoding.tugas_akhir.ui.theme.Neutral700
 import com.dicoding.tugas_akhir.ui.theme.Success
 import com.dicoding.tugas_akhir.ui.theme.SuccessLight
 import com.dicoding.tugas_akhir.ui.theme.Warning
@@ -51,39 +48,40 @@ fun InfoBox(
     variant: InfoBoxVariant = InfoBoxVariant.Info,
     @DrawableRes iconRes: Int? = null
 ) {
+    val colors = MaterialTheme.colorScheme
     val backgroundColor: Color
     val borderColor: Color
     val iconColor: Color
 
     when (variant) {
         InfoBoxVariant.Info -> {
-            backgroundColor = InfoLight
+            backgroundColor = Info.copy(alpha = 0.14f)
             borderColor = Info
             iconColor = Info
         }
 
         InfoBoxVariant.Success -> {
-            backgroundColor = SuccessLight
+            backgroundColor = Success.copy(alpha = 0.14f)
             borderColor = Success
             iconColor = Success
         }
 
         InfoBoxVariant.Warning -> {
-            backgroundColor = WarningLight
+            backgroundColor = Warning.copy(alpha = 0.16f)
             borderColor = Warning
             iconColor = Warning
         }
 
         InfoBoxVariant.Error -> {
-            backgroundColor = ErrorLight
+            backgroundColor = Error.copy(alpha = 0.14f)
             borderColor = Error
             iconColor = Error
         }
 
         InfoBoxVariant.Neutral -> {
-            backgroundColor = Neutral100
-            borderColor = Neutral500
-            iconColor = Neutral500
+            backgroundColor = colors.surfaceVariant
+            borderColor = colors.outline
+            iconColor = colors.onSurfaceVariant
         }
     }
 
@@ -117,13 +115,13 @@ fun InfoBox(
             Text(
                 text = title,
                 style = MaterialTheme.typography.titleSmall,
-                color = Neutral700
+                color = colors.onSurface
             )
 
             Text(
                 text = description,
                 style = MaterialTheme.typography.bodySmall,
-                color = Neutral500
+                color = colors.onSurfaceVariant
             )
         }
     }

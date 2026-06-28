@@ -53,10 +53,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import com.dicoding.tugas_akhir.ui.theme.Error
-import com.dicoding.tugas_akhir.ui.theme.Neutral500
-import com.dicoding.tugas_akhir.ui.theme.Neutral700
-import com.dicoding.tugas_akhir.ui.theme.Primary2
-import com.dicoding.tugas_akhir.ui.theme.White
 
 @Composable
 fun ProfileScreen(
@@ -255,11 +251,11 @@ private fun LogoutConfirmationDialog(
         Card(
             shape = androidx.compose.foundation.shape.RoundedCornerShape(26.dp),
             colors = CardDefaults.cardColors(
-                containerColor = White,
+                containerColor = MaterialTheme.colorScheme.surface,
             ),
             border = BorderStroke(
                 width = 1.dp,
-                color = Color(0xFFE3EAF2),
+                color = MaterialTheme.colorScheme.outlineVariant,
             ),
             elevation = CardDefaults.cardElevation(
                 defaultElevation = 8.dp,
@@ -276,7 +272,7 @@ private fun LogoutConfirmationDialog(
                     modifier = Modifier
                         .size(62.dp)
                         .background(
-                            color = Color(0xFFFFEBEE),
+                            color = MaterialTheme.colorScheme.errorContainer,
                             shape = CircleShape,
                         ),
                     contentAlignment = Alignment.Center,
@@ -284,21 +280,21 @@ private fun LogoutConfirmationDialog(
                     Icon(
                         imageVector = Icons.AutoMirrored.Outlined.Logout,
                         contentDescription = null,
-                        tint = Error,
+                        tint = MaterialTheme.colorScheme.onErrorContainer,
                         modifier = Modifier.size(30.dp),
                     )
                 }
 
                 Text(
                     text = "Keluar dari Akun?",
-                    color = Neutral700,
+                    color = MaterialTheme.colorScheme.onSurface,
                     fontWeight = FontWeight.Bold,
                     style = MaterialTheme.typography.titleMedium,
                 )
 
                 Text(
                     text = "Kamu perlu login kembali untuk mengakses profil, tiket, dan notifikasi perjalanan.",
-                    color = Neutral500,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     style = MaterialTheme.typography.bodySmall,
                     textAlign = androidx.compose.ui.text.style.TextAlign.Center,
                     modifier = Modifier.padding(horizontal = 4.dp),
@@ -314,10 +310,14 @@ private fun LogoutConfirmationDialog(
                         onClick = onDismiss,
                         modifier = Modifier.weight(1f),
                         shape = androidx.compose.foundation.shape.RoundedCornerShape(14.dp),
+                        border = BorderStroke(
+                            width = 1.dp,
+                            color = MaterialTheme.colorScheme.outlineVariant,
+                        ),
                     ) {
                         Text(
                             text = "Batal",
-                            color = Primary2,
+                            color = MaterialTheme.colorScheme.primary,
                             fontWeight = FontWeight.SemiBold,
                         )
                     }
@@ -326,6 +326,10 @@ private fun LogoutConfirmationDialog(
                         onClick = onConfirm,
                         modifier = Modifier.weight(1f),
                         shape = androidx.compose.foundation.shape.RoundedCornerShape(14.dp),
+                        colors = androidx.compose.material3.ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.error,
+                            contentColor = MaterialTheme.colorScheme.onError,
+                        ),
                     ) {
                         Text(
                             text = "Keluar",

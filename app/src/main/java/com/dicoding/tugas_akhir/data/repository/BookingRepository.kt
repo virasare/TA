@@ -9,6 +9,7 @@ import com.dicoding.tugas_akhir.domain.model.Booking
 import com.dicoding.tugas_akhir.domain.model.TicketClassOption
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 
 class BookingRepository private constructor(
@@ -72,6 +73,14 @@ class BookingRepository private constructor(
         emit(Resource.Error(exception.message ?: "Gagal mengambil detail pesanan"))
     }
 
+    suspend fun getLocalBookingsSnapshot(): List<Booking> {
+        return localDataSource.getAllBookings()
+            .first()
+            .map { bookingWithPassengers ->
+                DataMapper.mapBookingWithPassengersToDomain(bookingWithPassengers)
+            }
+    }
+
     suspend fun submitRefund(
         bookingId: String,
     ): Booking {
@@ -87,6 +96,16 @@ class BookingRepository private constructor(
         return updateBookingStatus(
             bookingId = bookingId,
             status = "Reschedule Diproses",
+        )
+    }
+
+    suspend fun updateBookingStatusForSimulation(
+        bookingId: String,
+        status: String,
+    ): Booking {
+        return updateBookingStatus(
+            bookingId = bookingId,
+            status = status,
         )
     }
 

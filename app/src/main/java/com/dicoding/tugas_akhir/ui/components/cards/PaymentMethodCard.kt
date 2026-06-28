@@ -32,12 +32,6 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.dicoding.tugas_akhir.domain.model.PaymentMethod
-import com.dicoding.tugas_akhir.ui.theme.Neutral200
-import com.dicoding.tugas_akhir.ui.theme.Neutral500
-import com.dicoding.tugas_akhir.ui.theme.Neutral700
-import com.dicoding.tugas_akhir.ui.theme.Primary2
-import com.dicoding.tugas_akhir.ui.theme.Primary3
-import com.dicoding.tugas_akhir.ui.theme.White
 
 @Composable
 fun PaymentMethodCard(
@@ -46,8 +40,13 @@ fun PaymentMethodCard(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val borderColor = if (selected) Primary2 else Neutral200
-    val backgroundColor = if (selected) Primary3 else White
+    val colors = MaterialTheme.colorScheme
+    val borderColor = if (selected) colors.primary else colors.outlineVariant
+    val iconBackgroundColor = if (selected) {
+        colors.primaryContainer
+    } else {
+        colors.surfaceVariant.copy(alpha = 0.72f)
+    }
 
     Surface(
         modifier = modifier
@@ -56,9 +55,9 @@ fun PaymentMethodCard(
                 selected = selected,
                 onClick = onClick,
                 role = Role.RadioButton,
-            ),
+        ),
         shape = RoundedCornerShape(18.dp),
-        color = White,
+        color = colors.surface,
         border = BorderStroke(1.4.dp, borderColor),
         shadowElevation = if (selected) 4.dp else 1.dp,
     ) {
@@ -71,8 +70,8 @@ fun PaymentMethodCard(
             Surface(
                 modifier = Modifier.size(44.dp),
                 shape = CircleShape,
-                color = backgroundColor,
-                border = BorderStroke(1.dp, if (selected) Primary2 else Neutral200),
+                color = iconBackgroundColor,
+                border = BorderStroke(1.dp, borderColor),
             ) {
                 Box(
                     contentAlignment = Alignment.Center,
@@ -80,7 +79,7 @@ fun PaymentMethodCard(
                     Icon(
                         imageVector = method.icon(),
                         contentDescription = null,
-                        tint = Primary2,
+                        tint = colors.primary,
                         modifier = Modifier.size(23.dp),
                     )
                 }
@@ -94,14 +93,14 @@ fun PaymentMethodCard(
             ) {
                 Text(
                     text = method.name,
-                    color = Neutral700,
+                    color = colors.onSurface,
                     fontWeight = FontWeight.Bold,
                     style = MaterialTheme.typography.titleSmall,
                 )
 
                 Text(
                     text = method.description,
-                    color = Neutral500,
+                    color = colors.onSurfaceVariant,
                     style = MaterialTheme.typography.bodySmall,
                 )
             }
@@ -110,8 +109,8 @@ fun PaymentMethodCard(
                 selected = selected,
                 onClick = onClick,
                 colors = RadioButtonDefaults.colors(
-                    selectedColor = Primary2,
-                    unselectedColor = Neutral500,
+                    selectedColor = colors.primary,
+                    unselectedColor = colors.onSurfaceVariant,
                 ),
             )
         }

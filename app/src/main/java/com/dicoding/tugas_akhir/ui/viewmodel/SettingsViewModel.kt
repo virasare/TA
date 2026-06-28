@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.dicoding.tugas_akhir.data.repository.SettingsRepository
 import com.dicoding.tugas_akhir.domain.model.LanguageMode
+import com.dicoding.tugas_akhir.domain.model.TextSizeMode
 import com.dicoding.tugas_akhir.domain.model.ThemeMode
 import com.dicoding.tugas_akhir.domain.model.UserSettings
 import kotlinx.coroutines.flow.SharingStarted
@@ -31,6 +32,12 @@ class SettingsViewModel(
     fun updateLanguageMode(languageMode: LanguageMode) {
         viewModelScope.launch {
             settingsRepository.saveLanguageMode(languageMode)
+        }
+    }
+
+    fun updateTextSizeMode(textSizeMode: TextSizeMode) {
+        viewModelScope.launch {
+            settingsRepository.saveTextSizeMode(textSizeMode)
         }
     }
 }

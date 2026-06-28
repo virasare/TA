@@ -30,13 +30,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.dicoding.tugas_akhir.ui.theme.Background
-import com.dicoding.tugas_akhir.ui.theme.Neutral200
-import com.dicoding.tugas_akhir.ui.theme.Neutral500
-import com.dicoding.tugas_akhir.ui.theme.Neutral700
-import com.dicoding.tugas_akhir.ui.theme.Primary2
-import com.dicoding.tugas_akhir.ui.theme.Primary3
-import com.dicoding.tugas_akhir.ui.theme.White
 
 @Composable
 fun TicketEmptyState(
@@ -46,10 +39,12 @@ fun TicketEmptyState(
     onActionClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val colors = MaterialTheme.colorScheme
+
     Box(
         modifier = modifier
             .fillMaxSize()
-            .background(Background)
+            .background(colors.background)
             .padding(24.dp),
         contentAlignment = Alignment.Center,
     ) {
@@ -57,9 +52,9 @@ fun TicketEmptyState(
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(28.dp),
             colors = CardDefaults.cardColors(
-                containerColor = White,
+                containerColor = colors.surface,
             ),
-            border = BorderStroke(1.dp, Neutral200),
+            border = BorderStroke(1.dp, colors.outlineVariant),
             elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
         ) {
             Column(
@@ -71,7 +66,7 @@ fun TicketEmptyState(
                     modifier = Modifier
                         .size(76.dp)
                         .background(
-                            color = Primary3,
+                            color = colors.primaryContainer.copy(alpha = 0.58f),
                             shape = RoundedCornerShape(24.dp),
                         ),
                     contentAlignment = Alignment.Center,
@@ -79,7 +74,7 @@ fun TicketEmptyState(
                     Icon(
                         imageVector = Icons.Outlined.ConfirmationNumber,
                         contentDescription = null,
-                        tint = Primary2,
+                        tint = colors.primary,
                         modifier = Modifier.size(38.dp),
                     )
                 }
@@ -88,14 +83,14 @@ fun TicketEmptyState(
                     text = title,
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
-                    color = Neutral700,
+                    color = colors.onSurface,
                     textAlign = TextAlign.Center,
                 )
 
                 Text(
                     text = description,
                     style = MaterialTheme.typography.bodySmall,
-                    color = Neutral500,
+                    color = colors.onSurfaceVariant,
                     textAlign = TextAlign.Center,
                 )
 
@@ -127,10 +122,12 @@ fun TicketLoadingState(
     description: String = "Mohon tunggu sebentar, data pesanan kamu sedang disiapkan.",
     modifier: Modifier = Modifier,
 ) {
+    val colors = MaterialTheme.colorScheme
+
     Box(
         modifier = modifier
             .fillMaxSize()
-            .background(Background)
+            .background(colors.background)
             .padding(24.dp),
         contentAlignment = Alignment.Center,
     ) {
@@ -138,9 +135,9 @@ fun TicketLoadingState(
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(24.dp),
             colors = CardDefaults.cardColors(
-                containerColor = White,
+                containerColor = colors.surface,
             ),
-            border = BorderStroke(1.dp, Neutral200),
+            border = BorderStroke(1.dp, colors.outlineVariant),
             elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
         ) {
             Row(
@@ -150,7 +147,7 @@ fun TicketLoadingState(
             ) {
                 CircularProgressIndicator(
                     modifier = Modifier.size(34.dp),
-                    color = Primary2,
+                    color = colors.primary,
                     strokeWidth = 3.dp,
                 )
 
@@ -161,13 +158,13 @@ fun TicketLoadingState(
                         text = title,
                         style = MaterialTheme.typography.titleSmall,
                         fontWeight = FontWeight.Bold,
-                        color = Neutral700,
+                        color = colors.onSurface,
                     )
 
                     Text(
                         text = description,
                         style = MaterialTheme.typography.bodySmall,
-                        color = Neutral500,
+                        color = colors.onSurfaceVariant,
                     )
                 }
             }
@@ -182,10 +179,12 @@ fun TicketErrorState(
     onRetryClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val colors = MaterialTheme.colorScheme
+
     Box(
         modifier = modifier
             .fillMaxSize()
-            .background(Background)
+            .background(colors.background)
             .padding(24.dp),
         contentAlignment = Alignment.Center,
     ) {
@@ -193,9 +192,9 @@ fun TicketErrorState(
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(24.dp),
             colors = CardDefaults.cardColors(
-                containerColor = White,
+                containerColor = colors.surface,
             ),
-            border = BorderStroke(1.dp, MaterialTheme.colorScheme.error),
+            border = BorderStroke(1.dp, colors.error),
             elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
         ) {
             Column(
@@ -206,7 +205,7 @@ fun TicketErrorState(
                 Icon(
                     imageVector = Icons.Outlined.ErrorOutline,
                     contentDescription = null,
-                    tint = MaterialTheme.colorScheme.error,
+                    tint = colors.error,
                     modifier = Modifier.size(42.dp),
                 )
 
@@ -214,14 +213,14 @@ fun TicketErrorState(
                     text = "Gagal Memuat Data",
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
-                    color = Neutral700,
+                    color = colors.onSurface,
                     textAlign = TextAlign.Center,
                 )
 
                 Text(
                     text = message,
                     style = MaterialTheme.typography.bodySmall,
-                    color = Neutral500,
+                    color = colors.onSurfaceVariant,
                     textAlign = TextAlign.Center,
                 )
 

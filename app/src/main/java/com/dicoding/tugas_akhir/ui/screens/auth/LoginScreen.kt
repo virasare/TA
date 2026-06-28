@@ -53,12 +53,6 @@ import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.dicoding.tugas_akhir.R
 import com.dicoding.tugas_akhir.ui.components.dialog.buttons.PrimaryButton
-import com.dicoding.tugas_akhir.ui.theme.Error
-import com.dicoding.tugas_akhir.ui.theme.Neutral500
-import com.dicoding.tugas_akhir.ui.theme.Neutral700
-import com.dicoding.tugas_akhir.ui.theme.Primary2
-import com.dicoding.tugas_akhir.ui.theme.Primary3
-import com.dicoding.tugas_akhir.ui.theme.White
 
 @Composable
 fun LoginScreen(
@@ -125,7 +119,7 @@ fun LoginScreen(
 
             Text(
                 text = "Masuk ke Akun",
-                color = Neutral700,
+                color = MaterialTheme.colorScheme.onSurface,
                 fontWeight = FontWeight.Bold,
                 style = MaterialTheme.typography.headlineSmall,
                 modifier = Modifier.padding(top = 24.dp),
@@ -133,7 +127,7 @@ fun LoginScreen(
 
             Text(
                 text = "Masuk untuk memesan tiket dan melihat riwayat perjalanan",
-                color = Neutral500,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 style = MaterialTheme.typography.bodySmall,
                 textAlign = TextAlign.Center,
                 modifier = Modifier
@@ -162,7 +156,7 @@ fun LoginScreen(
                     Icon(
                         painter = painterResource(id = R.drawable.ic_message_outlined),
                         contentDescription = null,
-                        tint = Primary2,
+                        tint = MaterialTheme.colorScheme.primary,
                     )
                 },
                 keyboardType = KeyboardType.Email,
@@ -182,7 +176,7 @@ fun LoginScreen(
                     Icon(
                         painter = painterResource(id = R.drawable.ic_lock_outlined),
                         contentDescription = null,
-                        tint = Primary2,
+                        tint = MaterialTheme.colorScheme.primary,
                     )
                 },
                 trailingIcon = {
@@ -201,7 +195,7 @@ fun LoginScreen(
                                 }
                             ),
                             contentDescription = null,
-                            tint = Neutral500,
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
                     }
                 },
@@ -240,7 +234,7 @@ fun LoginScreen(
 
             Text(
                 text = "atau masuk dengan",
-                color = Neutral500,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 style = MaterialTheme.typography.bodySmall,
                 modifier = Modifier.padding(top = 28.dp, bottom = 16.dp),
             )
@@ -266,13 +260,13 @@ fun LoginScreen(
             ) {
                 Text(
                     text = "Belum punya akun?",
-                    color = Neutral500,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     style = MaterialTheme.typography.bodySmall,
                 )
 
                 Text(
                     text = " Daftar",
-                    color = Primary2,
+                    color = MaterialTheme.colorScheme.primary,
                     fontWeight = FontWeight.Bold,
                     style = MaterialTheme.typography.bodySmall,
                     modifier = Modifier.clickable(
@@ -326,13 +320,19 @@ private fun LoginTextField(
             keyboardType = keyboardType,
         ),
         colors = OutlinedTextFieldDefaults.colors(
-            focusedBorderColor = Primary2,
-            unfocusedBorderColor = Color(0xFFE3EAF2),
-            focusedLabelColor = Primary2,
-            cursorColor = Primary2,
-            focusedContainerColor = White,
-            unfocusedContainerColor = White,
-            disabledContainerColor = White,
+            focusedBorderColor = MaterialTheme.colorScheme.primary,
+            unfocusedBorderColor = MaterialTheme.colorScheme.outlineVariant,
+            cursorColor = MaterialTheme.colorScheme.primary,
+            focusedContainerColor = MaterialTheme.colorScheme.surface,
+            unfocusedContainerColor = MaterialTheme.colorScheme.surface,
+            disabledContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+            focusedTextColor = MaterialTheme.colorScheme.onSurface,
+            unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
+            disabledTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
+            focusedPlaceholderColor = MaterialTheme.colorScheme.onSurfaceVariant,
+            unfocusedPlaceholderColor = MaterialTheme.colorScheme.onSurfaceVariant,
+            focusedLabelColor = MaterialTheme.colorScheme.primary,
+            unfocusedLabelColor = MaterialTheme.colorScheme.onSurfaceVariant,
         ),
         shape = RoundedCornerShape(12.dp),
         modifier = modifier.fillMaxWidth(),
@@ -353,10 +353,10 @@ private fun GoogleLoginButton(
                 onClick = onClick,
             ),
         shape = RoundedCornerShape(12.dp),
-        color = White,
+        color = MaterialTheme.colorScheme.surface,
         border = BorderStroke(
             width = 1.dp,
-            color = Color(0xFFE3EAF2),
+            color = MaterialTheme.colorScheme.outlineVariant,
         ),
         shadowElevation = 0.dp,
     ) {
@@ -375,7 +375,7 @@ private fun GoogleLoginButton(
 
             Text(
                 text = "Masuk dengan Google",
-                color = Neutral700,
+                color = MaterialTheme.colorScheme.onSurface,
                 fontWeight = FontWeight.SemiBold,
                 style = MaterialTheme.typography.bodyMedium,
             )
@@ -391,15 +391,15 @@ private fun ErrorMessageBox(
     Surface(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(14.dp),
-        color = Color(0xFFFFEBEE),
+        color = MaterialTheme.colorScheme.errorContainer,
         border = BorderStroke(
             width = 1.dp,
-            color = Color(0xFFFFCDD2),
+            color = MaterialTheme.colorScheme.error.copy(alpha = 0.32f),
         ),
     ) {
         Text(
             text = message,
-            color = Error,
+            color = MaterialTheme.colorScheme.onErrorContainer,
             style = MaterialTheme.typography.bodySmall,
             modifier = Modifier.padding(12.dp),
         )
@@ -414,15 +414,15 @@ private fun SuccessMessageBox(
     Surface(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(14.dp),
-        color = Color(0xFFE8F5E9),
+        color = Color(0xFF16A34A).copy(alpha = 0.14f),
         border = BorderStroke(
             width = 1.dp,
-            color = Color(0xFFC8E6C9),
+            color = Color(0xFF16A34A).copy(alpha = 0.24f),
         ),
     ) {
         Text(
             text = message,
-            color = Color(0xFF2E7D32),
+            color = Color(0xFF16A34A),
             style = MaterialTheme.typography.bodySmall,
             modifier = Modifier.padding(12.dp),
         )
@@ -469,7 +469,7 @@ private fun LoginLoadingOverlay(
 
             Text(
                 text = "Memproses Login",
-                color = White,
+                color = MaterialTheme.colorScheme.surface,
                 fontWeight = FontWeight.Bold,
                 style = MaterialTheme.typography.titleMedium,
                 textAlign = TextAlign.Center,
@@ -492,10 +492,10 @@ private fun GuestAccessCard(
                 onClick = onClick,
             ),
         shape = RoundedCornerShape(20.dp),
-        color = Primary3,
+        color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.58f),
         border = BorderStroke(
             width = 1.dp,
-            color = Color(0xFFD7EAFE),
+            color = MaterialTheme.colorScheme.outlineVariant,
         ),
     ) {
         Row(
@@ -506,7 +506,7 @@ private fun GuestAccessCard(
             Surface(
                 modifier = Modifier.size(42.dp),
                 shape = CircleShape,
-                color = White,
+                color = MaterialTheme.colorScheme.surface,
             ) {
                 Box(
                     contentAlignment = Alignment.Center,
@@ -514,7 +514,7 @@ private fun GuestAccessCard(
                     Icon(
                         imageVector = Icons.Outlined.DirectionsBoat,
                         contentDescription = null,
-                        tint = Primary2,
+                        tint = MaterialTheme.colorScheme.primary,
                         modifier = Modifier.size(22.dp),
                     )
                 }
@@ -526,21 +526,21 @@ private fun GuestAccessCard(
             ) {
                 Text(
                     text = "Lihat Jadwal Tanpa Login",
-                    color = Neutral700,
+                    color = MaterialTheme.colorScheme.onSurface,
                     fontWeight = FontWeight.Bold,
                     style = MaterialTheme.typography.bodyMedium,
                 )
 
                 Text(
                     text = "Kamu tetap bisa mencari jadwal kapal terlebih dahulu.",
-                    color = Neutral500,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     style = MaterialTheme.typography.bodySmall,
                 )
             }
 
             Text(
                 text = "→",
-                color = Primary2,
+                color = MaterialTheme.colorScheme.primary,
                 fontWeight = FontWeight.Bold,
                 style = MaterialTheme.typography.titleMedium,
             )

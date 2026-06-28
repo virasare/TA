@@ -14,6 +14,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.DrawScope
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import kotlin.math.absoluteValue
 
@@ -21,6 +22,7 @@ import kotlin.math.absoluteValue
 fun FakeQrCode(
     value: String,
     modifier: Modifier = Modifier,
+    qrSize: Dp = 190.dp,
 ) {
     val seed = remember(value) {
         value.hashCode().absoluteValue
@@ -33,7 +35,7 @@ fun FakeQrCode(
             .padding(12.dp),
     ) {
         Canvas(
-            modifier = Modifier.size(160.dp),
+            modifier = Modifier.size(qrSize),
         ) {
             val modules = 21
             val cellSize = size.minDimension / modules

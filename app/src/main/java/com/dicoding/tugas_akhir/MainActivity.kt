@@ -86,6 +86,7 @@ class MainActivity : ComponentActivity() {
             ) {
                 Tugas_AkhirTheme(
                     darkTheme = useDarkTheme,
+                    textScale = settings.textSizeMode.scale,
                 ) {
                     AppNavigation()
                 }

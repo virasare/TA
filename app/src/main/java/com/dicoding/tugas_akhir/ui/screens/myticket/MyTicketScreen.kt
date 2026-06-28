@@ -28,14 +28,6 @@ import com.dicoding.tugas_akhir.ui.state.TicketFilter
 import com.dicoding.tugas_akhir.ui.viewmodel.MyTicketViewModel
 import com.dicoding.tugas_akhir.ui.viewmodel.ViewModelFactory
 
-private val White = Color(0xFFFFFFFF)
-private val Background = Color(0xFFF6F8FB)
-private val Primary2 = Color(0xFF1976D2)
-private val Primary3 = Color(0xFFE8F2FD)
-private val Neutral500 = Color(0xFF6B7280)
-private val Neutral200 = Color(0xFFE5E7EB)
-private val Primary1 = Color(0xFF0B1F3A)
-
 @Composable
 fun MyTicketScreen(
     onTicketClick: (String) -> Unit,
@@ -120,6 +112,8 @@ private fun TicketFilterSection(
     onFilterClick: (TicketFilter) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val colors = MaterialTheme.colorScheme
+
     LazyRow(
         modifier = modifier,
         horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -136,18 +130,18 @@ private fun TicketFilterSection(
                     Text(filter.label)
                 },
                 colors = FilterChipDefaults.filterChipColors(
-                    containerColor = White,
-                    labelColor = Neutral500,
-                    selectedContainerColor = Primary3,
-                    selectedLabelColor = Primary1,
-                    disabledContainerColor = Neutral200,
-                    disabledLabelColor = Neutral500,
+                    containerColor = colors.surface,
+                    labelColor = colors.onSurfaceVariant,
+                    selectedContainerColor = colors.primaryContainer,
+                    selectedLabelColor = colors.onPrimaryContainer,
+                    disabledContainerColor = colors.surfaceVariant,
+                    disabledLabelColor = colors.onSurfaceVariant,
                 ),
                 border = FilterChipDefaults.filterChipBorder(
                     enabled = true,
                     selected = selected,
-                    borderColor = Neutral200,
-                    selectedBorderColor = Primary2,
+                    borderColor = colors.outlineVariant,
+                    selectedBorderColor = colors.primary,
                 ),
             )
         }

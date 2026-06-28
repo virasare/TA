@@ -18,8 +18,6 @@ import com.dicoding.tugas_akhir.ui.theme.Error
 import com.dicoding.tugas_akhir.ui.theme.ErrorLight
 import com.dicoding.tugas_akhir.ui.theme.Info
 import com.dicoding.tugas_akhir.ui.theme.InfoLight
-import com.dicoding.tugas_akhir.ui.theme.Neutral500
-import com.dicoding.tugas_akhir.ui.theme.Neutral100
 import com.dicoding.tugas_akhir.ui.theme.Success
 import com.dicoding.tugas_akhir.ui.theme.SuccessLight
 import com.dicoding.tugas_akhir.ui.theme.Warning
@@ -39,33 +37,34 @@ fun StatusBadge(
     modifier: Modifier = Modifier,
     variant: BadgeVariant = BadgeVariant.Success
 ) {
+    val colors = MaterialTheme.colorScheme
     val backgroundColor: Color
     val contentColor: Color
 
     when (variant) {
         BadgeVariant.Success -> {
-            backgroundColor = SuccessLight
+            backgroundColor = Success.copy(alpha = 0.14f)
             contentColor = Success
         }
 
         BadgeVariant.Info -> {
-            backgroundColor = InfoLight
+            backgroundColor = Info.copy(alpha = 0.14f)
             contentColor = Info
         }
 
         BadgeVariant.Warning -> {
-            backgroundColor = WarningLight
+            backgroundColor = Warning.copy(alpha = 0.16f)
             contentColor = Warning
         }
 
         BadgeVariant.Error -> {
-            backgroundColor = ErrorLight
+            backgroundColor = Error.copy(alpha = 0.14f)
             contentColor = Error
         }
 
         BadgeVariant.Neutral -> {
-            backgroundColor = Neutral100
-            contentColor = Neutral500
+            backgroundColor = colors.surfaceVariant
+            contentColor = colors.onSurfaceVariant
         }
     }
 

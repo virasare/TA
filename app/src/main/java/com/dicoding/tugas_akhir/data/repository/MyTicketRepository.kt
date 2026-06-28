@@ -1,6 +1,8 @@
 package com.dicoding.tugas_akhir.data.repository
 
 import com.dicoding.tugas_akhir.core.common.Resource
+import com.dicoding.tugas_akhir.data.dummy.ShipSchedule
+import com.dicoding.tugas_akhir.data.dummy.dummyShipSchedules
 import com.dicoding.tugas_akhir.data.local.LocalDataSource
 import com.dicoding.tugas_akhir.data.mapper.DataMapper
 import com.dicoding.tugas_akhir.domain.model.Booking
@@ -101,6 +103,10 @@ class MyTicketRepository private constructor(
         booking: Booking,
         payment: Payment?,
     ): ETicket {
+        val schedule = dummyShipSchedules.find { schedule ->
+            schedule.id.toString() == booking.scheduleId
+        }
+
         return ETicket(
             bookingId = booking.id,
             bookingCode = booking.id.replace("BKG", "NKP"),
@@ -118,7 +124,22 @@ class MyTicketRepository private constructor(
             terminal = "Pelabuhan ${booking.origin}",
             gate = "Gate 2",
             note = "Tunjukkan e-ticket ini kepada petugas pelabuhan saat proses check-in.",
+            transitInfo = schedule?.toTransitInfo() ?: "Langsung",
         )
+    }
+
+    private fun ShipSchedule.toTransitInfo(): String {
+        val routeText = route.lowercase()
+
+        return when {
+            duration.contains("12") || duration.contains("13") -> "Langsung"
+            "ende" in routeText && "denpasar" in routeText -> "Transit: Waingapu, Bima"
+            "ende" in routeText && "surabaya" in routeText -> "Transit: Labuan Bajo, Bima"
+            "kupang" in routeText && "surabaya" in routeText -> "Transit: Ende, Makassar"
+            "labuan bajo" in routeText && "denpasar" in routeText -> "Transit: Bima"
+            "maumere" in routeText && "makassar" in routeText -> "Transit: Baubau"
+            else -> "Transit: sesuai rute operasional kapal"
+        }
     }
 
     private fun getCurrentDateTime(): String {

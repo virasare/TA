@@ -6,6 +6,7 @@ import com.dicoding.tugas_akhir.core.common.Resource
 import com.dicoding.tugas_akhir.data.remote.request.CreateBookingRequest
 import com.dicoding.tugas_akhir.data.remote.request.PassengerRequest
 import com.dicoding.tugas_akhir.data.repository.BookingRepository
+import com.dicoding.tugas_akhir.domain.model.Booking
 import com.dicoding.tugas_akhir.domain.model.TicketClassOption
 import com.dicoding.tugas_akhir.ui.state.BookingDetailUiState
 import com.dicoding.tugas_akhir.ui.state.CreateBookingUiState
@@ -178,6 +179,20 @@ class BookingViewModel(
                 }
             }
         }
+    }
+
+    suspend fun getLocalBookingsSnapshot(): List<Booking> {
+        return bookingRepository.getLocalBookingsSnapshot()
+    }
+
+    suspend fun updateBookingStatusForSimulation(
+        bookingId: String,
+        status: String,
+    ): Booking {
+        return bookingRepository.updateBookingStatusForSimulation(
+            bookingId = bookingId,
+            status = status,
+        )
     }
 
     fun submitRefund(

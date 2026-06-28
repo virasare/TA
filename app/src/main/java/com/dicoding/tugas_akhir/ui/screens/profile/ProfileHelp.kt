@@ -1,5 +1,9 @@
 package com.dicoding.tugas_akhir.ui.screens.profile
 
+import android.content.ActivityNotFoundException
+import android.content.Context
+import android.content.Intent
+import android.net.Uri
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
@@ -17,6 +21,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.dicoding.tugas_akhir.ui.components.profile.DetailMenuItem
 import com.dicoding.tugas_akhir.ui.components.profile.InfoNote
@@ -29,6 +34,7 @@ fun ProfileHelpScreen(
     modifier: Modifier = Modifier,
 ) {
     val strings = LocalAppStrings.current
+    val context = LocalContext.current
 
     LazyColumn(
         modifier = modifier
@@ -100,14 +106,18 @@ fun ProfileHelpScreen(
                     title = strings.emailSupport,
                     subtitle = "Email Support",
                     icon = Icons.Outlined.Email,
-                    onClick = {},
+                    onClick = {
+                        context.openSupportEmail(strings.emailSupport)
+                    },
                 )
 
                 DetailMenuItem(
                     title = strings.phoneSupport,
                     subtitle = "WhatsApp / Call Center",
                     icon = Icons.Outlined.Call,
-                    onClick = {},
+                    onClick = {
+                        context.openWhatsAppSupport(strings.phoneSupport)
+                    },
                 )
 
                 DetailMenuItem(
@@ -118,5 +128,48 @@ fun ProfileHelpScreen(
                 )
             }
         }
+    }
+}
+
+private fun Context.openSupportEmail(
+    email: String,
+) {
+    val intent = Intent(Intent.ACTION_SENDTO).apply {
+        data = Uri.parse("mailto:$email")
+        putExtra(Intent.EXTRA_EMAIL, arrayOf(email))
+        putExtra(Intent.EXTRA_SUBJECT, "Bantuan Aplikasi NusaKapal")
+    }
+
+    runCatching {
+        startActivity(intent)
+    }
+}
+
+private fun Context.openWhatsAppSupport(
+    phoneNumber: String,
+) {
+    val normalizedPhone = phoneNumber
+        .filter { it.isDigit() }
+        .let { digits ->
+            if (digits.startsWith("0")) {
+                "62${digits.drop(1)}"
+            } else {
+                digits
+            }
+        }
+
+    val intent = Intent(
+        Intent.ACTION_VIEW,
+        Uri.parse("https://wa.me/$normalizedPhone?text=Saya%20butuh%20bantuan%20terkait%20aplikasi%20NusaKapal")
+    )
+
+    try {
+        startActivity(intent)
+    } catch (_: ActivityNotFoundException) {
+        val browserIntent = Intent(
+            Intent.ACTION_VIEW,
+            Uri.parse("https://wa.me/$normalizedPhone")
+        )
+        startActivity(browserIntent)
     }
 }

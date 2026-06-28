@@ -3,6 +3,7 @@ package com.dicoding.tugas_akhir.domain.model
 data class UserSettings(
     val themeMode: ThemeMode = ThemeMode.LIGHT,
     val languageMode: LanguageMode = LanguageMode.INDONESIAN,
+    val textSizeMode: TextSizeMode = TextSizeMode.NORMAL,
 )
 
 enum class ThemeMode(
@@ -13,13 +14,13 @@ enum class ThemeMode(
         label = "Terang",
         description = "Gunakan tampilan terang.",
     ),
-    SYSTEM(
-        label = "Ikuti Sistem",
-        description = "Tema mengikuti pengaturan perangkat.",
-    ),
     DARK(
         label = "Gelap",
         description = "Gunakan tampilan gelap.",
+    ),
+    SYSTEM(
+        label = "Ikuti Sistem",
+        description = "Tema mengikuti pengaturan perangkat.",
     ),
 }
 
@@ -35,4 +36,12 @@ enum class LanguageMode(
         label = "English",
         description = "Use English in the application.",
     ),
+}
+
+enum class TextSizeMode(
+    val scale: Float,
+) {
+    SMALL(scale = 0.92f),
+    NORMAL(scale = 1f),
+    LARGE(scale = 1.12f),
 }

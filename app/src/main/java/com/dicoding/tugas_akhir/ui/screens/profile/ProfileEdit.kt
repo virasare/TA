@@ -5,6 +5,7 @@ import android.net.Uri
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -54,7 +55,6 @@ import com.dicoding.tugas_akhir.ui.components.profile.BottomActionButton
 import com.dicoding.tugas_akhir.ui.components.profile.InfoNote
 import com.dicoding.tugas_akhir.ui.components.profile.ProfileFormCard
 import com.dicoding.tugas_akhir.ui.components.profile.ProfileTextField
-import com.dicoding.tugas_akhir.ui.theme.Primary2
 import com.dicoding.tugas_akhir.ui.viewmodel.ProfileViewModel
 import com.dicoding.tugas_akhir.ui.viewmodel.ViewModelFactory
 import com.dicoding.tugas_akhir.ui.components.loading.EditProfilePlaceholder
@@ -184,7 +184,7 @@ fun EditProfileScreen(
             onDismissRequest = {
                 showPhotoSheet = false
             },
-            containerColor = Color.White,
+            containerColor = MaterialTheme.colorScheme.surface,
         ) {
             Column(
                 modifier = Modifier
@@ -198,13 +198,13 @@ fun EditProfileScreen(
                     text = "Ubah Foto Profil",
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
-                    color = Color(0xFF102A43),
+                    color = MaterialTheme.colorScheme.onSurface,
                 )
 
                 Text(
                     text = "Pilih sumber foto yang ingin digunakan.",
                     style = MaterialTheme.typography.bodySmall,
-                    color = Color(0xFF627D98),
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
 
                 PhotoSourceCard(
@@ -355,8 +355,9 @@ private fun PhotoSourceCard(
             .clickable { onClick() },
         shape = RoundedCornerShape(18.dp),
         colors = CardDefaults.cardColors(
-            containerColor = Color(0xFFEAF4FF),
+            containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.58f),
         ),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
     ) {
         Row(
             modifier = Modifier.padding(16.dp),
@@ -366,7 +367,7 @@ private fun PhotoSourceCard(
             Icon(
                 imageVector = icon,
                 contentDescription = null,
-                tint = Primary2,
+                tint = MaterialTheme.colorScheme.primary,
             )
 
             Column(
@@ -376,13 +377,13 @@ private fun PhotoSourceCard(
                     text = title,
                     style = MaterialTheme.typography.titleSmall,
                     fontWeight = FontWeight.Bold,
-                    color = Color(0xFF102A43),
+                    color = MaterialTheme.colorScheme.onSurface,
                 )
 
                 Text(
                     text = subtitle,
                     style = MaterialTheme.typography.bodySmall,
-                    color = Color(0xFF627D98),
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
         }

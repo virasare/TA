@@ -2,6 +2,7 @@ package com.dicoding.tugas_akhir.ui.theme
 
 import com.dicoding.tugas_akhir.R
 import androidx.compose.material3.Typography
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -119,3 +120,34 @@ val Typography = Typography(
         letterSpacing = 0.1.sp
     ) // Input Label
 )
+
+fun scaledTypography(
+    scale: Float,
+): Typography {
+    if (scale == 1f) return Typography
+
+    fun TextStyle.scaled(): TextStyle {
+        return copy(
+            fontSize = fontSize * scale,
+            lineHeight = lineHeight * scale,
+        )
+    }
+
+    return Typography.copy(
+        displayLarge = Typography.displayLarge.scaled(),
+        displayMedium = Typography.displayMedium.scaled(),
+        displaySmall = Typography.displaySmall.scaled(),
+        headlineLarge = Typography.headlineLarge.scaled(),
+        headlineMedium = Typography.headlineMedium.scaled(),
+        headlineSmall = Typography.headlineSmall.scaled(),
+        titleLarge = Typography.titleLarge.scaled(),
+        titleMedium = Typography.titleMedium.scaled(),
+        titleSmall = Typography.titleSmall.scaled(),
+        bodyLarge = Typography.bodyLarge.scaled(),
+        bodyMedium = Typography.bodyMedium.scaled(),
+        bodySmall = Typography.bodySmall.scaled(),
+        labelLarge = Typography.labelLarge.scaled(),
+        labelMedium = Typography.labelMedium.scaled(),
+        labelSmall = Typography.labelSmall.scaled(),
+    )
+}

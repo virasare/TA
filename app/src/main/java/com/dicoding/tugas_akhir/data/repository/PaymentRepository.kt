@@ -170,7 +170,7 @@ class PaymentRepository private constructor(
     ): String {
         return when (methodId) {
             "virtual_account" -> "8808${System.currentTimeMillis().toString().takeLast(8)}"
-            "qris" -> "QRIS-${UUID.randomUUID().toString().take(10).uppercase()}"
+            "qris" -> "QRIS-SIMULASI-NUSAKAPAL-${UUID.randomUUID().toString().take(8).uppercase()}"
             "bank_transfer" -> "1234567890"
             else -> "-"
         }
@@ -191,16 +191,17 @@ class PaymentRepository private constructor(
             "qris" -> listOf(
                 "Buka aplikasi e-wallet atau mobile banking.",
                 "Pilih menu Scan QRIS.",
-                "Scan kode QR yang tersedia.",
+                "Scan gambar QRIS simulasi yang tersedia.",
                 "Pastikan nominal pembayaran sudah sesuai.",
                 "Konfirmasi pembayaran.",
             )
 
             "bank_transfer" -> listOf(
                 "Buka aplikasi mobile banking atau ATM.",
-                "Pilih menu Transfer Bank.",
-                "Masukkan nomor rekening tujuan.",
+                "Pilih menu Transfer Bank ke BCA.",
+                "Masukkan rekening tujuan 1234567890 a.n. PT NusaKapal Indonesia.",
                 "Masukkan nominal pembayaran sesuai total pesanan.",
+                "Pastikan nama penerima dan nominal sudah benar.",
                 "Simpan bukti pembayaran.",
             )
 

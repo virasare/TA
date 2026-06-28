@@ -24,6 +24,7 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -43,13 +44,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.dicoding.tugas_akhir.ui.state.PassengerFormState
-import com.dicoding.tugas_akhir.ui.theme.Background
-import com.dicoding.tugas_akhir.ui.theme.Neutral200
-import com.dicoding.tugas_akhir.ui.theme.Neutral500
-import com.dicoding.tugas_akhir.ui.theme.Neutral700
-import com.dicoding.tugas_akhir.ui.theme.Primary2
-import com.dicoding.tugas_akhir.ui.theme.Primary3
-import com.dicoding.tugas_akhir.ui.theme.White
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -66,11 +60,13 @@ fun PassengerInputForm(
     onGenderChange: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val colors = MaterialTheme.colorScheme
+
     Surface(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(20.dp),
-        color = White,
-        border = BorderStroke(1.dp, Neutral200),
+        color = colors.surface,
+        border = BorderStroke(1.dp, colors.outlineVariant),
         shadowElevation = 2.dp
     ) {
         Column(
@@ -83,14 +79,14 @@ fun PassengerInputForm(
                 Surface(
                     modifier = Modifier.size(40.dp),
                     shape = RoundedCornerShape(13.dp),
-                    color = Primary3,
-                    border = BorderStroke(1.dp, Neutral200)
+                    color = colors.primaryContainer.copy(alpha = 0.64f),
+                    border = BorderStroke(1.dp, colors.outlineVariant)
                 ) {
                     Box(contentAlignment = Alignment.Center) {
                         Icon(
                             imageVector = Icons.Outlined.Person,
                             contentDescription = null,
-                            tint = Primary2,
+                            tint = colors.primary,
                             modifier = Modifier.size(22.dp)
                         )
                     }
@@ -104,14 +100,14 @@ fun PassengerInputForm(
                 ) {
                     Text(
                         text = "Penumpang $passengerNumber",
-                        color = Neutral700,
+                        color = colors.onSurface,
                         fontWeight = FontWeight.Bold,
                         style = MaterialTheme.typography.titleMedium
                     )
 
                     Text(
                         text = "Isi sesuai identitas resmi",
-                        color = Neutral500,
+                        color = colors.onSurfaceVariant,
                         style = MaterialTheme.typography.bodySmall
                     )
                 }
@@ -246,10 +242,11 @@ private fun BirthDatePickerField(
                 )
             },
             trailingIcon = {
+                val colors = MaterialTheme.colorScheme
                 Icon(
                     imageVector = Icons.Outlined.CalendarMonth,
                     contentDescription = null,
-                    tint = Primary2
+                    tint = colors.primary
                 )
             },
             readOnly = true,
@@ -283,7 +280,10 @@ private fun BirthDatePickerField(
                             onDateSelected(selectedMillis.toDateString())
                         }
                         showDatePicker = false
-                    }
+                    },
+                    colors = ButtonDefaults.textButtonColors(
+                        contentColor = MaterialTheme.colorScheme.primary,
+                    ),
                 ) {
                     Text("Pilih")
                 }
@@ -292,7 +292,10 @@ private fun BirthDatePickerField(
                 TextButton(
                     onClick = {
                         showDatePicker = false
-                    }
+                    },
+                    colors = ButtonDefaults.textButtonColors(
+                        contentColor = MaterialTheme.colorScheme.primary,
+                    ),
                 ) {
                     Text("Batal")
                 }
@@ -303,6 +306,10 @@ private fun BirthDatePickerField(
                 showModeToggle = false,
                 colors = DatePickerDefaults.colors(
                     containerColor = MaterialTheme.colorScheme.surface,
+                    titleContentColor = MaterialTheme.colorScheme.onSurface,
+                    headlineContentColor = MaterialTheme.colorScheme.onSurface,
+                    weekdayContentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                    subheadContentColor = MaterialTheme.colorScheme.onSurfaceVariant,
                     selectedDayContainerColor = MaterialTheme.colorScheme.primary,
                     selectedDayContentColor = MaterialTheme.colorScheme.onPrimary,
                     todayContentColor = MaterialTheme.colorScheme.primary,
@@ -310,6 +317,7 @@ private fun BirthDatePickerField(
                     navigationContentColor = MaterialTheme.colorScheme.primary,
                     selectedYearContainerColor = MaterialTheme.colorScheme.primary,
                     selectedYearContentColor = MaterialTheme.colorScheme.onPrimary,
+                    currentYearContentColor = MaterialTheme.colorScheme.primary,
                 )
             )
         }
@@ -373,14 +381,14 @@ private fun GenderDropdownField(
             onDismissRequest = {
                 expanded = false
             },
-            containerColor = White
+            containerColor = MaterialTheme.colorScheme.surface
         ) {
             genderOptions.forEach { gender ->
                 DropdownMenuItem(
                     text = {
                         Text(
                             text = gender,
-                            color = Neutral700
+                            color = MaterialTheme.colorScheme.onSurface
                         )
                     },
                     onClick = {
@@ -395,23 +403,23 @@ private fun GenderDropdownField(
 
 @Composable
 private fun cleanTextFieldColors() = OutlinedTextFieldDefaults.colors(
-    focusedTextColor = Neutral700,
-    unfocusedTextColor = Neutral700,
-    focusedContainerColor = White,
-    unfocusedContainerColor = White,
-    disabledContainerColor = Background,
-    errorContainerColor = White,
-    focusedBorderColor = Primary2,
-    unfocusedBorderColor = Neutral200,
+    focusedTextColor = MaterialTheme.colorScheme.onSurface,
+    unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
+    focusedContainerColor = MaterialTheme.colorScheme.surface,
+    unfocusedContainerColor = MaterialTheme.colorScheme.surface,
+    disabledContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.56f),
+    errorContainerColor = MaterialTheme.colorScheme.surface,
+    focusedBorderColor = MaterialTheme.colorScheme.primary,
+    unfocusedBorderColor = MaterialTheme.colorScheme.outlineVariant,
     errorBorderColor = MaterialTheme.colorScheme.error,
-    focusedLabelColor = Primary2,
-    unfocusedLabelColor = Neutral500,
-    cursorColor = Primary2,
-    focusedLeadingIconColor = Primary2,
-    unfocusedLeadingIconColor = Neutral500,
+    focusedLabelColor = MaterialTheme.colorScheme.primary,
+    unfocusedLabelColor = MaterialTheme.colorScheme.onSurfaceVariant,
+    cursorColor = MaterialTheme.colorScheme.primary,
+    focusedLeadingIconColor = MaterialTheme.colorScheme.primary,
+    unfocusedLeadingIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
     errorLeadingIconColor = MaterialTheme.colorScheme.error,
-    focusedPlaceholderColor = Neutral500,
-    unfocusedPlaceholderColor = Neutral500
+    focusedPlaceholderColor = MaterialTheme.colorScheme.onSurfaceVariant,
+    unfocusedPlaceholderColor = MaterialTheme.colorScheme.onSurfaceVariant
 )
 
 private fun Long.toDateString(): String {

@@ -30,12 +30,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.dicoding.tugas_akhir.ui.components.lottie.LottieStateView
-import com.dicoding.tugas_akhir.ui.theme.Background
-import com.dicoding.tugas_akhir.ui.theme.Neutral200
-import com.dicoding.tugas_akhir.ui.theme.Neutral500
-import com.dicoding.tugas_akhir.ui.theme.Neutral700
-import com.dicoding.tugas_akhir.ui.theme.Primary2
-import com.dicoding.tugas_akhir.ui.theme.White
 
 @Composable
 fun PaymentFailedScreen(
@@ -47,7 +41,7 @@ fun PaymentFailedScreen(
     Column(
         modifier = modifier
             .fillMaxSize()
-            .background(Background)
+            .background(MaterialTheme.colorScheme.background)
             .testTag("payment_failed_screen"),
     ) {
         LazyColumn(
@@ -68,8 +62,8 @@ fun PaymentFailedScreen(
 
         Surface(
             modifier = Modifier.fillMaxWidth(),
-            color = White,
-            border = BorderStroke(1.dp, Neutral200),
+            color = MaterialTheme.colorScheme.surface,
+            border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
             shadowElevation = 8.dp,
         ) {
             Column(
@@ -83,7 +77,7 @@ fun PaymentFailedScreen(
                     onClick = onRetryClick,
                     colors = ButtonDefaults.buttonColors(
                         containerColor = MaterialTheme.colorScheme.error,
-                        contentColor = White,
+                        contentColor = MaterialTheme.colorScheme.onError,
                     ),
                     shape = RoundedCornerShape(14.dp),
                     modifier = Modifier.fillMaxWidth(),
@@ -101,10 +95,10 @@ fun PaymentFailedScreen(
                 OutlinedButton(
                     onClick = onBackHomeClick,
                     colors = ButtonDefaults.outlinedButtonColors(
-                        contentColor = Primary2,
-                        containerColor = White,
+                        contentColor = MaterialTheme.colorScheme.primary,
+                        containerColor = MaterialTheme.colorScheme.surface,
                     ),
-                    border = BorderStroke(1.dp, Neutral200),
+                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
                     shape = RoundedCornerShape(14.dp),
                     modifier = Modifier.fillMaxWidth(),
                 ) {
@@ -130,8 +124,8 @@ private fun PaymentFailedCard(
     Surface(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(24.dp),
-        color = White,
-        border = BorderStroke(1.dp, Neutral200),
+        color = MaterialTheme.colorScheme.surface,
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
         shadowElevation = 3.dp,
     ) {
         Column(
@@ -145,7 +139,7 @@ private fun PaymentFailedCard(
                 modifier = Modifier.fillMaxWidth(),
             )
 
-            HorizontalDivider(color = Neutral200)
+            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
 
             Surface(
                 modifier = Modifier.fillMaxWidth(),
@@ -165,7 +159,7 @@ private fun PaymentFailedCard(
 
                     Text(
                         text = paymentId,
-                        color = Neutral700,
+                        color = MaterialTheme.colorScheme.onSurface,
                         fontWeight = FontWeight.Bold,
                         style = MaterialTheme.typography.bodyMedium,
                     )
@@ -174,7 +168,7 @@ private fun PaymentFailedCard(
 
             Text(
                 text = "Jangan lakukan pembayaran ulang sebelum status dicek kembali.",
-                color = Neutral500,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 style = MaterialTheme.typography.bodySmall,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.fillMaxWidth(),

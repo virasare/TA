@@ -24,9 +24,9 @@ import com.dicoding.tugas_akhir.data.remote.response.ShipScheduleResponse
 import com.dicoding.tugas_akhir.ui.components.cards.ShipScheduleCard
 import com.dicoding.tugas_akhir.ui.components.cards.ShipScheduleStatus
 import com.dicoding.tugas_akhir.ui.components.lottie.LottieStateView
-import com.dicoding.tugas_akhir.ui.theme.Background
-import com.dicoding.tugas_akhir.ui.theme.Neutral500
-import com.dicoding.tugas_akhir.ui.theme.Neutral700
+import com.dicoding.tugas_akhir.data.dummy.ShipSchedule
+import com.dicoding.tugas_akhir.data.dummy.dummyShipSchedules
+import com.dicoding.tugas_akhir.data.dummy.filterUpcomingSchedules
 
 @Composable
 fun PopularRouteResultScreen(
@@ -37,7 +37,7 @@ fun PopularRouteResultScreen(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Background),
+                .background(MaterialTheme.colorScheme.background),
             contentAlignment = Alignment.Center
         ) {
             LottieStateView(
@@ -50,13 +50,16 @@ fun PopularRouteResultScreen(
     }
 
     val schedules = remember(popularRoute) {
-        DummyShipScheduleApiData.schedules
+        dummyShipSchedules
+            .filterUpcomingSchedules()
             .filter { schedule ->
-                schedule.origin.equals(popularRoute.originCity, ignoreCase = true) &&
-                        schedule.destination.equals(popularRoute.destinationCity, ignoreCase = true)
+                val route = schedule.toRouteDirection()
+
+                route.origin.equals(popularRoute.originCity, ignoreCase = true) &&
+                        route.destination.equals(popularRoute.destinationCity, ignoreCase = true)
             }
             .sortedWith(
-                compareBy<ShipScheduleResponse> { it.economyPrice }
+                compareBy<ShipSchedule> { it.price.toPriceNumber() }
                     .thenBy { it.departureDate }
                     .thenBy { it.departureTime }
             )
@@ -65,7 +68,7 @@ fun PopularRouteResultScreen(
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
-            .background(Background),
+            .background(MaterialTheme.colorScheme.background),
         contentPadding = PaddingValues(24.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
@@ -75,14 +78,14 @@ fun PopularRouteResultScreen(
             ) {
                 Text(
                     text = popularRoute.route,
-                    color = Neutral700,
+                    color = MaterialTheme.colorScheme.onSurface,
                     fontWeight = FontWeight.Bold,
                     style = MaterialTheme.typography.titleLarge
                 )
 
                 Text(
                     text = "Jadwal rute populer, diurutkan dari harga termurah.",
-                    color = Neutral500,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     style = MaterialTheme.typography.bodyMedium
                 )
             }
@@ -103,16 +106,16 @@ fun PopularRouteResultScreen(
             ) { schedule ->
                 ShipScheduleCard(
                     shipName = schedule.shipName,
-                    route = "${schedule.origin} - ${schedule.destination}",
-                    departureDate = DateFormatter.formatDate(schedule.departureDate),
+                    route = schedule.route,
+                    departureDate = schedule.departureDate,
                     departureTime = schedule.departureTime,
-                    arrivalTime = "${DateFormatter.formatDate(schedule.arrivalDate)}, ${schedule.arrivalTime}",
+                    arrivalTime = "${schedule.arrivalDate}, ${schedule.arrivalTime}",
                     duration = schedule.duration,
-                    price = PriceFormatter.formatToRupiah(schedule.economyPrice),
-                    quota = if (schedule.quota <= 0) "Habis" else "${schedule.quota} kursi",
-                    status = schedule.toUiStatus(),
+                    price = schedule.price,
+                    quota = schedule.quota,
+                    status = schedule.status,
                     onClick = {
-                        onScheduleClick(schedule.id)
+                        onScheduleClick(schedule.id.toString())
                     }
                 )
             }
@@ -128,4 +131,27 @@ private fun ShipScheduleResponse.toUiStatus(): ShipScheduleStatus {
         quota <= 10 -> ShipScheduleStatus.Limited
         else -> ShipScheduleStatus.Available
     }
+}
+
+private data class RouteDirection(
+    val origin: String,
+    val destination: String,
+)
+
+private fun ShipSchedule.toRouteDirection(): RouteDirection {
+    val parts = when {
+        route.contains("â†’") -> route.split("â†’")
+        route.contains("Ã¢â€ â€™") -> route.split("Ã¢â€ â€™")
+        route.contains("→") -> route.split("→")
+        else -> route.split("-")
+    }
+
+    return RouteDirection(
+        origin = parts.getOrNull(0)?.trim().orEmpty(),
+        destination = parts.getOrNull(1)?.trim().orEmpty(),
+    )
+}
+
+private fun String.toPriceNumber(): Int {
+    return filter { it.isDigit() }.toIntOrNull() ?: Int.MAX_VALUE
 }

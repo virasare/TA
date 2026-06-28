@@ -29,12 +29,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.dicoding.tugas_akhir.ui.theme.Neutral200
-import com.dicoding.tugas_akhir.ui.theme.Neutral500
-import com.dicoding.tugas_akhir.ui.theme.Neutral700
 import com.dicoding.tugas_akhir.ui.theme.Primary2
-import com.dicoding.tugas_akhir.ui.theme.Primary3
-import com.dicoding.tugas_akhir.ui.theme.White
 
 enum class TicketUiStatus {
     WAITING_PAYMENT,
@@ -117,6 +112,8 @@ fun TicketStatusInfoCard(
     status: TicketUiStatus,
     modifier: Modifier = Modifier,
 ) {
+    val colors = MaterialTheme.colorScheme
+
     Card(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(18.dp),
@@ -146,13 +143,13 @@ fun TicketStatusInfoCard(
                     text = status.label(),
                     style = MaterialTheme.typography.titleSmall,
                     fontWeight = FontWeight.Bold,
-                    color = Neutral700,
+                    color = colors.onSurface,
                 )
 
                 Text(
                     text = status.description(),
                     style = MaterialTheme.typography.bodySmall,
-                    color = Neutral500,
+                    color = colors.onSurfaceVariant,
                 )
             }
         }
@@ -168,13 +165,15 @@ fun TicketActionByStatusCard(
     onSeeTicketClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val colors = MaterialTheme.colorScheme
+
     Card(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(22.dp),
         colors = CardDefaults.cardColors(
-            containerColor = White,
+            containerColor = colors.surface,
         ),
-        border = BorderStroke(1.dp, Neutral200),
+        border = BorderStroke(1.dp, colors.outlineVariant),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
     ) {
         Column(
@@ -185,7 +184,7 @@ fun TicketActionByStatusCard(
                 text = "Aksi Tiket",
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
-                color = Neutral700,
+                color = colors.onSurface,
             )
 
             when (status) {
@@ -239,7 +238,7 @@ fun TicketActionByStatusCard(
                     Text(
                         text = "Tidak ada aksi lanjutan untuk status tiket ini.",
                         style = MaterialTheme.typography.bodySmall,
-                        color = Neutral500,
+                        color = colors.onSurfaceVariant,
                     )
                 }
             }
@@ -253,14 +252,16 @@ private fun StatusActionButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val colors = MaterialTheme.colorScheme
+
     OutlinedButton(
         onClick = onClick,
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(14.dp),
         colors = ButtonDefaults.outlinedButtonColors(
-            contentColor = Primary2,
+            contentColor = colors.primary,
         ),
-        border = BorderStroke(1.dp, Primary2),
+        border = BorderStroke(1.dp, colors.primary),
     ) {
         Text(
             text = text,
@@ -303,14 +304,7 @@ private fun TicketUiStatus.icon(): ImageVector {
 }
 
 private fun TicketUiStatus.backgroundColor(): Color {
-    return when (this) {
-        TicketUiStatus.WAITING_PAYMENT -> Color(0xFFFFF7E6)
-        TicketUiStatus.ACTIVE -> Color(0xFFEAF7EE)
-        TicketUiStatus.COMPLETED -> Color(0xFFEAF4FF)
-        TicketUiStatus.CANCELED -> Color(0xFFFFEBEE)
-        TicketUiStatus.REFUND_PROCESS -> Color(0xFFFFF7E6)
-        TicketUiStatus.RESCHEDULE_PROCESS -> Primary3
-    }
+    return contentColor().copy(alpha = 0.14f)
 }
 
 private fun TicketUiStatus.contentColor(): Color {
@@ -325,12 +319,5 @@ private fun TicketUiStatus.contentColor(): Color {
 }
 
 private fun TicketUiStatus.borderColor(): Color {
-    return when (this) {
-        TicketUiStatus.WAITING_PAYMENT -> Color(0xFFFFD699)
-        TicketUiStatus.ACTIVE -> Color(0xFFC8E6C9)
-        TicketUiStatus.COMPLETED -> Color(0xFFD7E9FF)
-        TicketUiStatus.CANCELED -> Color(0xFFFFCDD2)
-        TicketUiStatus.REFUND_PROCESS -> Color(0xFFFFD699)
-        TicketUiStatus.RESCHEDULE_PROCESS -> Color(0xFFD7E9FF)
-    }
+    return contentColor().copy(alpha = 0.24f)
 }

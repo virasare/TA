@@ -18,7 +18,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.dicoding.tugas_akhir.ui.theme.Primary2
 
 @Composable
 fun SettingOptionCard(
@@ -45,7 +44,7 @@ fun SettingOptionCard(
         border = BorderStroke(
             width = 1.dp,
             color = if (selected) {
-                Primary2
+                colors.primary
             } else {
                 colors.outlineVariant
             },
@@ -82,7 +81,8 @@ fun SettingOptionCard(
                 selected = selected,
                 onClick = onClick,
                 colors = RadioButtonDefaults.colors(
-                    selectedColor = Primary2,
+                    selectedColor = colors.primary,
+                    unselectedColor = colors.onSurfaceVariant,
                 ),
             )
         }

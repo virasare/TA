@@ -15,16 +15,32 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import java.util.UUID
+import com.dicoding.tugas_akhir.data.dummy.ShipSchedule as DummyShipSchedule
+import com.dicoding.tugas_akhir.data.dummy.dummyShipSchedules
+import com.dicoding.tugas_akhir.data.dummy.filterUpcomingSchedules
+import com.dicoding.tugas_akhir.ui.components.cards.ShipScheduleStatus
 
 class FakeRemoteDataSource private constructor() {
 
     private val bookings = mutableListOf<BookingResponse>()
     private val payments = mutableListOf<PaymentResponse>()
 
+    private fun getDummyScheduleResponses(
+        includePastSchedules: Boolean = false,
+    ): List<ShipScheduleResponse> {
+        val schedules = if (includePastSchedules) {
+            dummyShipSchedules
+        } else {
+            dummyShipSchedules.filterUpcomingSchedules()
+        }
+
+        return schedules.map { it.toScheduleResponse() }
+    }
+
     suspend fun getUpcomingSchedules(): List<ShipScheduleResponse> {
         delay(600)
 
-        return DummyShipScheduleApiData.schedules
+        return getDummyScheduleResponses()
     }
 
     suspend fun searchSchedules(
@@ -34,10 +50,13 @@ class FakeRemoteDataSource private constructor() {
     ): List<ShipScheduleResponse> {
         delay(900)
 
-        return DummyShipScheduleApiData.schedules.filter { schedule ->
+        val normalizedDate = date.toIsoDateOrOriginal()
+
+        return getDummyScheduleResponses().filter { schedule ->
             val isOriginMatch = schedule.origin.contains(origin, ignoreCase = true)
             val isDestinationMatch = schedule.destination.contains(destination, ignoreCase = true)
-            val isDateMatch = schedule.departureDate == date
+            val isDateMatch = schedule.departureDate == date ||
+                    schedule.departureDate == normalizedDate
 
             isOriginMatch && isDestinationMatch && isDateMatch
         }
@@ -46,8 +65,98 @@ class FakeRemoteDataSource private constructor() {
     suspend fun getScheduleDetail(scheduleId: String): ShipScheduleResponse? {
         delay(600)
 
-        return DummyShipScheduleApiData.schedules.find { schedule ->
+        getDummyScheduleResponses(includePastSchedules = true).find { schedule ->
             schedule.id == scheduleId
+        }?.let { return it }
+
+        val numericId = scheduleId.toScheduleNumber() ?: return DummyShipScheduleApiData.schedules.find {
+            it.id == scheduleId
+        }
+
+        return dummyShipSchedules.find { schedule ->
+            schedule.id == numericId
+        }?.toScheduleResponse()
+    }
+
+    private fun String.toScheduleNumber(): Int? {
+        return when {
+            all { it.isDigit() } -> toIntOrNull()
+            startsWith("SCH", ignoreCase = true) -> drop(3).toIntOrNull()
+            else -> null
+        }
+    }
+
+    private fun DummyShipSchedule.toScheduleResponse(): ShipScheduleResponse {
+        val normalizedRoute = route
+            .replace("â†’", "->")
+            .replace("Ã¢â€ â€™", "->")
+            .replace("\u2192", "->")
+
+        val routeParts = normalizedRoute.split("->").map { it.trim() }
+        val origin = routeParts.getOrNull(0).orEmpty()
+        val destination = routeParts.getOrNull(1).orEmpty()
+        val economyPrice = price.filter { it.isDigit() }.toIntOrNull() ?: 0
+
+        return ShipScheduleResponse(
+            id = id.toString(),
+            shipName = shipName,
+            shipCode = "NS-${id.toString().padStart(3, '0')}",
+            origin = origin,
+            destination = destination,
+            departureDate = departureDate.toIsoDateOrOriginal(),
+            departureTime = departureTime,
+            arrivalDate = arrivalDate.toIsoDateOrOriginal(),
+            arrivalTime = arrivalTime,
+            duration = duration,
+            economyPrice = economyPrice,
+            businessPrice = economyPrice + 150000,
+            firstClassPrice = economyPrice + 350000,
+            quota = quota.filter { it.isDigit() }.toIntOrNull() ?: 0,
+            status = status.toApiStatus(),
+            facilities = listOf(
+                "Kursi penumpang",
+                "Bagasi",
+                "Kantin",
+                "Toilet",
+                "Mushola",
+            ),
+            description = "Kapal $shipName melayani rute $origin menuju $destination.",
+            canRefund = status != ShipScheduleStatus.Unavailable,
+            canReschedule = status != ShipScheduleStatus.Unavailable,
+        )
+    }
+
+    private fun String.toIsoDateOrOriginal(): String {
+        val monthMap = mapOf(
+            "Jan" to "01",
+            "Feb" to "02",
+            "Mar" to "03",
+            "Apr" to "04",
+            "Mei" to "05",
+            "Jun" to "06",
+            "Jul" to "07",
+            "Agu" to "08",
+            "Sep" to "09",
+            "Okt" to "10",
+            "Nov" to "11",
+            "Des" to "12",
+        )
+
+        val parts = trim().split(" ")
+        if (parts.size != 3) return this
+
+        val day = parts[0].padStart(2, '0')
+        val month = monthMap[parts[1]] ?: return this
+        val year = parts[2]
+
+        return "$year-$month-$day"
+    }
+
+    private fun ShipScheduleStatus.toApiStatus(): String {
+        return when (this) {
+            ShipScheduleStatus.Available -> "Tersedia"
+            ShipScheduleStatus.Limited -> "Terbatas"
+            ShipScheduleStatus.Unavailable -> "Habis"
         }
     }
 
@@ -61,19 +170,19 @@ class FakeRemoteDataSource private constructor() {
                 id = "economy",
                 name = "Ekonomi",
                 price = schedule.economyPrice,
-                description = "Pilihan hemat untuk perjalanan antar pulau.",
+                description = "Kursi reguler di area penumpang umum. Akses toilet, mushola, kantin, area duduk bersama, dan bagasi kabin. Makanan belum termasuk.",
             ),
             TicketClassOption(
                 id = "business",
                 name = "Bisnis",
                 price = schedule.businessPrice,
-                description = "Tempat duduk lebih nyaman dengan fasilitas tambahan.",
+                description = "Kursi lebih nyaman dengan ruang duduk lebih lega, area lebih tenang, dan prioritas boarding. Cocok untuk perjalanan menengah hingga jauh.",
             ),
             TicketClassOption(
                 id = "first_class",
                 name = "Kelas I",
                 price = schedule.firstClassPrice,
-                description = "Pilihan terbaik dengan kenyamanan lebih maksimal.",
+                description = "Kabin atau ruang istirahat lebih privat dengan fasilitas lebih lengkap. Cocok untuk perjalanan jauh atau penumpang yang ingin lebih nyaman.",
             ),
         )
     }
@@ -294,7 +403,7 @@ class FakeRemoteDataSource private constructor() {
     private fun generatePaymentCode(methodId: String): String {
         return when (methodId) {
             "virtual_account" -> "8808${System.currentTimeMillis().toString().takeLast(8)}"
-            "qris" -> "QRIS-${UUID.randomUUID().toString().take(10).uppercase()}"
+            "qris" -> "QRIS-SIMULASI-NUSAKAPAL-${UUID.randomUUID().toString().take(8).uppercase()}"
             "bank_transfer" -> "1234567890"
             else -> "-"
         }
@@ -313,16 +422,17 @@ class FakeRemoteDataSource private constructor() {
             "qris" -> listOf(
                 "Buka aplikasi e-wallet atau mobile banking.",
                 "Pilih menu Scan QRIS.",
-                "Scan kode QR yang tersedia.",
+                "Scan gambar QRIS simulasi yang tersedia.",
                 "Pastikan nominal pembayaran sudah sesuai.",
                 "Konfirmasi pembayaran.",
             )
 
             "bank_transfer" -> listOf(
                 "Buka aplikasi mobile banking atau ATM.",
-                "Pilih menu Transfer Bank.",
-                "Masukkan nomor rekening tujuan.",
+                "Pilih menu Transfer Bank ke BCA.",
+                "Masukkan rekening tujuan 1234567890 a.n. PT NusaKapal Indonesia.",
                 "Masukkan nominal pembayaran sesuai total pesanan.",
+                "Pastikan nama penerima dan nominal sudah benar.",
                 "Simpan bukti pembayaran.",
             )
 

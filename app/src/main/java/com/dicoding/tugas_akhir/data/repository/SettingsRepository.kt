@@ -2,6 +2,7 @@ package com.dicoding.tugas_akhir.data.repository
 
 import com.dicoding.tugas_akhir.data.local.datastore.SettingsDataStore
 import com.dicoding.tugas_akhir.domain.model.LanguageMode
+import com.dicoding.tugas_akhir.domain.model.TextSizeMode
 import com.dicoding.tugas_akhir.domain.model.ThemeMode
 import com.dicoding.tugas_akhir.domain.model.UserSettings
 import kotlinx.coroutines.flow.Flow
@@ -20,6 +21,10 @@ class SettingsRepository private constructor(
 
     suspend fun saveLanguageMode(languageMode: LanguageMode) {
         settingsDataStore.saveLanguageMode(languageMode)
+    }
+
+    suspend fun saveTextSizeMode(textSizeMode: TextSizeMode) {
+        settingsDataStore.saveTextSizeMode(textSizeMode)
     }
 
     companion object {

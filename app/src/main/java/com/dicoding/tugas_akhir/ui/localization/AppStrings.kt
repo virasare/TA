@@ -2,6 +2,7 @@ package com.dicoding.tugas_akhir.ui.localization
 
 import androidx.compose.runtime.staticCompositionLocalOf
 import com.dicoding.tugas_akhir.domain.model.LanguageMode
+import com.dicoding.tugas_akhir.domain.model.TextSizeMode
 import com.dicoding.tugas_akhir.domain.model.ThemeMode
 
 data class AppStrings(
@@ -25,12 +26,58 @@ data class AppStrings(
     val securitySubtitle: String,
     val logout: String,
 
+    val navHome: String,
+    val navSchedule: String,
+    val navMyTicket: String,
+    val navNotification: String,
+    val navProfile: String,
+
+    val titleLoginRequired: String,
+    val titleScheduleDetail: String,
+    val titleSelectTicket: String,
+    val titlePassengerForm: String,
+    val titleBookingSummary: String,
+    val titlePayment: String,
+    val titlePaymentWaiting: String,
+    val titlePaymentStatus: String,
+    val titleETicket: String,
+    val titleRefund: String,
+    val titleReschedule: String,
+    val titleRefundProcess: String,
+    val titleRescheduleSuccess: String,
+    val titleNotificationDetail: String,
+    val titleChoosePort: String,
+    val titleSearchResult: String,
+    val titlePopularRoute: String,
+    val titleAddPassenger: String,
+
+    val homeGreetingTitle: String,
+    val homeGreetingSubtitle: String,
+    val searchScheduleTitle: String,
+    val searchScheduleSubtitle: String,
+    val chooseOrigin: String,
+    val chooseDestination: String,
+    val chooseDate: String,
+    val origin: String,
+    val destination: String,
+    val departureDate: String,
+    val searchSchedule: String,
+    val ticketSummary: String,
+    val noActiveTicket: String,
+    val ticketSummaryEmptyDesc: String,
+    val monitorActiveTicket: String,
+    val noTicketYet: String,
+    val popularRoute: String,
+    val popularRouteSubtitle: String,
+
     val preferences: String,
     val information: String,
     val language: String,
     val languageSubtitle: String,
     val theme: String,
     val themeSubtitle: String,
+    val textSize: String,
+    val textSizeSubtitle: String,
 
     val indonesian: String,
     val indonesianDesc: String,
@@ -45,6 +92,14 @@ data class AppStrings(
     val systemTheme: String,
     val systemThemeDesc: String,
     val themeNote: String,
+
+    val smallText: String,
+    val smallTextDesc: String,
+    val normalText: String,
+    val normalTextDesc: String,
+    val largeText: String,
+    val largeTextDesc: String,
+    val textSizeNote: String,
 
     val helpTitle: String,
     val helpIntro: String,
@@ -95,12 +150,58 @@ val IndonesianStrings = AppStrings(
     securitySubtitle = "Lihat status login dan akses fitur akun.",
     logout = "Keluar Akun",
 
+    navHome = "Beranda",
+    navSchedule = "Jadwal",
+    navMyTicket = "Tiket Saya",
+    navNotification = "Notifikasi",
+    navProfile = "Profil",
+
+    titleLoginRequired = "Login Diperlukan",
+    titleScheduleDetail = "Detail Jadwal",
+    titleSelectTicket = "Pilih Tiket",
+    titlePassengerForm = "Data Penumpang",
+    titleBookingSummary = "Ringkasan Pesanan",
+    titlePayment = "Pembayaran",
+    titlePaymentWaiting = "Menunggu Pembayaran",
+    titlePaymentStatus = "Status Pembayaran",
+    titleETicket = "E-Ticket",
+    titleRefund = "Ajukan Refund",
+    titleReschedule = "Reschedule Tiket",
+    titleRefundProcess = "Refund Diproses",
+    titleRescheduleSuccess = "Reschedule Berhasil",
+    titleNotificationDetail = "Detail Notifikasi",
+    titleChoosePort = "Pilih Pelabuhan",
+    titleSearchResult = "Hasil Pencarian",
+    titlePopularRoute = "Rute Populer",
+    titleAddPassenger = "Tambah Penumpang",
+
+    homeGreetingTitle = "Rencanakan perjalanan laut Anda",
+    homeGreetingSubtitle = "Cari jadwal kapal, pesan tiket, dan pantau status keberangkatan dalam satu aplikasi.",
+    searchScheduleTitle = "Cari Jadwal Kapal",
+    searchScheduleSubtitle = "Temukan jadwal kapal sesuai tujuan perjalanan Anda.",
+    chooseOrigin = "Pilih Kota Asal",
+    chooseDestination = "Pilih Tujuan",
+    chooseDate = "Pilih Tanggal",
+    origin = "Asal",
+    destination = "Tujuan",
+    departureDate = "Tanggal Keberangkatan",
+    searchSchedule = "Cari Jadwal",
+    ticketSummary = "Ringkasan Tiket",
+    noActiveTicket = "Belum ada tiket aktif",
+    ticketSummaryEmptyDesc = "Tiket yang sudah dibayar akan muncul di sini agar jadwal keberangkatan lebih mudah dipantau.",
+    monitorActiveTicket = "Pantau tiket aktif",
+    noTicketYet = "Belum ada tiket",
+    popularRoute = "Rute Populer",
+    popularRouteSubtitle = "Rekomendasi rute berdasarkan pola pilihan pengguna.",
+
     preferences = "Preferensi",
     information = "Informasi",
     language = "Bahasa",
     languageSubtitle = "Pilih bahasa yang digunakan di aplikasi.",
     theme = "Tema",
     themeSubtitle = "Atur tampilan terang, gelap, atau mengikuti sistem.",
+    textSize = "Ukuran Teks",
+    textSizeSubtitle = "Atur ukuran teks agar lebih nyaman dibaca.",
 
     indonesian = "Bahasa Indonesia",
     indonesianDesc = "Gunakan Bahasa Indonesia di aplikasi.",
@@ -116,13 +217,21 @@ val IndonesianStrings = AppStrings(
     systemThemeDesc = "Tema mengikuti pengaturan perangkat.",
     themeNote = "Tema akan mengubah warna background, teks, komponen, navigation bar, dan status bar.",
 
+    smallText = "Kecil",
+    smallTextDesc = "Tampilkan teks lebih ringkas pada layar kecil.",
+    normalText = "Normal",
+    normalTextDesc = "Gunakan ukuran teks standar aplikasi.",
+    largeText = "Besar",
+    largeTextDesc = "Perbesar teks untuk keterbacaan yang lebih baik.",
+    textSizeNote = "Ukuran teks akan diterapkan ke komponen yang menggunakan gaya typography aplikasi.",
+
     helpTitle = "Pusat Bantuan",
     helpIntro = "Temukan panduan penggunaan aplikasi dan kontak bantuan dummy untuk kebutuhan pengujian.",
     guideTitle = "Panduan Penggunaan",
     contactTitle = "Kontak Bantuan",
     contactSubtitle = "Hubungi bantuan jika mengalami kendala saat menggunakan aplikasi.",
-    emailSupport = "support@example.com",
-    phoneSupport = "+62 812-0000-0000",
+    emailSupport = "virasare@gmail.com",
+    phoneSupport = "082145821730",
     serviceHours = "Senin - Jumat, 09.00 - 17.00 WITA",
 
     aboutTitle = "Tentang Aplikasi",
@@ -165,12 +274,58 @@ val EnglishStrings = AppStrings(
     securitySubtitle = "View login status and account access.",
     logout = "Sign Out",
 
+    navHome = "Home",
+    navSchedule = "Schedule",
+    navMyTicket = "Tickets",
+    navNotification = "Alerts",
+    navProfile = "Profile",
+
+    titleLoginRequired = "Login Required",
+    titleScheduleDetail = "Schedule Detail",
+    titleSelectTicket = "Select Ticket",
+    titlePassengerForm = "Passenger Data",
+    titleBookingSummary = "Booking Summary",
+    titlePayment = "Payment",
+    titlePaymentWaiting = "Waiting for Payment",
+    titlePaymentStatus = "Payment Status",
+    titleETicket = "E-Ticket",
+    titleRefund = "Request Refund",
+    titleReschedule = "Reschedule Ticket",
+    titleRefundProcess = "Refund in Progress",
+    titleRescheduleSuccess = "Reschedule Successful",
+    titleNotificationDetail = "Notification Detail",
+    titleChoosePort = "Choose Port",
+    titleSearchResult = "Search Results",
+    titlePopularRoute = "Popular Route",
+    titleAddPassenger = "Add Passenger",
+
+    homeGreetingTitle = "Plan your sea journey",
+    homeGreetingSubtitle = "Search ferry schedules, book tickets, and monitor departure status in one app.",
+    searchScheduleTitle = "Search Ship Schedule",
+    searchScheduleSubtitle = "Find ship schedules that match your travel destination.",
+    chooseOrigin = "Choose Origin",
+    chooseDestination = "Choose Destination",
+    chooseDate = "Choose Date",
+    origin = "Origin",
+    destination = "Destination",
+    departureDate = "Departure Date",
+    searchSchedule = "Search Schedule",
+    ticketSummary = "Ticket Summary",
+    noActiveTicket = "No active ticket",
+    ticketSummaryEmptyDesc = "Paid tickets will appear here so you can monitor departure schedules more easily.",
+    monitorActiveTicket = "Monitor active ticket",
+    noTicketYet = "No ticket yet",
+    popularRoute = "Popular Routes",
+    popularRouteSubtitle = "Route recommendations based on user selection patterns.",
+
     preferences = "Preferences",
     information = "Information",
     language = "Language",
     languageSubtitle = "Choose the language used in the app.",
     theme = "Theme",
     themeSubtitle = "Choose light, dark, or system theme.",
+    textSize = "Text Size",
+    textSizeSubtitle = "Adjust text size for easier reading.",
 
     indonesian = "Bahasa Indonesia",
     indonesianDesc = "Use Indonesian in the application.",
@@ -186,13 +341,21 @@ val EnglishStrings = AppStrings(
     systemThemeDesc = "Follow your device theme setting.",
     themeNote = "Theme changes will affect background, text, components, navigation bar, and status bar.",
 
+    smallText = "Small",
+    smallTextDesc = "Show more compact text on smaller screens.",
+    normalText = "Normal",
+    normalTextDesc = "Use the app default text size.",
+    largeText = "Large",
+    largeTextDesc = "Increase text size for better readability.",
+    textSizeNote = "Text size applies to components that use the app typography styles.",
+
     helpTitle = "Help Center",
     helpIntro = "Find app usage guides and dummy support contact for testing purposes.",
     guideTitle = "Usage Guide",
     contactTitle = "Support Contact",
     contactSubtitle = "Contact support if you experience issues while using the app.",
-    emailSupport = "support@example.com",
-    phoneSupport = "+62 812-0000-0000",
+    emailSupport = "virasare@gmail.com",
+    phoneSupport = "082145821730",
     serviceHours = "Monday - Friday, 09.00 - 17.00 WITA",
 
     aboutTitle = "About App",
@@ -234,6 +397,22 @@ fun ThemeMode.getDescription(strings: AppStrings): String {
         ThemeMode.LIGHT -> strings.lightThemeDesc
         ThemeMode.DARK -> strings.darkThemeDesc
         ThemeMode.SYSTEM -> strings.systemThemeDesc
+    }
+}
+
+fun TextSizeMode.getLabel(strings: AppStrings): String {
+    return when (this) {
+        TextSizeMode.SMALL -> strings.smallText
+        TextSizeMode.NORMAL -> strings.normalText
+        TextSizeMode.LARGE -> strings.largeText
+    }
+}
+
+fun TextSizeMode.getDescription(strings: AppStrings): String {
+    return when (this) {
+        TextSizeMode.SMALL -> strings.smallTextDesc
+        TextSizeMode.NORMAL -> strings.normalTextDesc
+        TextSizeMode.LARGE -> strings.largeTextDesc
     }
 }
 

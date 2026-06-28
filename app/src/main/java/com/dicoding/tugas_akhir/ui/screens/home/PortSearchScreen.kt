@@ -41,15 +41,7 @@ import androidx.compose.ui.unit.dp
 import com.dicoding.tugas_akhir.data.dummy.Port
 import com.dicoding.tugas_akhir.data.dummy.dummyPorts
 import com.dicoding.tugas_akhir.ui.components.lottie.LottieStateView
-import com.dicoding.tugas_akhir.ui.theme.Background
-import com.dicoding.tugas_akhir.ui.theme.Neutral200
-import com.dicoding.tugas_akhir.ui.theme.Neutral300
-import com.dicoding.tugas_akhir.ui.theme.Neutral500
-import com.dicoding.tugas_akhir.ui.theme.Neutral700
-import com.dicoding.tugas_akhir.ui.theme.Primary2
-import com.dicoding.tugas_akhir.ui.theme.Primary3
 import com.dicoding.tugas_akhir.ui.theme.Tugas_AkhirTheme
-import com.dicoding.tugas_akhir.ui.theme.White
 
 @Composable
 fun PortSearchScreen(
@@ -66,7 +58,7 @@ fun PortSearchScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Background)
+            .background(MaterialTheme.colorScheme.background)
             .padding(horizontal = 24.dp)
             .padding(top = 16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
@@ -84,14 +76,14 @@ fun PortSearchScreen(
                 Text(
                     text = "Cari pelabuhan atau kota",
                     style = MaterialTheme.typography.bodyMedium,
-                    color = Neutral500
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             },
             leadingIcon = {
                 Icon(
                     imageVector = Icons.Outlined.Search,
                     contentDescription = null,
-                    tint = Neutral500
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             },
             shape = RoundedCornerShape(14.dp),
@@ -99,13 +91,16 @@ fun PortSearchScreen(
                 capitalization = KeyboardCapitalization.Words
             ),
             colors = OutlinedTextFieldDefaults.colors(
-                focusedContainerColor = White,
-                unfocusedContainerColor = White,
-                focusedBorderColor = Primary2,
-                unfocusedBorderColor = Neutral300,
-                cursorColor = Primary2,
-                focusedTextColor = Neutral700,
-                unfocusedTextColor = Neutral700
+                focusedContainerColor = MaterialTheme.colorScheme.surface,
+                unfocusedContainerColor = MaterialTheme.colorScheme.surface,
+                disabledContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                focusedBorderColor = MaterialTheme.colorScheme.primary,
+                unfocusedBorderColor = MaterialTheme.colorScheme.outlineVariant,
+                cursorColor = MaterialTheme.colorScheme.primary,
+                focusedTextColor = MaterialTheme.colorScheme.onSurface,
+                unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
+                focusedPlaceholderColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                unfocusedPlaceholderColor = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         )
 
@@ -149,8 +144,8 @@ private fun PortSearchItem(
             .fillMaxWidth()
             .clickable { onClick() },
         shape = RoundedCornerShape(14.dp),
-        color = White,
-        border = BorderStroke(1.dp, Neutral200),
+        color = MaterialTheme.colorScheme.surface,
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
         shadowElevation = 1.dp
     ) {
         Row(
@@ -160,7 +155,7 @@ private fun PortSearchItem(
             Surface(
                 modifier = Modifier.size(42.dp),
                 shape = RoundedCornerShape(12.dp),
-                color = Primary3
+                color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.58f)
             ) {
                 Box(
                     contentAlignment = Alignment.Center
@@ -168,7 +163,7 @@ private fun PortSearchItem(
                     Icon(
                         imageVector = Icons.Outlined.DirectionsBoat,
                         contentDescription = null,
-                        tint = Primary2,
+                        tint = MaterialTheme.colorScheme.primary,
                         modifier = Modifier.size(22.dp)
                     )
                 }
@@ -179,14 +174,14 @@ private fun PortSearchItem(
             Column {
                 Text(
                     text = port.name,
-                    color = Neutral700,
+                    color = MaterialTheme.colorScheme.onSurface,
                     fontWeight = FontWeight.SemiBold,
                     style = MaterialTheme.typography.bodyMedium
                 )
 
                 Text(
                     text = port.city,
-                    color = Neutral500,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     style = MaterialTheme.typography.bodySmall
                 )
             }

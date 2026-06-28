@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -58,13 +59,6 @@ import com.dicoding.tugas_akhir.ui.components.dialog.feedback.InfoBoxVariant
 import com.dicoding.tugas_akhir.ui.components.dialog.feedback.StatusBadge
 import com.dicoding.tugas_akhir.ui.components.loading.ScheduleDetailPlaceholder
 import com.dicoding.tugas_akhir.ui.state.ScheduleDetailUiState
-import com.dicoding.tugas_akhir.ui.theme.Background
-import com.dicoding.tugas_akhir.ui.theme.Neutral200
-import com.dicoding.tugas_akhir.ui.theme.Neutral500
-import com.dicoding.tugas_akhir.ui.theme.Neutral700
-import com.dicoding.tugas_akhir.ui.theme.Primary2
-import com.dicoding.tugas_akhir.ui.theme.Primary3
-import com.dicoding.tugas_akhir.ui.theme.White
 import com.dicoding.tugas_akhir.ui.viewmodel.ScheduleViewModel
 import com.dicoding.tugas_akhir.ui.viewmodel.ViewModelFactory
 
@@ -72,7 +66,8 @@ private data class TicketClass(
     val name: String,
     val description: String,
     val price: String,
-    val quota: String
+    val quota: String,
+    val facilities: String,
 )
 
 @Composable
@@ -177,6 +172,13 @@ private fun ScheduleDetailContent(
             }
 
             item {
+                TravelDetailCard(
+                    schedule = schedule,
+                    routeDirection = routeDirection,
+                )
+            }
+
+            item {
                 TicketInformationCard(
                     price = schedule.startingPriceText(),
                     quota = schedule.quotaText(),
@@ -208,8 +210,8 @@ private fun ScheduleDetailContent(
 
         Surface(
             modifier = Modifier.fillMaxWidth(),
-            color = White,
-            border = BorderStroke(1.dp, Neutral200),
+            color = MaterialTheme.colorScheme.surface,
+            border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
             shadowElevation = 8.dp
         ) {
             PrimaryButton(
@@ -245,6 +247,7 @@ private fun ScheduleDetailLoadingState(
 private fun ScheduleDetailHeroCard(
     schedule: ShipSchedule
 ) {
+    val colors = MaterialTheme.colorScheme
     val uiStatus = schedule.toUiStatus()
     val badgeText = when (uiStatus) {
         ShipScheduleStatus.Available -> "Tersedia"
@@ -261,8 +264,8 @@ private fun ScheduleDetailHeroCard(
     Surface(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(20.dp),
-        color = White,
-        border = BorderStroke(1.dp, Neutral200),
+        color = colors.surface,
+        border = BorderStroke(1.dp, colors.outlineVariant),
         shadowElevation = 3.dp
     ) {
         Box(
@@ -271,9 +274,9 @@ private fun ScheduleDetailHeroCard(
                 .background(
                     brush = Brush.linearGradient(
                         colors = listOf(
-                            MaterialTheme.colorScheme.primaryContainer,
-                            MaterialTheme.colorScheme.background,
-                            MaterialTheme.colorScheme.background
+                            colors.primaryContainer.copy(alpha = 0.76f),
+                            colors.surface,
+                            colors.surface
                         )
                     )
                 )
@@ -288,8 +291,8 @@ private fun ScheduleDetailHeroCard(
                     Surface(
                         modifier = Modifier.size(52.dp),
                         shape = RoundedCornerShape(16.dp),
-                        color = White,
-                        border = BorderStroke(1.dp, Neutral200),
+                        color = colors.surface,
+                        border = BorderStroke(1.dp, colors.outlineVariant),
                         shadowElevation = 1.dp
                     ) {
                         Box(
@@ -298,7 +301,7 @@ private fun ScheduleDetailHeroCard(
                             Icon(
                                 imageVector = Icons.Outlined.DirectionsBoat,
                                 contentDescription = null,
-                                tint = Primary2,
+                                tint = colors.primary,
                                 modifier = Modifier.size(28.dp)
                             )
                         }
@@ -312,7 +315,7 @@ private fun ScheduleDetailHeroCard(
                     ) {
                         Text(
                             text = schedule.shipName,
-                            color = Neutral700,
+                            color = colors.onSurface,
                             fontWeight = FontWeight.Bold,
                             style = MaterialTheme.typography.titleLarge
                         )
@@ -323,7 +326,7 @@ private fun ScheduleDetailHeroCard(
                             Icon(
                                 imageVector = Icons.Outlined.LocationOn,
                                 contentDescription = null,
-                                tint = Neutral500,
+                                tint = colors.onSurfaceVariant,
                                 modifier = Modifier.size(18.dp)
                             )
 
@@ -331,7 +334,7 @@ private fun ScheduleDetailHeroCard(
 
                             Text(
                                 text = schedule.routeText(),
-                                color = Neutral500,
+                                color = colors.onSurfaceVariant,
                                 style = MaterialTheme.typography.bodyMedium
                             )
                         }
@@ -343,7 +346,7 @@ private fun ScheduleDetailHeroCard(
                     )
                 }
 
-                Divider(color = Neutral200)
+                Divider(color = colors.outlineVariant)
 
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -378,6 +381,8 @@ private fun HeroMiniInfo(
     value: String,
     icon: ImageVector
 ) {
+    val colors = MaterialTheme.colorScheme
+
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(5.dp)
@@ -385,8 +390,8 @@ private fun HeroMiniInfo(
         Surface(
             modifier = Modifier.size(30.dp),
             shape = CircleShape,
-            color = White,
-            border = BorderStroke(1.dp, Neutral200)
+            color = colors.surface,
+            border = BorderStroke(1.dp, colors.outlineVariant)
         ) {
             Box(
                 contentAlignment = Alignment.Center
@@ -394,7 +399,7 @@ private fun HeroMiniInfo(
                 Icon(
                     imageVector = icon,
                     contentDescription = null,
-                    tint = Primary2,
+                    tint = colors.primary,
                     modifier = Modifier.size(16.dp)
                 )
             }
@@ -402,13 +407,13 @@ private fun HeroMiniInfo(
 
         Text(
             text = label,
-            color = Neutral500,
+            color = colors.onSurfaceVariant,
             style = MaterialTheme.typography.labelSmall
         )
 
         Text(
             text = value,
-            color = Neutral700,
+            color = colors.onSurface,
             fontWeight = FontWeight.Bold,
             style = MaterialTheme.typography.bodySmall,
             textAlign = TextAlign.Center
@@ -434,7 +439,7 @@ private fun ScheduleRouteInfoCard(
             destinationCity = destinationCity
         )
 
-        Divider(color = Neutral200)
+        Divider(color = MaterialTheme.colorScheme.outlineVariant)
 
         DetailInfoRow(
             icon = Icons.Outlined.LocationOn,
@@ -479,6 +484,8 @@ private fun RouteSummaryRow(
     originCity: String,
     destinationCity: String
 ) {
+    val colors = MaterialTheme.colorScheme
+
     Row(
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically
@@ -489,19 +496,43 @@ private fun RouteSummaryRow(
             modifier = Modifier.weight(1f)
         )
 
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally
+        Row(
+            modifier = Modifier.weight(0.72f),
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             Divider(
-                modifier = Modifier.width(44.dp),
-                color = Primary2
+                modifier = Modifier
+                    .weight(1f)
+                    .height(1.dp),
+                color = colors.primary.copy(alpha = 0.72f),
             )
 
-            Text(
-                text = "ke",
-                color = Neutral500,
-                style = MaterialTheme.typography.labelSmall,
-                modifier = Modifier.padding(top = 2.dp)
+            Surface(
+                modifier = Modifier
+                    .padding(horizontal = 6.dp)
+                    .size(30.dp),
+                shape = CircleShape,
+                color = colors.primaryContainer.copy(alpha = 0.72f),
+                border = BorderStroke(1.dp, colors.outlineVariant),
+            ) {
+                Box(
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Icon(
+                        imageVector = Icons.Outlined.Sailing,
+                        contentDescription = null,
+                        tint = colors.primary,
+                        modifier = Modifier.size(16.dp),
+                    )
+                }
+            }
+
+            Divider(
+                modifier = Modifier
+                    .weight(1f)
+                    .height(1.dp),
+                color = colors.primary.copy(alpha = 0.72f),
             )
         }
 
@@ -521,6 +552,8 @@ private fun RoutePoint(
     modifier: Modifier = Modifier,
     alignEnd: Boolean = false
 ) {
+    val colors = MaterialTheme.colorScheme
+
     Column(
         modifier = modifier,
         horizontalAlignment = if (alignEnd) Alignment.End else Alignment.Start,
@@ -528,15 +561,53 @@ private fun RoutePoint(
     ) {
         Text(
             text = label,
-            color = Neutral500,
+            color = colors.onSurfaceVariant,
             style = MaterialTheme.typography.labelSmall
         )
 
         Text(
             text = city.ifBlank { "-" },
-            color = Neutral700,
+            color = colors.onSurface,
             fontWeight = FontWeight.Bold,
             style = MaterialTheme.typography.titleMedium
+        )
+    }
+}
+
+@Composable
+private fun TravelDetailCard(
+    schedule: ShipSchedule,
+    routeDirection: RouteDirection,
+) {
+    DetailSectionCard(
+        title = "Rute & Pelayaran"
+    ) {
+        DetailInfoRow(
+            icon = Icons.Outlined.Sailing,
+            label = "Operator/Pelayaran",
+            value = schedule.operatorName(),
+        )
+
+        DetailInfoRow(
+            icon = Icons.Outlined.LocationOn,
+            label = "Pelabuhan Asal",
+            value = cityToPortName(routeDirection.origin),
+        )
+
+        DetailInfoRow(
+            icon = Icons.Outlined.LocationOn,
+            label = "Pelabuhan Tujuan",
+            value = cityToPortName(routeDirection.destination),
+        )
+
+        DetailInfoRow(
+            icon = Icons.Outlined.AccessTime,
+            label = "Estimasi Waktu",
+            value = "${DateFormatter.formatDate(schedule.arrivalDate)}, ${schedule.arrivalTime}",
+        )
+
+        TransitTimeline(
+            stops = schedule.transitStops(routeDirection),
         )
     }
 }
@@ -554,7 +625,7 @@ private fun TicketInformationCard(
             icon = Icons.Outlined.Payments,
             label = "Harga Mulai",
             value = price,
-            valueColor = Primary2
+            valueColor = MaterialTheme.colorScheme.primary
         )
 
         DetailInfoRow(
@@ -586,7 +657,7 @@ private fun TicketClassCard(
             TicketClassItem(ticketClass = ticketClass)
 
             if (index != ticketClasses.lastIndex) {
-                Divider(color = Neutral200)
+                Divider(color = MaterialTheme.colorScheme.outlineVariant)
             }
         }
     }
@@ -596,6 +667,8 @@ private fun TicketClassCard(
 private fun TicketClassItem(
     ticketClass: TicketClass
 ) {
+    val colors = MaterialTheme.colorScheme
+
     Row(
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.Top
@@ -603,7 +676,7 @@ private fun TicketClassItem(
         Surface(
             modifier = Modifier.size(38.dp),
             shape = RoundedCornerShape(12.dp),
-            color = Primary3
+            color = colors.primaryContainer.copy(alpha = 0.62f)
         ) {
             Box(
                 contentAlignment = Alignment.Center
@@ -611,7 +684,7 @@ private fun TicketClassItem(
                 Icon(
                     imageVector = Icons.Outlined.EventSeat,
                     contentDescription = null,
-                    tint = Primary2,
+                    tint = colors.primary,
                     modifier = Modifier.size(20.dp)
                 )
             }
@@ -625,27 +698,27 @@ private fun TicketClassItem(
         ) {
             Text(
                 text = ticketClass.name,
-                color = Neutral700,
+                color = colors.onSurface,
                 fontWeight = FontWeight.Bold,
                 style = MaterialTheme.typography.bodyMedium
             )
 
             Text(
                 text = ticketClass.description,
-                color = Neutral500,
+                color = colors.onSurfaceVariant,
                 style = MaterialTheme.typography.bodySmall
             )
 
             Text(
-                text = ticketClass.quota,
-                color = Neutral500,
+                text = "${ticketClass.facilities} • ${ticketClass.quota}",
+                color = colors.onSurface,
                 style = MaterialTheme.typography.bodySmall
             )
         }
 
         Text(
             text = ticketClass.price,
-            color = Primary2,
+            color = colors.primary,
             fontWeight = FontWeight.Bold,
             style = MaterialTheme.typography.bodyMedium
         )
@@ -675,10 +748,12 @@ private fun FacilitySection(
 private fun FacilityChip(
     text: String
 ) {
+    val colors = MaterialTheme.colorScheme
+
     Surface(
         shape = RoundedCornerShape(50.dp),
-        color = Color(0xFFF8FAFC),
-        border = BorderStroke(1.dp, Neutral200)
+        color = colors.surfaceVariant.copy(alpha = 0.72f),
+        border = BorderStroke(1.dp, colors.outlineVariant)
     ) {
         Row(
             modifier = Modifier.padding(horizontal = 12.dp, vertical = 7.dp),
@@ -687,7 +762,7 @@ private fun FacilityChip(
             Icon(
                 imageVector = Icons.Outlined.Shield,
                 contentDescription = null,
-                tint = Primary2,
+                tint = colors.primary,
                 modifier = Modifier.size(14.dp)
             )
 
@@ -695,9 +770,93 @@ private fun FacilityChip(
 
             Text(
                 text = text,
-                color = Neutral700,
+                color = colors.onSurface,
                 style = MaterialTheme.typography.labelSmall
             )
+        }
+    }
+}
+
+@Composable
+private fun TransitTimeline(
+    stops: List<String>,
+) {
+    val colors = MaterialTheme.colorScheme
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 4.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Surface(
+                modifier = Modifier.size(28.dp),
+                shape = CircleShape,
+                color = colors.primaryContainer.copy(alpha = 0.62f),
+            ) {
+                Box(
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Icon(
+                        imageVector = Icons.Outlined.Info,
+                        contentDescription = null,
+                        tint = colors.primary,
+                        modifier = Modifier.size(16.dp),
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.width(10.dp))
+
+            Text(
+                text = if (stops.size > 2) "Rencana Transit" else "Rute Perjalanan",
+                color = colors.onSurface,
+                fontWeight = FontWeight.SemiBold,
+                style = MaterialTheme.typography.bodySmall,
+            )
+        }
+
+        Column(
+            modifier = Modifier.padding(start = 8.dp, top = 2.dp),
+            verticalArrangement = Arrangement.spacedBy(0.dp),
+        ) {
+            stops.forEachIndexed { index, stop ->
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.Top,
+                ) {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                    ) {
+                        Surface(
+                            modifier = Modifier.size(10.dp),
+                            shape = CircleShape,
+                            color = if (index == 0 || index == stops.lastIndex) colors.primary else colors.onSurfaceVariant,
+                        ) {}
+
+                        if (index != stops.lastIndex) {
+                            Box(
+                                modifier = Modifier
+                                    .width(2.dp)
+                                    .height(22.dp)
+                                    .background(colors.outlineVariant),
+                            )
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.width(10.dp))
+
+                    Text(
+                        text = stop,
+                        modifier = Modifier.weight(1f),
+                        color = colors.onSurface,
+                        style = MaterialTheme.typography.bodySmall,
+                    )
+                }
+            }
         }
     }
 }
@@ -707,11 +866,13 @@ private fun DetailSectionCard(
     title: String,
     content: @Composable () -> Unit
 ) {
+    val colors = MaterialTheme.colorScheme
+
     Surface(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(18.dp),
-        color = White,
-        border = BorderStroke(1.dp, Neutral200),
+        color = colors.surface,
+        border = BorderStroke(1.dp, colors.outlineVariant),
         shadowElevation = 2.dp
     ) {
         Column(
@@ -720,7 +881,7 @@ private fun DetailSectionCard(
         ) {
             Text(
                 text = title,
-                color = Neutral700,
+                color = colors.onSurface,
                 fontWeight = FontWeight.Bold,
                 style = MaterialTheme.typography.titleMedium
             )
@@ -735,8 +896,11 @@ private fun DetailInfoRow(
     icon: ImageVector,
     label: String,
     value: String,
-    valueColor: androidx.compose.ui.graphics.Color = Neutral700
+    valueColor: androidx.compose.ui.graphics.Color = Color.Unspecified
 ) {
+    val colors = MaterialTheme.colorScheme
+    val resolvedValueColor = if (valueColor == Color.Unspecified) colors.onSurface else valueColor
+
     Row(
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.Top
@@ -744,7 +908,7 @@ private fun DetailInfoRow(
         Surface(
             modifier = Modifier.size(28.dp),
             shape = CircleShape,
-            color = Primary3
+            color = colors.primaryContainer.copy(alpha = 0.62f)
         ) {
             Box(
                 contentAlignment = Alignment.Center
@@ -752,7 +916,7 @@ private fun DetailInfoRow(
                 Icon(
                     imageVector = icon,
                     contentDescription = null,
-                    tint = Primary2,
+                    tint = colors.primary,
                     modifier = Modifier.size(16.dp)
                 )
             }
@@ -763,13 +927,13 @@ private fun DetailInfoRow(
         Text(
             text = label,
             modifier = Modifier.weight(1f),
-            color = Neutral500,
+            color = colors.onSurfaceVariant,
             style = MaterialTheme.typography.bodySmall
         )
 
         Text(
             text = value,
-            color = valueColor,
+            color = resolvedValueColor,
             fontWeight = FontWeight.SemiBold,
             style = MaterialTheme.typography.bodySmall,
             textAlign = TextAlign.End
@@ -781,17 +945,19 @@ private fun DetailInfoRow(
 private fun ScheduleNotFoundState(
     message: String = "Detail jadwal tidak ditemukan"
 ) {
+    val colors = MaterialTheme.colorScheme
+
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Background)
+            .background(colors.background)
             .padding(24.dp),
         contentAlignment = Alignment.Center
     ) {
         Surface(
-            color = White,
+            color = colors.surface,
             shape = MaterialTheme.shapes.large,
-            border = BorderStroke(1.dp, Neutral200)
+            border = BorderStroke(1.dp, colors.outlineVariant)
         ) {
             Column(
                 modifier = Modifier.padding(24.dp),
@@ -800,7 +966,7 @@ private fun ScheduleNotFoundState(
             ) {
                 Text(
                     text = "Detail jadwal tidak ditemukan",
-                    color = Neutral700,
+                    color = colors.onSurface,
                     fontWeight = FontWeight.Bold,
                     style = MaterialTheme.typography.titleMedium,
                     textAlign = TextAlign.Center
@@ -808,7 +974,7 @@ private fun ScheduleNotFoundState(
 
                 Text(
                     text = message,
-                    color = Neutral500,
+                    color = colors.onSurfaceVariant,
                     style = MaterialTheme.typography.bodyMedium,
                     textAlign = TextAlign.Center
                 )
@@ -873,23 +1039,68 @@ private fun ShipSchedule.toTicketClasses(): List<TicketClass> {
     return listOf(
         TicketClass(
             name = "Ekonomi",
-            description = "Tempat duduk standar penumpang",
+            description = "Area duduk reguler untuk perjalanan hemat.",
             price = economyPrice.toRupiah(),
-            quota = quotaText()
+            quota = quotaText(),
+            facilities = "Toilet, mushola, kantin, bagasi kabin. Makan belum termasuk."
         ),
         TicketClass(
             name = "Bisnis",
-            description = "Tempat duduk lebih nyaman",
+            description = "Kursi lebih lega dan area lebih tenang.",
             price = businessPrice.toRupiah(),
-            quota = if (quota <= 0) "Habis" else "12 kursi"
+            quota = if (quota <= 0) "Habis" else "12 kursi",
+            facilities = "Kursi reclining, prioritas boarding, bagasi kabin."
         ),
         TicketClass(
             name = "Kelas I",
-            description = "Kabin terbatas dengan fasilitas lebih lengkap",
+            description = "Ruang istirahat lebih privat untuk perjalanan jauh.",
             price = firstClassPrice.toRupiah(),
-            quota = if (quota <= 0) "Habis" else "6 kursi"
+            quota = if (quota <= 0) "Habis" else "6 kursi",
+            facilities = "Ruang istirahat, stopkontak, prioritas layanan terbatas."
         )
     )
+}
+
+private fun ShipSchedule.operatorName(): String {
+    return when {
+        shipName.contains("Nusa", ignoreCase = true) -> "PT Nusa Lautan Sejahtera"
+        shipName.contains("Flores", ignoreCase = true) -> "PT Flores Bahari Mandiri"
+        shipName.contains("Samudra", ignoreCase = true) -> "PT Samudra Timur Line"
+        shipName.contains("Lintas", ignoreCase = true) -> "PT Lintas Pulau Nusantara"
+        else -> "PT Pelayaran Nusantara"
+    }
+}
+
+private fun ShipSchedule.transitStops(
+    routeDirection: RouteDirection,
+): List<String> {
+    val route = routeText().lowercase()
+    val origin = "${routeDirection.origin} (${departureTime})"
+    val destination = "${routeDirection.destination} (${arrivalTime})"
+
+    return when {
+        route.contains("ende") && (route.contains("denpasar") || route.contains("bali")) -> {
+            listOf(origin, "Waingapu (transit)", "Bima (transit)", destination)
+        }
+
+        route.contains("ende") && route.contains("surabaya") -> {
+            listOf(origin, "Labuan Bajo (transit)", "Bima (transit)", destination)
+        }
+
+        route.contains("kupang") && route.contains("surabaya") -> {
+            listOf(origin, "Ende (transit)", "Makassar (transit)", destination)
+        }
+
+        route.contains("labuan bajo") && (route.contains("denpasar") || route.contains("bali")) -> {
+            listOf(origin, "Bima (transit)", destination)
+        }
+
+        route.contains("maumere") && route.contains("makassar") -> {
+            listOf(origin, "Baubau (transit)", destination)
+        }
+
+        else -> listOf(origin, destination)
+    }
 }
 
 private fun Int.toRupiah(): String {

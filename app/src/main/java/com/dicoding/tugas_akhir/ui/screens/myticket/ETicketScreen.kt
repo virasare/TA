@@ -27,6 +27,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -93,6 +96,9 @@ fun ETicketScreen(
     val eTicketUiState by viewModel.eTicketUiState.collectAsStateWithLifecycle()
 
     val context = LocalContext.current
+    var handledDownloadRequest by rememberSaveable(bookingId, paymentId) {
+        mutableStateOf(downloadRequest)
+    }
 
     LaunchedEffect(bookingId, paymentId) {
         when {
@@ -112,7 +118,8 @@ fun ETicketScreen(
 
         is ETicketUiState.Success -> {
             LaunchedEffect(downloadRequest, state.ticket.bookingId) {
-                if (downloadRequest > 0) {
+                if (downloadRequest > handledDownloadRequest) {
+                    handledDownloadRequest = downloadRequest
                     downloadETicketPdf(
                         context = context,
                         ticket = state.ticket,
@@ -160,6 +167,10 @@ private fun ETicketContent(
 
         PassengerListCard(ticket = ticket)
 
+        BoardingInfoCard(ticket = ticket)
+
+        ImportantInfoCard()
+
         if (ticket.status.equals("Aktif", ignoreCase = true)) {
             ManageTicketCard(
                 bookingId = ticket.bookingId,
@@ -167,10 +178,6 @@ private fun ETicketContent(
                 onRescheduleClick = onRescheduleClick,
             )
         }
-
-        BoardingInfoCard(ticket = ticket)
-
-        ImportantInfoCard()
 
         Spacer(modifier = Modifier.height(12.dp))
     }
@@ -181,15 +188,17 @@ private fun ETicketBoardingPassCard(
     ticket: ETicket,
     modifier: Modifier = Modifier,
 ) {
+    val colors = MaterialTheme.colorScheme
+
     Card(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(30.dp),
         colors = CardDefaults.cardColors(
-            containerColor = White,
+            containerColor = colors.surface,
         ),
         border = BorderStroke(
             width = 1.dp,
-            color = Neutral200,
+            color = colors.outlineVariant,
         ),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
     ) {
@@ -329,6 +338,8 @@ private fun QrTicketSection(
     ticket: ETicket,
     modifier: Modifier = Modifier,
 ) {
+    val colors = MaterialTheme.colorScheme
+
     Column(
         modifier = modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -336,10 +347,10 @@ private fun QrTicketSection(
     ) {
         Surface(
             shape = RoundedCornerShape(26.dp),
-            color = Neutral100,
+            color = colors.surfaceVariant,
             border = BorderStroke(
                 width = 1.dp,
-                color = Neutral200,
+                color = colors.outlineVariant,
             ),
         ) {
             Box(
@@ -348,6 +359,7 @@ private fun QrTicketSection(
             ) {
                 FakeQrCode(
                     value = ticket.qrCode,
+                    qrSize = 220.dp,
                 )
             }
         }
@@ -358,7 +370,7 @@ private fun QrTicketSection(
         ) {
             Text(
                 text = "Scan QR saat check-in",
-                color = Black,
+                color = colors.onSurface,
                 style = MaterialTheme.typography.titleSmall,
                 fontWeight = FontWeight.Bold,
                 textAlign = TextAlign.Center,
@@ -366,7 +378,7 @@ private fun QrTicketSection(
 
             Text(
                 text = "Tunjukkan kode ini kepada petugas pelabuhan. Pastikan layar cukup terang.",
-                color = Neutral500,
+                color = colors.onSurfaceVariant,
                 style = MaterialTheme.typography.bodySmall,
                 textAlign = TextAlign.Center,
             )
@@ -425,10 +437,12 @@ private fun TicketInfoItem(
     value: String,
     modifier: Modifier = Modifier,
 ) {
+    val colors = MaterialTheme.colorScheme
+
     Surface(
         modifier = modifier,
         shape = RoundedCornerShape(18.dp),
-        color = Neutral100,
+        color = colors.surfaceVariant,
     ) {
         Column(
             modifier = Modifier.padding(14.dp),
@@ -436,14 +450,14 @@ private fun TicketInfoItem(
         ) {
             Text(
                 text = title,
-                color = Neutral500,
+                color = colors.onSurfaceVariant,
                 style = MaterialTheme.typography.labelSmall,
                 maxLines = 1,
             )
 
             Text(
                 text = value,
-                color = Black,
+                color = colors.onSurface,
                 style = MaterialTheme.typography.bodyMedium,
                 fontWeight = FontWeight.SemiBold,
                 maxLines = 2,
@@ -458,15 +472,17 @@ private fun PassengerListCard(
     ticket: ETicket,
     modifier: Modifier = Modifier,
 ) {
+    val colors = MaterialTheme.colorScheme
+
     Card(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(24.dp),
         colors = CardDefaults.cardColors(
-            containerColor = White,
+            containerColor = colors.surface,
         ),
         border = BorderStroke(
             width = 1.dp,
-            color = Neutral200,
+            color = colors.outlineVariant,
         ),
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
     ) {
@@ -483,7 +499,7 @@ private fun PassengerListCard(
                 Surface(
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(18.dp),
-                    color = Neutral100,
+                    color = colors.surfaceVariant,
                 ) {
                     Row(
                         modifier = Modifier.padding(14.dp),
@@ -493,14 +509,14 @@ private fun PassengerListCard(
                         Surface(
                             modifier = Modifier.size(36.dp),
                             shape = CircleShape,
-                            color = Primary3,
+                            color = colors.primaryContainer,
                         ) {
                             Box(
                                 contentAlignment = Alignment.Center,
                             ) {
                                 Text(
                                     text = "${index + 1}",
-                                    color = Primary2,
+                                    color = colors.primary,
                                     style = MaterialTheme.typography.labelMedium,
                                     fontWeight = FontWeight.Bold,
                                 )
@@ -513,7 +529,7 @@ private fun PassengerListCard(
                         ) {
                             Text(
                                 text = passenger.fullName,
-                                color = Black,
+                                color = colors.onSurface,
                                 style = MaterialTheme.typography.bodyMedium,
                                 fontWeight = FontWeight.SemiBold,
                                 maxLines = 1,
@@ -521,8 +537,26 @@ private fun PassengerListCard(
                             )
 
                             Text(
-                                text = "NIK: ${maskNik(passenger.nik)}",
-                                color = Neutral500,
+                                text = "NIK: ${passenger.nik}",
+                                color = colors.onSurfaceVariant,
+                                style = MaterialTheme.typography.bodySmall,
+                            )
+
+                            Text(
+                                text = "No. HP: ${passenger.phoneNumber}",
+                                color = colors.onSurfaceVariant,
+                                style = MaterialTheme.typography.bodySmall,
+                            )
+
+                            Text(
+                                text = "Tanggal Lahir: ${passenger.birthDate.ifBlank { "-" }}",
+                                color = colors.onSurfaceVariant,
+                                style = MaterialTheme.typography.bodySmall,
+                            )
+
+                            Text(
+                                text = "Jenis Kelamin: ${passenger.gender.ifBlank { "-" }}",
+                                color = colors.onSurfaceVariant,
                                 style = MaterialTheme.typography.bodySmall,
                             )
                         }
@@ -540,15 +574,17 @@ private fun ManageTicketCard(
     onRescheduleClick: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val colors = MaterialTheme.colorScheme
+
     Card(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(24.dp),
         colors = CardDefaults.cardColors(
-            containerColor = White,
+            containerColor = colors.surface,
         ),
         border = BorderStroke(
             width = 1.dp,
-            color = Neutral200,
+            color = colors.outlineVariant,
         ),
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
     ) {
@@ -616,15 +652,17 @@ private fun BoardingInfoCard(
     ticket: ETicket,
     modifier: Modifier = Modifier,
 ) {
+    val colors = MaterialTheme.colorScheme
+
     Card(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(24.dp),
         colors = CardDefaults.cardColors(
-            containerColor = White,
+            containerColor = colors.surface,
         ),
         border = BorderStroke(
             width = 1.dp,
-            color = Neutral200,
+            color = colors.outlineVariant,
         ),
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
     ) {
@@ -648,6 +686,11 @@ private fun BoardingInfoCard(
             )
 
             BoardingInfoRow(
+                title = "Transit",
+                value = ticket.transitInfo,
+            )
+
+            BoardingInfoRow(
                 title = "Diterbitkan",
                 value = ticket.issuedAt,
             )
@@ -656,7 +699,7 @@ private fun BoardingInfoCard(
 
             Text(
                 text = ticket.note,
-                color = Neutral500,
+                color = colors.onSurfaceVariant,
                 style = MaterialTheme.typography.bodySmall,
             )
         }
@@ -667,13 +710,15 @@ private fun BoardingInfoCard(
 private fun ImportantInfoCard(
     modifier: Modifier = Modifier,
 ) {
+    val colors = MaterialTheme.colorScheme
+
     Surface(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(20.dp),
-        color = InfoLight,
+        color = colors.surfaceVariant,
         border = BorderStroke(
             width = 1.dp,
-            color = Color(0xFFBBD7FF),
+            color = colors.outlineVariant,
         ),
     ) {
         Column(
@@ -682,14 +727,14 @@ private fun ImportantInfoCard(
         ) {
             Text(
                 text = "Informasi Penting",
-                color = Primary1,
+                color = colors.onSurface,
                 style = MaterialTheme.typography.titleSmall,
                 fontWeight = FontWeight.Bold,
             )
 
             Text(
                 text = "Datang lebih awal ke pelabuhan dan siapkan identitas sesuai data penumpang. E-ticket ini berlaku sebagai bukti pemesanan yang sah.",
-                color = Neutral700,
+                color = colors.onSurfaceVariant,
                 style = MaterialTheme.typography.bodySmall,
             )
         }
@@ -702,20 +747,22 @@ private fun SectionHeader(
     description: String,
     modifier: Modifier = Modifier,
 ) {
+    val colors = MaterialTheme.colorScheme
+
     Column(
         modifier = modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(4.dp),
     ) {
         Text(
             text = title,
-            color = Black,
+            color = colors.onSurface,
             style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.Bold,
         )
 
         Text(
             text = description,
-            color = Neutral500,
+            color = colors.onSurfaceVariant,
             style = MaterialTheme.typography.bodySmall,
         )
     }
@@ -727,6 +774,8 @@ private fun BoardingInfoRow(
     value: String,
     modifier: Modifier = Modifier,
 ) {
+    val colors = MaterialTheme.colorScheme
+
     Row(
         modifier = modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -734,14 +783,14 @@ private fun BoardingInfoRow(
     ) {
         Text(
             text = title,
-            color = Neutral500,
+            color = colors.onSurfaceVariant,
             style = MaterialTheme.typography.bodyMedium,
             modifier = Modifier.weight(1f),
         )
 
         Text(
             text = value,
-            color = Black,
+            color = colors.onSurface,
             style = MaterialTheme.typography.bodyMedium,
             fontWeight = FontWeight.SemiBold,
             textAlign = TextAlign.End,
@@ -754,6 +803,8 @@ private fun BoardingInfoRow(
 private fun TicketPerforationDivider(
     modifier: Modifier = Modifier,
 ) {
+    val colors = MaterialTheme.colorScheme
+
     Row(
         modifier = modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
@@ -761,7 +812,7 @@ private fun TicketPerforationDivider(
         Surface(
             modifier = Modifier.size(10.dp),
             shape = CircleShape,
-            color = Background,
+            color = colors.background,
         ) {}
 
         Box(
@@ -772,14 +823,14 @@ private fun TicketPerforationDivider(
         ) {
             Surface(
                 modifier = Modifier.fillMaxSize(),
-                color = Neutral200,
+                color = colors.outlineVariant,
             ) {}
         }
 
         Surface(
             modifier = Modifier.size(10.dp),
             shape = CircleShape,
-            color = Background,
+            color = colors.background,
         ) {}
     }
 }
@@ -835,11 +886,84 @@ private fun ETicketStatusPill(
     }
 }
 
-private fun maskNik(nik: String): String {
-    return if (nik.length >= 6) {
-        nik.take(6) + "xxxxxxxxxx"
-    } else {
-        nik
+private fun drawPdfLabelValue(
+    canvas: android.graphics.Canvas,
+    label: String,
+    value: String,
+    x: Float,
+    y: Float,
+    labelPaint: Paint,
+    valuePaint: Paint,
+) {
+    canvas.drawText(label, x, y, labelPaint)
+    canvas.drawText(value.take(28), x, y + 20f, valuePaint)
+}
+
+private fun drawDummyTicketQr(
+    canvas: android.graphics.Canvas,
+    value: String,
+    left: Float,
+    top: Float,
+    size: Float,
+) {
+    val whitePaint = Paint().apply {
+        color = android.graphics.Color.WHITE
+        style = Paint.Style.FILL
+    }
+    val blackPaint = Paint().apply {
+        color = android.graphics.Color.BLACK
+        style = Paint.Style.FILL
+    }
+    val borderPaint = Paint().apply {
+        color = android.graphics.Color.rgb(229, 231, 235)
+        style = Paint.Style.STROKE
+        strokeWidth = 2f
+    }
+
+    canvas.drawRect(left, top, left + size, top + size, whitePaint)
+    canvas.drawRect(left, top, left + size, top + size, borderPaint)
+
+    val cells = 21
+    val cellSize = size / cells
+    val seed = value.hashCode().let { if (it < 0) -it else it }
+
+    fun drawCell(x: Int, y: Int) {
+        canvas.drawRect(
+            left + x * cellSize,
+            top + y * cellSize,
+            left + (x + 1) * cellSize,
+            top + (y + 1) * cellSize,
+            blackPaint,
+        )
+    }
+
+    fun drawFinder(startX: Int, startY: Int) {
+        for (x in 0 until 7) {
+            for (y in 0 until 7) {
+                val isBorder = x == 0 || y == 0 || x == 6 || y == 6
+                val isCenter = x in 2..4 && y in 2..4
+                if (isBorder || isCenter) {
+                    drawCell(startX + x, startY + y)
+                }
+            }
+        }
+    }
+
+    drawFinder(0, 0)
+    drawFinder(14, 0)
+    drawFinder(0, 14)
+
+    for (x in 0 until cells) {
+        for (y in 0 until cells) {
+            val inFinder = (x in 0..6 && y in 0..6) ||
+                    (x in 14..20 && y in 0..6) ||
+                    (x in 0..6 && y in 14..20)
+
+            val shouldDraw = !inFinder && ((x * 31 + y * 17 + seed) % 5) < 2
+            if (shouldDraw) {
+                drawCell(x, y)
+            }
+        }
     }
 }
 
@@ -853,10 +977,36 @@ private fun downloadETicketPdf(
     val page = pdfDocument.startPage(pageInfo)
     val canvas = page.canvas
 
-    val titlePaint = Paint().apply {
-        textSize = 22f
-        typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
+    val bluePaint = Paint().apply {
         color = android.graphics.Color.rgb(25, 118, 210)
+        style = Paint.Style.FILL
+    }
+
+    val lightPaint = Paint().apply {
+        color = android.graphics.Color.rgb(232, 242, 253)
+        style = Paint.Style.FILL
+    }
+
+    val titlePaint = Paint().apply {
+        textSize = 24f
+        typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
+        color = android.graphics.Color.WHITE
+    }
+
+    val whiteBodyPaint = Paint().apply {
+        textSize = 13f
+        color = android.graphics.Color.WHITE
+    }
+
+    val sectionPaint = Paint().apply {
+        textSize = 18f
+        typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
+        color = android.graphics.Color.rgb(17, 24, 39)
+    }
+
+    val labelPaint = Paint().apply {
+        textSize = 11f
+        color = android.graphics.Color.rgb(107, 114, 128)
     }
 
     val bodyPaint = Paint().apply {
@@ -864,38 +1014,56 @@ private fun downloadETicketPdf(
         color = android.graphics.Color.rgb(17, 24, 39)
     }
 
-    var y = 72f
-
-    canvas.drawText("E-Ticket Kapal", 48f, y, titlePaint)
-    y += 34f
-    canvas.drawText("Kode Booking: ${ticket.bookingCode}", 48f, y, bodyPaint)
-    y += 26f
-    canvas.drawText("Status: ${ticket.status}", 48f, y, bodyPaint)
-    y += 34f
-    canvas.drawText("Kapal: ${ticket.shipName}", 48f, y, bodyPaint)
-    y += 26f
-    canvas.drawText("Rute: ${ticket.origin} - ${ticket.destination}", 48f, y, bodyPaint)
-    y += 26f
-    canvas.drawText("Tanggal: ${DateFormatter.formatDate(ticket.departureDate)}", 48f, y, bodyPaint)
-    y += 26f
-    canvas.drawText("Jam: ${ticket.departureTime}", 48f, y, bodyPaint)
-    y += 26f
-    canvas.drawText("Kelas: ${ticket.ticketClassName}", 48f, y, bodyPaint)
-    y += 40f
-    canvas.drawText("Data Penumpang", 48f, y, titlePaint)
-    y += 30f
-
-    ticket.passengers.forEachIndexed { index, passenger ->
-        canvas.drawText("${index + 1}. ${passenger.fullName} - NIK: ${maskNik(passenger.nik)}", 48f, y, bodyPaint)
-        y += 24f
+    val boldPaint = Paint(bodyPaint).apply {
+        typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
     }
 
-    y += 24f
-    canvas.drawText("Terminal: ${ticket.terminal}", 48f, y, bodyPaint)
-    y += 24f
-    canvas.drawText("Gate: ${ticket.gate}", 48f, y, bodyPaint)
-    y += 34f
-    canvas.drawText(ticket.note.take(80), 48f, y, bodyPaint)
+    canvas.drawRect(36f, 36f, 559f, 230f, bluePaint)
+    canvas.drawText("E-Ticket Kapal", 56f, 74f, titlePaint)
+    canvas.drawText("Kode Booking: ${ticket.bookingCode}", 56f, 100f, whiteBodyPaint)
+    canvas.drawText("Status: ${ticket.status}", 56f, 122f, whiteBodyPaint)
+
+    canvas.drawText(ticket.origin, 56f, 174f, titlePaint)
+    canvas.drawText("Pelabuhan asal", 56f, 196f, whiteBodyPaint)
+    canvas.drawText("→", 272f, 174f, titlePaint)
+    canvas.drawText(ticket.destination, 338f, 174f, titlePaint)
+    canvas.drawText("Pelabuhan tujuan", 338f, 196f, whiteBodyPaint)
+
+    canvas.drawRect(36f, 248f, 559f, 396f, lightPaint)
+    canvas.drawText("Detail Perjalanan", 56f, 284f, sectionPaint)
+    drawPdfLabelValue(canvas, "Kapal", ticket.shipName, 56f, 318f, labelPaint, boldPaint)
+    drawPdfLabelValue(canvas, "Tanggal", DateFormatter.formatDate(ticket.departureDate), 56f, 358f, labelPaint, boldPaint)
+    drawPdfLabelValue(canvas, "Jam Berangkat", ticket.departureTime, 300f, 318f, labelPaint, boldPaint)
+    drawPdfLabelValue(canvas, "Kelas", ticket.ticketClassName, 300f, 358f, labelPaint, boldPaint)
+
+    canvas.drawText("QR Check-in", 56f, 440f, sectionPaint)
+    drawDummyTicketQr(
+        canvas = canvas,
+        value = ticket.qrCode,
+        left = 56f,
+        top = 458f,
+        size = 190f,
+    )
+
+    canvas.drawText("Data Penumpang", 286f, 440f, sectionPaint)
+    var passengerY = 472f
+    ticket.passengers.forEachIndexed { index, passenger ->
+        canvas.drawText("${index + 1}. ${passenger.fullName}", 286f, passengerY, boldPaint)
+        passengerY += 18f
+        canvas.drawText("NIK: ${passenger.nik}", 286f, passengerY, bodyPaint)
+        passengerY += 18f
+        canvas.drawText("HP: ${passenger.phoneNumber}", 286f, passengerY, bodyPaint)
+        passengerY += 18f
+        canvas.drawText("Lahir: ${passenger.birthDate.ifBlank { "-" }}", 286f, passengerY, bodyPaint)
+        passengerY += 18f
+        canvas.drawText("Gender: ${passenger.gender.ifBlank { "-" }}", 286f, passengerY, bodyPaint)
+        passengerY += 24f
+    }
+
+    canvas.drawText("Informasi Boarding", 56f, 700f, sectionPaint)
+    canvas.drawText("Terminal: ${ticket.terminal}", 56f, 730f, bodyPaint)
+    canvas.drawText("Gate: ${ticket.gate}", 56f, 754f, bodyPaint)
+    canvas.drawText(ticket.note.take(90), 56f, 786f, bodyPaint)
 
     pdfDocument.finishPage(page)
 

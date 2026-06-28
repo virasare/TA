@@ -45,17 +45,11 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.dicoding.tugas_akhir.core.utils.PriceFormatter
+import com.dicoding.tugas_akhir.domain.model.SavedPassenger
 import com.dicoding.tugas_akhir.ui.components.dialog.buttons.PrimaryButton
 import com.dicoding.tugas_akhir.ui.components.forms.PassengerInputForm
 import com.dicoding.tugas_akhir.ui.state.CreateBookingUiState
 import com.dicoding.tugas_akhir.ui.state.PassengerFormState
-import com.dicoding.tugas_akhir.ui.theme.Background
-import com.dicoding.tugas_akhir.ui.theme.Neutral200
-import com.dicoding.tugas_akhir.ui.theme.Neutral500
-import com.dicoding.tugas_akhir.ui.theme.Neutral700
-import com.dicoding.tugas_akhir.ui.theme.Primary2
-import com.dicoding.tugas_akhir.ui.theme.Primary3
-import com.dicoding.tugas_akhir.ui.theme.White
 import com.dicoding.tugas_akhir.ui.viewmodel.BookingViewModel
 import com.dicoding.tugas_akhir.ui.viewmodel.ViewModelFactory
 import androidx.compose.runtime.mutableStateMapOf
@@ -110,6 +104,14 @@ fun PassengerFormScreen(
     val isCurrentFormValid = currentForm.isValid
     val isLastPassenger = selectedPassengerIndex == passengerForms.lastIndex
     val totalPrice = ticketPrice * passengerCount
+    val isCurrentPassengerAlreadySaved = remember(
+        currentForm,
+        savedPassengerUiState.savedPassengers,
+    ) {
+        savedPassengerUiState.savedPassengers.any { savedPassenger ->
+            savedPassenger.hasSameData(currentForm)
+        }
+    }
 
     LaunchedEffect(passengerCount) {
         viewModel.preparePassengerForms(passengerCount)
@@ -127,6 +129,12 @@ fun PassengerFormScreen(
         if (state is CreateBookingUiState.Success) {
             onBookingCreated(state.booking.id)
             viewModel.resetCreateBookingState()
+        }
+    }
+
+    LaunchedEffect(selectedPassengerIndex, isCurrentPassengerAlreadySaved) {
+        if (isCurrentPassengerAlreadySaved) {
+            savePassengerCheckedMap[selectedPassengerIndex] = false
         }
     }
 
@@ -160,7 +168,11 @@ fun PassengerFormScreen(
                 val shouldSaveCurrentPassenger =
                     savePassengerCheckedMap[selectedPassengerIndex] ?: false
 
-                if (shouldSaveCurrentPassenger && currentForm.isValid) {
+                if (
+                    shouldSaveCurrentPassenger &&
+                    currentForm.isValid &&
+                    !isCurrentPassengerAlreadySaved
+                ) {
                     savedPassengerViewModel.savePassengerFromBooking(
                         fullName = currentForm.fullName,
                         nik = currentForm.nik,
@@ -259,13 +271,15 @@ fun PassengerFormScreen(
                 )
             }
 
-            item {
-                SavePassengerDataCheckboxCard(
-                    saveToPassengerData = savePassengerCheckedMap[selectedPassengerIndex] ?: false,
-                    onSaveCheckedChange = { checked ->
-                        savePassengerCheckedMap[selectedPassengerIndex] = checked
-                    },
-                )
+            if (!isCurrentPassengerAlreadySaved) {
+                item {
+                    SavePassengerDataCheckboxCard(
+                        saveToPassengerData = savePassengerCheckedMap[selectedPassengerIndex] ?: false,
+                        onSaveCheckedChange = { checked ->
+                            savePassengerCheckedMap[selectedPassengerIndex] = checked
+                        },
+                    )
+                }
             }
 
             if (createBookingUiState is CreateBookingUiState.Error) {
@@ -298,7 +312,11 @@ fun PassengerFormScreen(
                     val shouldSaveCurrentPassenger =
                         savePassengerCheckedMap[selectedPassengerIndex] ?: false
 
-                    if (shouldSaveCurrentPassenger && currentForm.isValid) {
+                    if (
+                        shouldSaveCurrentPassenger &&
+                        currentForm.isValid &&
+                        !isCurrentPassengerAlreadySaved
+                    ) {
                         savedPassengerViewModel.savePassengerFromBooking(
                             fullName = currentForm.fullName,
                             nik = currentForm.nik,
@@ -326,8 +344,8 @@ private fun PassengerFormHeader(
     Surface(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(20.dp),
-        color = White,
-        border = BorderStroke(1.dp, Neutral200),
+        color = MaterialTheme.colorScheme.surface,
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
         shadowElevation = 2.dp
     ) {
         Row(
@@ -337,13 +355,13 @@ private fun PassengerFormHeader(
             Surface(
                 modifier = Modifier.size(46.dp),
                 shape = RoundedCornerShape(15.dp),
-                color = Primary3
+                color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.58f)
             ) {
                 Box(contentAlignment = Alignment.Center) {
                     Icon(
                         imageVector = Icons.Outlined.Person,
                         contentDescription = null,
-                        tint = Primary2,
+                        tint = MaterialTheme.colorScheme.primary,
                         modifier = Modifier.size(25.dp)
                     )
                 }
@@ -357,14 +375,14 @@ private fun PassengerFormHeader(
             ) {
                 Text(
                     text = "Data Penumpang",
-                    color = Neutral700,
+                    color = MaterialTheme.colorScheme.onSurface,
                     fontWeight = FontWeight.Bold,
                     style = MaterialTheme.typography.titleMedium
                 )
 
                 Text(
                     text = "$passengerCount penumpang • ${PriceFormatter.formatToRupiah(totalPrice)}",
-                    color = Neutral500,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     style = MaterialTheme.typography.bodySmall
                 )
             }
@@ -379,8 +397,8 @@ private fun BookingStepCard(
     Surface(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(18.dp),
-        color = White,
-        border = BorderStroke(1.dp, Neutral200),
+        color = MaterialTheme.colorScheme.surface,
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
         shadowElevation = 1.dp
     ) {
         Column(
@@ -389,7 +407,7 @@ private fun BookingStepCard(
         ) {
             Text(
                 text = "Proses Pemesanan",
-                color = Neutral700,
+                color = MaterialTheme.colorScheme.onSurface,
                 fontWeight = FontWeight.Bold,
                 style = MaterialTheme.typography.titleSmall
             )
@@ -440,8 +458,8 @@ private fun PassengerTabSection(
     Surface(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(18.dp),
-        color = White,
-        border = BorderStroke(1.dp, Neutral200),
+        color = MaterialTheme.colorScheme.surface,
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
         shadowElevation = 1.dp
     ) {
         Column(
@@ -454,14 +472,14 @@ private fun PassengerTabSection(
             ) {
                 Text(
                     text = "Pilih Penumpang",
-                    color = Neutral700,
+                    color = MaterialTheme.colorScheme.onSurface,
                     fontWeight = FontWeight.Bold,
                     style = MaterialTheme.typography.titleSmall
                 )
 
                 Text(
                     text = "Tanda centang berarti data sudah lengkap.",
-                    color = Neutral500,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     style = MaterialTheme.typography.bodySmall
                 )
             }
@@ -499,10 +517,10 @@ private fun PassengerTabChip(
         modifier = modifier,
         onClick = onClick,
         shape = RoundedCornerShape(50.dp),
-        color = if (selected) Primary2 else White,
+        color = if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface,
         border = BorderStroke(
             width = 1.dp,
-            color = if (selected || completed) Primary2 else Neutral200
+            color = if (selected || completed) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outlineVariant
         )
     ) {
         Row(
@@ -516,7 +534,7 @@ private fun PassengerTabChip(
                     else -> Icons.Outlined.Person
                 },
                 contentDescription = null,
-                tint = if (selected) White else if (completed) Primary2 else Neutral500,
+                tint = if (selected) MaterialTheme.colorScheme.onPrimary else if (completed) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.size(16.dp)
             )
 
@@ -524,7 +542,7 @@ private fun PassengerTabChip(
 
             Text(
                 text = "P$passengerNumber",
-                color = if (selected) White else Neutral700,
+                color = if (selected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface,
                 fontWeight = FontWeight.SemiBold,
                 style = MaterialTheme.typography.labelMedium
             )
@@ -556,10 +574,10 @@ private fun StepItem(
         Surface(
             modifier = Modifier.size(30.dp),
             shape = CircleShape,
-            color = if (active || done) Primary2 else Background,
+            color = if (active || done) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant,
             border = BorderStroke(
                 width = 1.dp,
-                color = if (active || done) Primary2 else Neutral200
+                color = if (active || done) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outlineVariant
             )
         ) {
             Box(contentAlignment = Alignment.Center) {
@@ -567,13 +585,13 @@ private fun StepItem(
                     Icon(
                         imageVector = Icons.Outlined.TaskAlt,
                         contentDescription = null,
-                        tint = White,
+                        tint = MaterialTheme.colorScheme.onPrimary,
                         modifier = Modifier.size(17.dp)
                     )
                 } else {
                     Text(
                         text = number,
-                        color = if (active) White else Neutral500,
+                        color = if (active) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant,
                         fontWeight = FontWeight.Bold,
                         style = MaterialTheme.typography.labelMedium
                     )
@@ -583,7 +601,7 @@ private fun StepItem(
 
         Text(
             text = title,
-            color = if (active) Primary2 else Neutral500,
+            color = if (active) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
             fontWeight = if (active) FontWeight.Bold else FontWeight.Normal,
             style = MaterialTheme.typography.labelSmall,
             textAlign = TextAlign.Center
@@ -597,7 +615,7 @@ private fun StepLine(
 ) {
     HorizontalDivider(
         modifier = modifier.padding(horizontal = 4.dp),
-        color = Neutral200
+        color = MaterialTheme.colorScheme.outlineVariant
     )
 }
 
@@ -613,14 +631,14 @@ private fun SectionTitle(
     ) {
         Text(
             text = title,
-            color = Neutral700,
+            color = MaterialTheme.colorScheme.onSurface,
             fontWeight = FontWeight.Bold,
             style = MaterialTheme.typography.titleMedium
         )
 
         Text(
             text = description,
-            color = Neutral500,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
             style = MaterialTheme.typography.bodySmall
         )
     }
@@ -633,8 +651,8 @@ private fun PassengerNoteCard(
     Surface(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
-        color = Primary3,
-        border = BorderStroke(1.dp, Neutral200)
+        color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.58f),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
     ) {
         Row(
             modifier = Modifier.padding(14.dp),
@@ -643,7 +661,7 @@ private fun PassengerNoteCard(
             Icon(
                 imageVector = Icons.Outlined.Badge,
                 contentDescription = null,
-                tint = Primary2,
+                tint = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.size(20.dp)
             )
 
@@ -651,7 +669,7 @@ private fun PassengerNoteCard(
 
             Text(
                 text = "Data penumpang akan digunakan untuk penerbitan e-ticket. Gunakan chip penumpang di atas untuk mengecek data satu per satu.",
-                color = Neutral700,
+                color = MaterialTheme.colorScheme.onSurface,
                 style = MaterialTheme.typography.bodySmall
             )
         }
@@ -698,8 +716,8 @@ private fun PassengerFormBottomBar(
 
     Surface(
         modifier = modifier.fillMaxWidth(),
-        color = White,
-        border = BorderStroke(1.dp, Neutral200),
+        color = MaterialTheme.colorScheme.surface,
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
         shadowElevation = 8.dp
     ) {
         Column(
@@ -719,13 +737,13 @@ private fun PassengerFormBottomBar(
                 ) {
                     Text(
                         text = "$passengerCount penumpang",
-                        color = Neutral500,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                         style = MaterialTheme.typography.bodySmall
                     )
 
                     Text(
                         text = PriceFormatter.formatToRupiah(totalPrice),
-                        color = Neutral700,
+                        color = MaterialTheme.colorScheme.onSurface,
                         fontWeight = FontWeight.Bold,
                         style = MaterialTheme.typography.titleMedium
                     )
@@ -733,7 +751,7 @@ private fun PassengerFormBottomBar(
 
                 Surface(
                     shape = RoundedCornerShape(50.dp),
-                    color = Primary3
+                    color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.58f)
                 ) {
                     Row(
                         modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
@@ -742,7 +760,7 @@ private fun PassengerFormBottomBar(
                         Icon(
                             imageVector = Icons.Outlined.EventSeat,
                             contentDescription = null,
-                            tint = Primary2,
+                            tint = MaterialTheme.colorScheme.primary,
                             modifier = Modifier.size(15.dp)
                         )
 
@@ -750,7 +768,7 @@ private fun PassengerFormBottomBar(
 
                         Text(
                             text = "P${selectedPassengerIndex + 1}/$totalPassenger",
-                            color = Primary2,
+                            color = MaterialTheme.colorScheme.primary,
                             fontWeight = FontWeight.SemiBold,
                             style = MaterialTheme.typography.labelSmall
                         )
@@ -773,10 +791,20 @@ private fun PassengerFormBottomBar(
                     CircularProgressIndicator(
                         modifier = Modifier.size(18.dp),
                         strokeWidth = 2.dp,
-                        color = Primary2
+                        color = MaterialTheme.colorScheme.primary
                     )
                 }
             }
         }
     }
+}
+
+private fun SavedPassenger.hasSameData(
+    formState: PassengerFormState,
+): Boolean {
+    return fullName.trim().equals(formState.fullName.trim(), ignoreCase = true) &&
+            nik.trim() == formState.nik.trim() &&
+            phoneNumber.trim() == formState.phoneNumber.trim() &&
+            birthDate.trim() == formState.birthDate.trim() &&
+            gender.trim().equals(formState.gender.trim(), ignoreCase = true)
 }
